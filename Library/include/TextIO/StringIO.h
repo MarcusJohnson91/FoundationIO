@@ -29,7 +29,7 @@ extern "C" {
      @constant     UTF16BOM_LE                           UTF16BOM_LE byte order mark.
      @constant     UTF16BOM_BE                           UTF16BOM_BE byte order mark.
      @constant     UTF32BOM_LE                           UTF32BOM_LE byte order mark.
-     @constant     UTF32BOM_BE                           UTF32BOM_LE byte order mark.
+     @constant     UTF32BOM_BE                           UTF32BOM_BE byte order mark.
      @constant     UnicodeUNCPathPrefixSize              Size of "//?/" or "\\?\" in CodePoints and CodeUnits.
      @constant     UTF16HighSurrogateStart               The value that marks the start of the High Surrogate range.
      @constant     UTF16HighSurrogateEnd                 The value that marks the end   of the High Surrogate range.
@@ -141,64 +141,10 @@ extern "C" {
     } StringIO_WhitespaceTypes;
     
     /*!
-     @typedef          StringSlice
-     @abstract                                           Contains the start and end position in codeunits of a string for UTF8, UTF16, and UTF32
+     @typedef          StringIO_Slice
+     @abstract                                           Contains the start and end position (in CodeUnits) of a string for immutable access.
      */
-    typedef struct     StringSlice                       StringSlice;
-    
-    /*!
-     @abstract                                           Creates an instance of a StringSlice.
-     @param            String                            The String to Slice.
-     @param            StringType                        The type of the string.
-     @param            StartInCodeUnits                  Where should the string start?
-     @param            EndInCodeUnits                    Where should the string end?
-     */
-    StringSlice       *StringSlice_Init(void *String, TextIO_StringTypes StringType, uint64_t StartInCodeUnits, uint64_t EndInCodeUnits);
-    
-    /*!
-     @abstract                                           Where does this slice start?
-     @param            Slice                             The instance of the StringSlice.
-     @return                                             The Start of the StringSlice in CodeUnits.
-     */
-    uint64_t           StringSlice_GetStartInCodeUnits(StringSlice *Slice);
-    
-    /*!
-     @abstract                                           Where does this slice end?
-     @param            Slice                             The instance of the StringSlice.
-     @return                                             The End of the StringSlice in CodeUnits.
-     */
-    uint64_t           StringSlice_GetEndInCodeUnits(StringSlice *Slice);
-    
-    /*!
-     @abstract                                           What is the type of the embedded String?
-     @param            Slice                             The instance of the StringSlice.
-     @return                                             The type of the embedded string.
-     */
-    TextIO_StringTypes StringSlice_GetStringType(StringSlice *Slice);
-    
-    /*!
-     @abstract                                           Returns the embedded string casted as a UTF8 string
-     @remark                                             Checks the type of the embedded string, returns NULL if it does not match the return type
-     @param            Slice                             The instance of the StringSlice.
-     @return                                             The embedded string properly casted.
-     */
-    UTF8              *StringSlice_GetUTF8String(StringSlice *Slice);
-    
-    /*!
-     @abstract                                           Returns the embedded string casted as a UTF8 string
-     @remark                                             Checks the type of the embedded string, returns NULL if it does not match the return type
-     @param            Slice                             The instance of the StringSlice.
-     @return                                             The embedded string properly casted.
-     */
-    UTF16             *StringSlice_GetUTF16String(StringSlice *Slice);
-    
-    /*!
-     @abstract                                           Returns the embedded string casted as a UTF8 string
-     @remark                                             Checks the type of the embedded string, returns NULL if it does not match the return type
-     @param            Slice                             The instance of the StringSlice.
-     @return                                             The embedded string properly casted.
-     */
-    UTF32             *StringSlice_GetUTF32String(StringSlice *Slice);
+    typedef struct     StringIO_Slice                    StringIO_Slice;
     
     /*!
      @abstract                                           Creates a UTF8 string plus a NULL terminator.
@@ -1241,6 +1187,56 @@ extern "C" {
      @return                                             Returns the SubString.
      */
     uint64_t           UTF32_GetSubStringLength(ImmutableString_UTF32 Format, ImmutableString_UTF32 Formatted, uint64_t Offset);
+
+    /* Unicode Conversion */
+    /*!
+     @abstract                                           Converts a UTF-8 encoded String to the specified CodePage.
+     @param            String                            The Unicode String to convert.
+     @param            CharSet                           The character set to convert the string into.
+     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     */
+    CharSet8          *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CharSets CharSet);
+
+    /*!
+     @abstract                                           Converts a UTF-16 encoded String to the specified CodePage.
+     @param            String                            The Unicode String to convert.
+     @param            CharSet                           The character set to convert the string into.
+     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     */
+    CharSet16         *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CharSets CharSet);
+
+    /*!
+     @abstract                                           Converts a UTF-32 encoded String to the specified CodePage.
+     @param            String                            The Unicode String to convert.
+     @param            CharSet                           The character set to convert the string into.
+     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     */
+    CharSet32         *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CharSets CharSet);
+
+    /*!
+     @abstract                                           Converts a UTF-8 encoded String to the specified CodePage.
+     @param            String                            The Unicode String to convert.
+     @param            CharSet                           The character set to convert the string into.
+     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     */
+    UTF8              *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CharSets CharSet);
+
+    /*!
+     @abstract                                           Converts a UTF-16 encoded String to the specified CodePage.
+     @param            String                            The Unicode String to convert.
+     @param            CharSet                           The character set to convert the string into.
+     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     */
+    UTF16             *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CharSets CharSet);
+
+    /*!
+     @abstract                                           Converts a UTF-32 encoded String to the specified CodePage.
+     @param            String                            The Unicode String to convert.
+     @param            CharSet                           The character set to convert the string into.
+     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     */
+    UTF32             *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CharSets CharSet);
+    /* Unicode Conversion */
     
     /*!
      @abstract                                           Deletes String.
@@ -1259,7 +1255,8 @@ extern "C" {
      @param            String                            The string to deinitialize.
      */
     void               UTF32_Deinit(UTF32 *String);
-    
+
+    /* StringSet Functions */
     /*!
      @abstract                                           Creates a UTF-8 encoded StringSet.
      @param            NumStrings                        How many strings will this StringSet contain?
@@ -1288,7 +1285,7 @@ extern "C" {
      @param            Index                             Which position should String2Attach be in?
      @return                                             Returns true when attaching was sucessful.
      */
-    bool               UTF8_StringSet_Attach(UTF8 **StringSet, ImmutableString_UTF8 String2Attach, uint64_t Index);
+    bool               UTF8_StringSet_Attach(UTF8 **StringSet, UTF8 *String2Attach, uint64_t Index);
     
     /*!
      @abstract                                           Attaches a string to a StringSet at the specified position.
@@ -1297,7 +1294,7 @@ extern "C" {
      @param            Index                             Which position should String2Attach be in?
      @return                                             Returns true when attaching was sucessful.
      */
-    bool               UTF16_StringSet_Attach(UTF16 **StringSet, ImmutableString_UTF16 String2Attach, uint64_t Index);
+    bool               UTF16_StringSet_Attach(UTF16 **StringSet, UTF16 *String2Attach, uint64_t Index);
     
     /*!
      @abstract                                           Attaches a string to a StringSet at the specified position.
@@ -1306,7 +1303,7 @@ extern "C" {
      @param            Index                             Which position should String2Attach be in?
      @return                                             Returns true when attaching was sucessful.
      */
-    bool               UTF32_StringSet_Attach(UTF32 **StringSet, ImmutableString_UTF32 String2Attach, uint64_t Index);
+    bool               UTF32_StringSet_Attach(UTF32 **StringSet, UTF32 *String2Attach, uint64_t Index);
     
     /*!
      @abstract                                           Gets the number of strings in a StringSet.
@@ -1430,55 +1427,30 @@ extern "C" {
      @param            StringSet                         An StringSet to deinitialize, all strings will be freed.
      */
     void               UTF32_StringSet_Deinit(UTF32 **StringSet);
-    /* Unicode Conversion */
+    /* StringSet Functions */
+
+    /* StringIO_Slice Functions */
     /*!
-     @abstract                                           Converts a UTF-8 encoded String to the specified CodePage.
-     @param            String                            The Unicode String to convert.
-     @param            CharSet                           The character set to convert the string into.
-     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     @abstract                                           Creates an instance of a StringIO_Slice.
+     @param            StartInCodeUnits                  Where should the string start?
+     @param            EndInCodeUnits                    Where should the string end?
      */
-    CharSet8          *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CharSets CharSet);
-    
+    StringIO_Slice        StringIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits);
+
     /*!
-     @abstract                                           Converts a UTF-16 encoded String to the specified CodePage.
-     @param            String                            The Unicode String to convert.
-     @param            CharSet                           The character set to convert the string into.
-     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     @abstract                                           Where does this slice start?
+     @param            Slice                             The instance of the StringIO_Slice.
+     @return                                             The Start of the StringIO_Slice in CodeUnits.
      */
-    CharSet16         *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CharSets CharSet);
-    
+    size_t             StringIO_Slice_GetStartInCodeUnits(StringIO_Slice Slice);
+
     /*!
-     @abstract                                           Converts a UTF-32 encoded String to the specified CodePage.
-     @param            String                            The Unicode String to convert.
-     @param            CharSet                           The character set to convert the string into.
-     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
+     @abstract                                           Where does this slice end?
+     @param            Slice                             The instance of the StringIO_Slice.
+     @return                                             The End of the StringIO_Slice in CodeUnits.
      */
-    CharSet32         *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CharSets CharSet);
-    
-    /*!
-     @abstract                                           Converts a UTF-8 encoded String to the specified CodePage.
-     @param            String                            The Unicode String to convert.
-     @param            CharSet                           The character set to convert the string into.
-     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
-     */
-    UTF8              *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CharSets CharSet);
-    
-    /*!
-     @abstract                                           Converts a UTF-16 encoded String to the specified CodePage.
-     @param            String                            The Unicode String to convert.
-     @param            CharSet                           The character set to convert the string into.
-     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
-     */
-    UTF16             *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CharSets CharSet);
-    
-    /*!
-     @abstract                                           Converts a UTF-32 encoded String to the specified CodePage.
-     @param            String                            The Unicode String to convert.
-     @param            CharSet                           The character set to convert the string into.
-     @return                                             Returns the equivalent (or as close as possible) string in the new character set.
-     */
-    UTF32             *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CharSets CharSet);
-    /* Unicode Conversion */
+    size_t             StringIO_Slice_GetEndInCodeUnits(StringIO_Slice Slice);
+    /* StringIO_Slice Functions */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

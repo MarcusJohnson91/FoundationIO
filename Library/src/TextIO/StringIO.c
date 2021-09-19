@@ -11,60 +11,6 @@ extern "C" {
     static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + PlatformIO_NULLTerminatorSize] = {0, 0, 0, 0, 0};
     static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + PlatformIO_NULLTerminatorSize] = {0, 0, 0};
     
-    typedef struct StringSlice {
-        void              *String;
-        uint64_t           StartInCodeUnits;
-        uint64_t           EndInCodeUnits;
-        TextIO_StringTypes StringType;
-    } StringSlice;
-    
-    StringSlice *StringSlice_Init(void *String, TextIO_StringTypes StringType, uint64_t StartInCodeUnits, uint64_t EndInCodeUnits) {
-        StringSlice *Slice          = calloc(1, sizeof(StringSlice));
-        if (Slice != NULL) {
-            Slice->String           = String;
-            Slice->StartInCodeUnits = StartInCodeUnits;
-            Slice->EndInCodeUnits   = EndInCodeUnits;
-            Slice->StringType       = StringType;
-        }
-        return Slice;
-    }
-    
-    uint64_t StringSlice_GetStartInCodeUnits(StringSlice *Slice) {
-        return Slice->StartInCodeUnits;
-    }
-    
-    uint64_t StringSlice_GetEndInCodeUnits(StringSlice *Slice) {
-        return Slice->EndInCodeUnits;
-    }
-    
-    TextIO_StringTypes StringSlice_GetStringType(StringSlice *Slice) {
-        return Slice->StringType;
-    }
-    
-    UTF8 *StringSlice_GetUTF8String(StringSlice *Slice) {
-        UTF8 *String = NULL;
-        if (Slice->StringType == StringType_UTF8) {
-            String   = Slice->String;
-        }
-        return String;
-    }
-    
-    UTF16 *StringSlice_GetUTF16String(StringSlice *Slice) {
-        UTF16 *String = NULL;
-        if (Slice->StringType == StringType_UTF16) {
-            String    = Slice->String;
-        }
-        return String;
-    }
-    
-    UTF32 *StringSlice_GetUTF32String(StringSlice *Slice) {
-        UTF32 *String = NULL;
-        if (Slice->StringType == StringType_UTF32) {
-            String    = Slice->String;
-        }
-        return String;
-    }
-    
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
         UTF8 *String            = NULL;
         if (NumCodeUnits >= 1) {
@@ -4055,6 +4001,184 @@ extern "C" {
         }
         return Length;
     }
+
+    /* Unicode Conversion */
+    CharSet8 *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CharSets CodePage) {
+        CharSet8 *Encoded = NULL;
+        if (String != NULL && CodePage != CharSet_Unspecified) {
+            UTF32 *Decoded      = UTF8_Decode(String);
+            UTF32 *Composed     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
+            uint64_t Characters = 0ULL;
+            uint64_t Character  = 0ULL;
+            if (CodePage == CharSet_ISO_8859_1) {
+                while (Composed[Characters] != PlatformIO_NULLTerminator) {
+                    if (Composed[Characters] <= 0xFF) {
+                        Characters += 1;
+                    }
+                }
+                // Ok so now we have our number of characters, init a new string with that many and copy em over
+                Encoded = UTF8_Init(Characters);
+                while (Composed[Character] != PlatformIO_NULLTerminator && Character < Characters) {
+                    if (Composed[Characters] <= 0xFF) {
+                        Encoded[Character] = Composed[Characters] & 0xFF;
+                        Character  += 1;
+                        Characters += 1;
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        } else if (CodePage == CharSet_Unspecified) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
+        }
+        return Encoded;
+    }
+
+    CharSet16 *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CharSets CodePage) {
+        CharSet16 *Encoded = NULL;
+        if (String != NULL && CodePage != CharSet_Unspecified) {
+            UTF32 *Decoded      = UTF16_Decode(String);
+            UTF32 *Composed     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
+            uint64_t Characters = 0ULL;
+            uint64_t Character  = 0ULL;
+            if (CodePage == CharSet_ISO_8859_1) {
+                while (Composed[Characters] != PlatformIO_NULLTerminator) {
+                    if (Composed[Characters] <= 0xFF) {
+                        Characters += 1;
+                    }
+                }
+                // Ok so now we have our number of characters, init a new string with that many and copy em over
+                Encoded = UTF16_Init(Characters);
+                while (Composed[Character] != PlatformIO_NULLTerminator && Character < Characters) {
+                    if (Composed[Characters] <= 0xFF) {
+                        Encoded[Character] = Composed[Characters] & 0xFF;
+                        Character  += 1;
+                        Characters += 1;
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        } else if (CodePage == CharSet_Unspecified) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
+        }
+        return Encoded;
+    }
+
+    CharSet32 *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CharSets CodePage) {
+        CharSet32 *Encoded = NULL;
+        if (String != NULL && CodePage != CharSet_Unspecified) {
+            UTF32 *Composed     = UTF32_Normalize(String, NormalizationForm_KompatibleCompose);
+            uint64_t Characters = 0ULL;
+            uint64_t Character  = 0ULL;
+            if (CodePage == CharSet_ISO_8859_1) {
+                while (Composed[Characters] != PlatformIO_NULLTerminator) {
+                    if (Composed[Characters] <= 0xFF) {
+                        Characters += 1;
+                    }
+                }
+                // Ok so now we have our number of characters, init a new string with that many and copy em over
+                Encoded = UTF32_Init(Characters);
+                while (Composed[Character] != PlatformIO_NULLTerminator && Character < Characters) {
+                    if (Composed[Characters] <= 0xFF) {
+                        Encoded[Character] = Composed[Characters] & 0xFF;
+                        Character  += 1;
+                        Characters += 1;
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        } else if (CodePage == CharSet_Unspecified) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
+        }
+        return Encoded;
+    }
+
+    UTF8 *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CharSets CodePage) {
+        UTF8 *Unicode = NULL;
+        if (String != NULL && CodePage != CharSet_Unspecified) {
+            UTF32   *Decoded          = UTF8_Decode(String);
+            uint64_t Character        = 0ULL;
+            uint64_t CodePoint        = 0ULL;
+            uint64_t NumCodeUnits     = 0ULL;
+            if (CodePage == CharSet_ISO_8859_1) {
+                while (Decoded[Character] != PlatformIO_NULLTerminator) {
+                    if (Decoded[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
+                        NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
+                    }
+                    Character        += 1;
+                }
+                Unicode               = UTF8_Init(NumCodeUnits);
+                while (Decoded[Character] != PlatformIO_NULLTerminator && Unicode[CodePoint] != PlatformIO_NULLTerminator) {
+                    for (uint8_t Byte = 0; Byte < UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]); Byte++) {
+                        Unicode[CodePoint + Byte] = StringIO_PreallocateCodePoint_UTF8[Byte];
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        } else if (CodePage == CharSet_Unspecified) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
+        }
+        return Unicode;
+    }
+
+    UTF16 *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CharSets CodePage) {
+        UTF16 *Unicode = NULL;
+        if (String != NULL && CodePage != CharSet_Unspecified) {
+            UTF32   *Decoded          = UTF16_Decode(String);
+            uint64_t Character        = 0ULL;
+            uint64_t CodePoint        = 0ULL;
+            uint64_t NumCodeUnits     = 0ULL;
+            if (CodePage == CharSet_ISO_8859_1) {
+                while (Decoded[Character] != PlatformIO_NULLTerminator) {
+                    if (Decoded[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
+                        NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
+                    }
+                    Character        += 1;
+                }
+                Unicode               = UTF16_Init(NumCodeUnits);
+                while (Decoded[Character] != PlatformIO_NULLTerminator && Unicode[CodePoint] != PlatformIO_NULLTerminator) {
+                    for (uint8_t Byte = 0; Byte < UTF32_GetCodePointSizeInUTF16CodeUnits(Decoded[Character]); Byte++) {
+                        Unicode[CodePoint + Byte] = StringIO_PreallocateCodePoint_UTF16[Byte];
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        } else if (CodePage == CharSet_Unspecified) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
+        }
+        return Unicode;
+    }
+
+    UTF32 *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CharSets CodePage) {
+        UTF32 *Unicode = NULL;
+        if (String != NULL && CodePage != CharSet_Unspecified) {
+            uint64_t Character        = 0ULL;
+            uint64_t CodePoint        = 0ULL;
+            uint64_t NumCodeUnits     = 0ULL;
+            if (CodePage == CharSet_ISO_8859_1) {
+                while (String[Character] != PlatformIO_NULLTerminator) {
+                    if (String[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
+                        NumCodeUnits += 1;
+                    }
+                    Character        += 1;
+                }
+                Unicode               = UTF32_Init(NumCodeUnits);
+                while (String[Character] != PlatformIO_NULLTerminator && Unicode[CodePoint] != PlatformIO_NULLTerminator) {
+                    Unicode[CodePoint] = String[Character];
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        } else if (CodePage == CharSet_Unspecified) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
+        }
+        return Unicode;
+    }
+    /* Unicode Conversion */
     
     void UTF8_Deinit(UTF8 *String) {
         if (String != NULL) {
@@ -4078,7 +4202,7 @@ extern "C" {
     UTF8 **UTF8_StringSet_Init(uint64_t NumStrings) {
         UTF8 **StringSet = NULL;
         if (NumStrings > 0) {
-            StringSet    = (UTF8**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF8*));
+            StringSet    = calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF8*));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSet[String] = (UTF8*) 0x8888888888888888;
@@ -4120,7 +4244,26 @@ extern "C" {
         return StringSet;
     }
     
-    bool UTF8_StringSet_Attach(UTF8 **StringSet, ImmutableString_UTF8 String2Attach, uint64_t Index) {
+    bool UTF8_StringSet_Attach(UTF8 **StringSet, UTF8 *String2Attach, uint64_t Index) {
+        bool AttachedSucessfully = No;
+        if (StringSet != NULL && String2Attach != NULL) {
+            uint64_t NumStrings  = 0ULL;
+            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
+                NumStrings      += 1;
+            }
+            if (NumStrings >= Index) {
+                StringSet[Index] =  String2Attach;
+                AttachedSucessfully = Yes;
+            }
+        } else if (StringSet == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSet Pointer is NULL"));
+        } else if (String2Attach == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String2Attach Pointer is NULL"));
+        }
+        return AttachedSucessfully;
+    }
+    
+    bool UTF16_StringSet_Attach(UTF16 **StringSet, UTF16 *String2Attach, uint64_t Index) {
         bool AttachedSucessfully = No;
         if (StringSet != NULL && String2Attach != NULL) {
             uint64_t NumStrings  = 0ULL;
@@ -4139,26 +4282,7 @@ extern "C" {
         return AttachedSucessfully;
     }
     
-    bool UTF16_StringSet_Attach(UTF16 **StringSet, ImmutableString_UTF16 String2Attach, uint64_t Index) {
-        bool AttachedSucessfully = No;
-        if (StringSet != NULL && String2Attach != NULL) {
-            uint64_t NumStrings  = 0ULL;
-            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
-                NumStrings      += 1;
-            }
-            if (NumStrings >= Index) {
-                StringSet[Index] = String2Attach;
-                AttachedSucessfully = Yes;
-            }
-        } else if (StringSet == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSet Pointer is NULL"));
-        } else if (String2Attach == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String2Attach Pointer is NULL"));
-        }
-        return AttachedSucessfully;
-    }
-    
-    bool UTF32_StringSet_Attach(UTF32 **StringSet, ImmutableString_UTF32 String2Attach, uint64_t Index) {
+    bool UTF32_StringSet_Attach(UTF32 **StringSet, UTF32 *String2Attach, uint64_t Index) {
         bool AttachedSucessfully = No;
         if (StringSet != NULL && String2Attach != NULL) {
             uint64_t NumStrings  = 0ULL;
@@ -4452,184 +4576,28 @@ extern "C" {
         }
     }
     /* StringSet Functions */
-    
-    /* Unicode Conversion */
-    CharSet8 *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CharSets CodePage) {
-        CharSet8 *Encoded = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
-            UTF32 *Decoded      = UTF8_Decode(String);
-            UTF32 *Composed     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
-            uint64_t Characters = 0ULL;
-            uint64_t Character  = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
-                while (Composed[Characters] != PlatformIO_NULLTerminator) {
-                    if (Composed[Characters] <= 0xFF) {
-                        Characters += 1;
-                    }
-                }
-                // Ok so now we have our number of characters, init a new string with that many and copy em over
-                Encoded = UTF8_Init(Characters);
-                while (Composed[Character] != PlatformIO_NULLTerminator && Character < Characters) {
-                    if (Composed[Characters] <= 0xFF) {
-                        Encoded[Character] = Composed[Characters] & 0xFF;
-                        Character  += 1;
-                        Characters += 1;
-                    }
-                }
-            }
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
-        }
-        return Encoded;
+
+    /* StringIO_Slice Functions */
+    typedef struct StringIO_Slice {
+        size_t   StartInCodeUnits;
+        size_t   EndInCodeUnits;
+    } StringIO_Slice;
+
+    StringIO_Slice StringIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits) {
+        StringIO_Slice Slice;
+        Slice.StartInCodeUnits = StartInCodeUnits;
+        Slice.EndInCodeUnits   = EndInCodeUnits;
+        return Slice;
     }
-    
-    CharSet16 *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CharSets CodePage) {
-        CharSet16 *Encoded = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
-            UTF32 *Decoded      = UTF16_Decode(String);
-            UTF32 *Composed     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
-            uint64_t Characters = 0ULL;
-            uint64_t Character  = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
-                while (Composed[Characters] != PlatformIO_NULLTerminator) {
-                    if (Composed[Characters] <= 0xFF) {
-                        Characters += 1;
-                    }
-                }
-                // Ok so now we have our number of characters, init a new string with that many and copy em over
-                Encoded = UTF16_Init(Characters);
-                while (Composed[Character] != PlatformIO_NULLTerminator && Character < Characters) {
-                    if (Composed[Characters] <= 0xFF) {
-                        Encoded[Character] = Composed[Characters] & 0xFF;
-                        Character  += 1;
-                        Characters += 1;
-                    }
-                }
-            }
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
-        }
-        return Encoded;
+
+    size_t StringIO_Slice_GetStartInCodeUnits(StringIO_Slice Slice) {
+        return Slice.StartInCodeUnits;
     }
-    
-    CharSet32 *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CharSets CodePage) {
-        CharSet32 *Encoded = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
-            UTF32 *Composed     = UTF32_Normalize(String, NormalizationForm_KompatibleCompose);
-            uint64_t Characters = 0ULL;
-            uint64_t Character  = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
-                while (Composed[Characters] != PlatformIO_NULLTerminator) {
-                    if (Composed[Characters] <= 0xFF) {
-                        Characters += 1;
-                    }
-                }
-                // Ok so now we have our number of characters, init a new string with that many and copy em over
-                Encoded = UTF32_Init(Characters);
-                while (Composed[Character] != PlatformIO_NULLTerminator && Character < Characters) {
-                    if (Composed[Characters] <= 0xFF) {
-                        Encoded[Character] = Composed[Characters] & 0xFF;
-                        Character  += 1;
-                        Characters += 1;
-                    }
-                }
-            }
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
-        }
-        return Encoded;
+
+    size_t StringIO_Slice_GetEndInCodeUnits(StringIO_Slice Slice) {
+        return Slice.EndInCodeUnits;
     }
-    
-    UTF8 *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CharSets CodePage) {
-        UTF8 *Unicode = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
-            UTF32   *Decoded          = UTF8_Decode(String);
-            uint64_t Character        = 0ULL;
-            uint64_t CodePoint        = 0ULL;
-            uint64_t NumCodeUnits     = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
-                while (Decoded[Character] != PlatformIO_NULLTerminator) {
-                    if (Decoded[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
-                        NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
-                    }
-                    Character        += 1;
-                }
-                Unicode               = UTF8_Init(NumCodeUnits);
-                while (Decoded[Character] != PlatformIO_NULLTerminator && Unicode[CodePoint] != PlatformIO_NULLTerminator) {
-                    for (uint8_t Byte = 0; Byte < UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]); Byte++) {
-                        Unicode[CodePoint + Byte] = StringIO_PreallocateCodePoint_UTF8[Byte];
-                    }
-                }
-            }
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
-        }
-        return Unicode;
-    }
-    
-    UTF16 *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CharSets CodePage) {
-        UTF16 *Unicode = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
-            UTF32   *Decoded          = UTF16_Decode(String);
-            uint64_t Character        = 0ULL;
-            uint64_t CodePoint        = 0ULL;
-            uint64_t NumCodeUnits     = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
-                while (Decoded[Character] != PlatformIO_NULLTerminator) {
-                    if (Decoded[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
-                        NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
-                    }
-                    Character        += 1;
-                }
-                Unicode               = UTF16_Init(NumCodeUnits);
-                while (Decoded[Character] != PlatformIO_NULLTerminator && Unicode[CodePoint] != PlatformIO_NULLTerminator) {
-                    for (uint8_t Byte = 0; Byte < UTF32_GetCodePointSizeInUTF16CodeUnits(Decoded[Character]); Byte++) {
-                        Unicode[CodePoint + Byte] = StringIO_PreallocateCodePoint_UTF16[Byte];
-                    }
-                }
-            }
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
-        }
-        return Unicode;
-    }
-    
-    UTF32 *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CharSets CodePage) {
-        UTF32 *Unicode = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
-            uint64_t Character        = 0ULL;
-            uint64_t CodePoint        = 0ULL;
-            uint64_t NumCodeUnits     = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
-                while (String[Character] != PlatformIO_NULLTerminator) {
-                    if (String[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
-                        NumCodeUnits += 1;
-                    }
-                    Character        += 1;
-                }
-                Unicode               = UTF32_Init(NumCodeUnits);
-                while (String[Character] != PlatformIO_NULLTerminator && Unicode[CodePoint] != PlatformIO_NULLTerminator) {
-                    Unicode[CodePoint] = String[Character];
-                }
-            }
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
-        }
-        return Unicode;
-    }
-    /* Unicode Conversion */
+    /* StringIO_Slice Functions */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
