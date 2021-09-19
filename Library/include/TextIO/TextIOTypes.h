@@ -90,7 +90,7 @@ extern "C" {
 #endif /* PlatformIO_Compiler */
 #endif /* __CHAR32_TYPE__ */
   
-#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC2X)
+#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC23)
   typedef __CHAR8_TYPE__  char8_t;
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX20)
   typedef __CHAR8_TYPE__  char8_t;

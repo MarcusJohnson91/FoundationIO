@@ -99,8 +99,8 @@ extern "C" {
 #define             PlatformIO_LanguageVersionC18                                       (201710UL)
 #endif
 
-#ifndef             PlatformIO_LanguageVersionC2X
-#define             PlatformIO_LanguageVersionC2X                                       (202102UL)
+#ifndef             PlatformIO_LanguageVersionC23
+#define             PlatformIO_LanguageVersionC23                                       (202302UL)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionCXX98
@@ -505,6 +505,7 @@ extern "C" {
 #define             PlatformIO_HiddenSymbol                                             __attribute__((visibility("hidden")))
 #endif /* Compiler is MSVC */
 #endif /* PlatformIO_HiddenSymbol */
+
 
     /*!
      @abstract      Gets the total amount of memory in the system.
