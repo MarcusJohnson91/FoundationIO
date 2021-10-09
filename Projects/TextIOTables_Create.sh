@@ -25,84 +25,86 @@ CreateHeaderFile() {
     CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     {
-        printf "/*!\n"
-        printf " @header          TextIOTables.h\n"
-        printf " @author          Marcus Johnson\n"
-        printf " @copyright       2018+\n"
-        printf " @version         1.3.0\n"
-        printf " @brief           This header contains table declarations used across FoundationIO for Unicode and character set conversion.\n"
-        printf " @remark          ScriptHash is to know if the script has changed since the tables were last generated.\n"
-        printf " */\n\n"
-        printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
-        printf "#include \"../TextIOTypes.h\"    /* Included for the Text types */\n\n"
-        printf "#pragma once\n\n"
-        printf "#ifndef FoundationIO_TextIO_TextIOTables_H\n"
-        printf "#define FoundationIO_TextIO_TextIOTables_H\n\n"
-        printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
-        printf "extern \"C\" {\n"
-        printf "#endif\n\n"
-        printf "#define ScriptHash %s\n\n" "$ScriptSHA"
-        printf "#define UnicodeVersion %s\n\n" "$ReadmeUnicodeVersion"
-        printf "    typedef enum TextIOConstants {\n"
-        printf "        IntegerTableBase2Size            = %u,\n" "$IntegerTableBase2Size"
-        printf "        IntegerTableBase8Size            = %u,\n" "$IntegerTableBase8Size"
-        printf "        IntegerTableBase10Size           = %u,\n" "$IntegerTableBase10Size"
-        printf "        IntegerTableBase16Size           = %u,\n" "$IntegerTableBase16Size"
-        printf "        IntegerValueTableSize            = %u,\n" "$IntegerValueTableSize"
-        printf "        DecimalTableBase10Size           = %u,\n" "$DecimalTableBase10Size"
-        printf "        DecimalTableScientificSize       = %u,\n" "$DecimalTableScientificSize"
-        printf "        DecimalTableHexadecimalSize      = %u,\n" "$DecimalTableHexadecimalSize"
-        printf "        DecimalValueTableSize            = %u,\n" "$DecimalValueTableSize"
-        printf "        MathSeperatorTableSize           = %u,\n" "$MathSeperatorTableSize"
-        printf "        LineBreakTableSize               = %u,\n" "$NumLineBreakCodePoints"
-        printf "        BiDirectionalControlsTableSize   = %u,\n" "$NumBiDirectionalControls"
-        printf "        WordBreakTableSize               = %u,\n" "$NumWordBreakCodePoints"
-        printf "        CurrencyTableSize                = %u,\n" "$NumCurrencyCodePoints"
-        printf "        CombiningCharacterClassTableSize = %u,\n" "$CombiningCharacterClassTableSize"
-        printf "        GraphemeExtensionTableSize       = %u,\n" "$GraphemeExtensionSize"
-        printf "        KompatibleNormalizationTableSize = %u,\n" "$KompatibleNormalizationTableSize"
-        printf "        CaseFoldTableSize                = %u,\n" "$CaseFoldTableSize"
-        printf "        CanonicalNormalizationTableSize  = %u,\n" "$CanonicalNormalizationTableSize"
-        printf "    } TextIOConstants;\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase2[IntegerTableBase2Size];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase8[IntegerTableBase8Size];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase10[IntegerTableBase10Size];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase16Uppercase[IntegerTableBase16Size];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase16Lowercase[IntegerTableBase16Size];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern uint64_t const     IntegerValueTable[IntegerValueTableSize][2];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableScientificUppercase[DecimalTableScientificSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableScientificLowercase[DecimalTableScientificSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableHexadecimalUppercase[DecimalTableHexadecimalSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableHexadecimalLowercase[DecimalTableHexadecimalSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern int32_t const      DecimalValueTable[DecimalValueTableSize][3];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        MathSeperators[MathSeperatorTableSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        LineBreakTable[LineBreakTableSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        BiDirectionalControlsTable[BiDirectionalControlsTableSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        WordBreakTable[WordBreakTableSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        CurrencyTable[CurrencyTableSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        CombiningCharacterClassTable[CombiningCharacterClassTableSize][2];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern UTF32 const        GraphemeExtensionTable[GraphemeExtensionTableSize];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern const UTF32 *const CaseFoldTable[CaseFoldTableSize][2];\n\n"
-        printf "    PlatformIO_HiddenSymbol extern const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2];\n\n"
-        printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
-        printf "}\n"
-        printf "#endif /* Extern C */\n\n"
-        printf "#endif /* FoundationIO_TextIO_TextIOTables_H */\n"
+        printf '/*!\n'
+        printf ' @header          TextIOTables.h\n'
+        printf ' @author          Marcus Johnson\n'
+        printf ' @copyright       2018+\n'
+        printf ' @version         1.3.0\n'
+        printf ' @brief           This header contains table declarations used across FoundationIO for Unicode and character set conversion.\n'
+        printf ' @remark          ScriptHash is to know if the script has changed since the tables were last generated.\n'
+        printf ' */\n\n'
+        printf '#include "../../PlatformIO.h"  /* Included for Platform Independence macros */\n'
+        printf '#include "../TextIOTypes.h"    /* Included for the Text types */\n\n'
+        printf '#pragma once\n\n'
+        printf '#ifndef FoundationIO_TextIO_TextIOTables_H\n'
+        printf '#define FoundationIO_TextIO_TextIOTables_H\n\n'
+        printf '#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n'
+        printf 'extern "C" {\n'
+        printf '#endif\n\n'
+        printf '#define ScriptHash %s\n\n' "$ScriptSHA"
+        printf '#define UnicodeVersion %s\n\n' "$ReadmeUnicodeVersion"
+        printf '    typedef enum TextIOConstants {\n'
+        printf '        IntegerTableBase2Size            = %u,\n' "$IntegerTableBase2Size"
+        printf '        IntegerTableBase8Size            = %u,\n' "$IntegerTableBase8Size"
+        printf '        IntegerTableBase10Size           = %u,\n' "$IntegerTableBase10Size"
+        printf '        IntegerTableBase16Size           = %u,\n' "$IntegerTableBase16Size"
+        printf '        IntegerValueTableSize            = %u,\n' "$IntegerValueTableSize"
+        printf '        DecimalTableBase10Size           = %u,\n' "$DecimalTableBase10Size"
+        printf '        DecimalTableScientificSize       = %u,\n' "$DecimalTableScientificSize"
+        printf '        DecimalTableHexadecimalSize      = %u,\n' "$DecimalTableHexadecimalSize"
+        printf '        DecimalValueTableSize            = %u,\n' "$DecimalValueTableSize"
+        printf '        MathSeperatorTableSize           = %u,\n' "$MathSeperatorTableSize"
+        printf '        LineBreakTableSize               = %u,\n' "$NumLineBreakCodePoints"
+        printf '        BiDirectionalControlsTableSize   = %u,\n' "$NumBiDirectionalControls"
+        printf '        WordBreakTableSize               = %u,\n' "$NumWordBreakCodePoints"
+        printf '        CurrencyTableSize                = %u,\n' "$NumCurrencyCodePoints"
+        printf '        CombiningCharacterClassTableSize = %u,\n' "$CombiningCharacterClassTableSize"
+        printf '        GraphemeExtensionTableSize       = %u,\n' "$GraphemeExtensionSize"
+        printf '        KompatibleNormalizationTableSize = %u,\n' "$KompatibleNormalizationTableSize"
+        printf '        CaseFoldTableSize                = %u,\n' "$CaseFoldTableSize"
+        printf '        CanonicalNormalizationTableSize  = %u,\n' "$CanonicalNormalizationTableSize"
+        printf '    } TextIOConstants;\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase2[IntegerTableBase2Size];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase8[IntegerTableBase8Size];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase10[IntegerTableBase10Size];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase16Uppercase[IntegerTableBase16Size];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase16Lowercase[IntegerTableBase16Size];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern uint64_t const     IntegerValueTable[IntegerValueTableSize][2];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableScientificUppercase[DecimalTableScientificSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableScientificLowercase[DecimalTableScientificSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableHexadecimalUppercase[DecimalTableHexadecimalSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableHexadecimalLowercase[DecimalTableHexadecimalSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern int32_t const      DecimalValueTable[DecimalValueTableSize][3];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        MathSeperators[MathSeperatorTableSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        LineBreakTable[LineBreakTableSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        BiDirectionalControlsTable[BiDirectionalControlsTableSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        WordBreakTable[WordBreakTableSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        CurrencyTable[CurrencyTableSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        CombiningCharacterClassTable[CombiningCharacterClassTableSize][2];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern UTF32 const        GraphemeExtensionTable[GraphemeExtensionTableSize];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern const UTF32 *const CaseFoldTable[CaseFoldTableSize][2];\n\n'
+        printf '    PlatformIO_HiddenSymbol extern const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2];\n\n'
+        printf '#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n'
+        printf '}\n'
+        printf '#endif /* Extern C */\n\n'
+        printf '#endif /* FoundationIO_TextIO_TextIOTables_H */\n'
     } >> "$HeaderFile"
 }
 
 CreateSourceFileTop() {
-    printf "#include \"../../../include/TextIO/Private/TextIOTables.h\" /* Included for our declarations */\n\n"
-    printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
-    printf "extern \"C\" {\n"
-    printf "#endif\n\n"
-} >> "$SourceFile"
+    {
+        printf '#include "../../../include/TextIO/Private/TextIOTables.h" /* Included for our declarations */\n\n'
+        printf '#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n'
+        printf 'extern "C" {\n'
+        printf '#endif\n\n'
+    } >> "$SourceFile"
+}
 
 CreateSourceFileBottom() {
-    printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
-    printf "}\n"
-    printf "#endif /* Extern C */\n"
+    printf '#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n'
+    printf '}\n'
+    printf '#endif /* Extern C */\n'
 } >> "$SourceFile"
 
 CreateIntegerConstantTables() {
@@ -175,7 +177,7 @@ CreateIntegerValueTable() {
     printf "    const uint64_t IntegerValueTable[IntegerValueTableSize][2] = {\n" >> "$SourceFile"
 
     setopt SH_WORD_SPLIT
-    while IFS=':|' read -d $'\n' CodePoint Value; do
+    while IFS=':|' read -r -d $'\n' CodePoint Value; do
         printf "        {0x%06X, %u},\n" "$CodePoint" "$Value" >> "$SourceFile"
     done <<< "$IntegerTable"
     unset SH_WORD_SPLIT
@@ -263,7 +265,7 @@ CreateDecimalValueTable() {
     printf "    const int32_t DecimalValueTable[DecimalValueTableSize][3] = {\n" >> "$SourceFile"
 
     setopt SH_WORD_SPLIT
-    while IFS=':/' read -d $'\n' CodePoint Numerator Denominator; do
+    while IFS=':/' read -r -d $'\n' CodePoint Numerator Denominator; do
         printf "        {0x%06X, %i, %u},\n" "$CodePoint" "$Numerator" "$Denominator"  >> "$SourceFile"
     done <<< "$DecimalMap"
     unset SH_WORD_SPLIT
@@ -272,47 +274,51 @@ CreateDecimalValueTable() {
 }
 
 CreateLineBreakTable() {
-    printf "    const UTF32 LineBreakTable[LineBreakTableSize] = {\n"
-    printf "        0x00000A,\n"
-    printf "        0x00000B,\n"
-    printf "        0x00000C,\n"
-    printf "        0x00000D,\n"
-    printf "        0x000085,\n"
-    printf "        0x002028,\n"
-    printf "        0x002029,\n"
-    printf "    };\n\n"
+    printf '    const UTF32 LineBreakTable[LineBreakTableSize] = {\n'
+    printf '        0x00000A,\n'
+    printf '        0x00000B,\n'
+    printf '        0x00000C,\n'
+    printf '        0x00000D,\n'
+    printf '        0x000085,\n'
+    printf '        0x002028,\n'
+    printf '        0x002029,\n'
+    printf '    };\n\n'
 } >> "$SourceFile"
 
 CreateBiDirectionalControlsTable() {
     printf "    const UTF32 BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {\n" >> "$SourceFile"
     BiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Bidi_C = 'Y']" -o '0x' -v @cp -n "$UCD_Data")
-    for line in $BiDirectionalControls; do
-        echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$SourceFile"
-    done
+
+    setopt SH_WORD_SPLIT
+    while IFS=':|' read -r -d $'\n' CodePoint; do
+        printf "        0x%06X,\n" "$CodePoint" >> "$SourceFile"
+    done <<< "$BiDirectionalControls"
+    unset SH_WORD_SPLIT
+
     printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateWordBreakTable() {
-    printf "    const UTF32 WordBreakTable[WordBreakTableSize] = {\n"
-    printf "        0x000020,\n"
-    printf "        0x0000A0,\n"
-    printf "        0x001680,\n"
-    printf "        0x002000,\n"
-    printf "        0x002000,\n"
-    printf "        0x002001,\n"
-    printf "        0x002002,\n"
-    printf "        0x002003,\n"
-    printf "        0x002004,\n"
-    printf "        0x002005,\n"
-    printf "        0x002006,\n"
-    printf "        0x002007,\n"
-    printf "        0x002008,\n"
-    printf "        0x002009,\n"
-    printf "        0x00200A,\n"
-    printf "        0x00202F,\n"
-    printf "        0x00205F,\n"
-    printf "        0x003000,\n"
-    printf "    };\n\n"
+    printf '    const UTF32 WordBreakTable[WordBreakTableSize] = {\n'
+    printf '        0x000020,\n'
+    printf '        0x0000A0,\n'
+    printf '        0x001680,\n'
+    printf '        0x002000,\n'
+    printf '        0x002000,\n'
+    printf '        0x002001,\n'
+    printf '        0x002002,\n'
+    printf '        0x002003,\n'
+    printf '        0x002004,\n'
+    printf '        0x002005,\n'
+    printf '        0x002006,\n'
+    printf '        0x002007,\n'
+    printf '        0x002008,\n'
+    printf '        0x002009,\n'
+    printf '        0x00200A,\n'
+    printf '        0x00202F,\n'
+    printf '        0x00205F,\n'
+    printf '        0x003000,\n'
+    printf '    };\n\n'
 } >> "$SourceFile"
 
 CreateCurrencyTable() {
@@ -320,7 +326,7 @@ CreateCurrencyTable() {
     Currency=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@gc = 'Sc']" -o '0x' -v @cp -n "$UCD_Data")
 
     setopt SH_WORD_SPLIT
-    while IFS=':|' read -d $'\n' CodePoint; do
+    while IFS=':|' read -r -d $'\n' CodePoint; do
         printf "        0x%06X,\n" "$CodePoint" >> "$SourceFile"
     done <<< "$Currency"
     unset SH_WORD_SPLIT
@@ -333,7 +339,7 @@ CreateCombiningCharacterClassTable() {
     CombiningCharacterClass=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@ccc != '0']" -o '0x' -v @cp -o ':' -v @ccc -n "$UCD_Data")
 
     setopt SH_WORD_SPLIT
-    while IFS=':|' read -d $'\n' CodePoint Value; do
+    while IFS=':|' read -r -d $'\n' CodePoint Value; do
         printf "        {0x%06X, %u},\n" "$CodePoint" "$Value" >> "$SourceFile"
     done <<< "$CombiningCharacterClass"
     unset SH_WORD_SPLIT
@@ -346,7 +352,7 @@ CreateGraphemeExtensionTable() {
     GraphemeExtensions=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Ext = 'Y' or @EComp = 'Y']" -o '0x' -v @cp -n "$UCD_Data")
 
     setopt SH_WORD_SPLIT
-    while IFS=':|' read -d $'\n' CodePoint; do
+    while IFS=':|' read -r -d $'\n' CodePoint; do
         printf "        0x%06X,\n" "$CodePoint" >> "$SourceFile"
     done <<< "$GraphemeExtensions"
     unset SH_WORD_SPLIT
@@ -356,9 +362,9 @@ CreateGraphemeExtensionTable() {
 
 AddUnicodePrefix2CodePoint() {
     Prefixed_CodePoint=""
-    printf -v CodePoint_Decimal "%u" $1
+    printf -v CodePoint_Decimal "%u" "$1"
 
-    if [ "$CodePoint_Decimal" -le 159 ] && [ ! "$CodePoint_Decimal" -eq 36  ] && [ ! "$CodePoint_Decimal" -eq 64 ] && [ ! "$CodePoint_Decimal" -eq 96 ]; then
+    if [ "$CodePoint_Decimal" -le 159 ] && [ ! "$CodePoint_Decimal" -eq 36 ] && [ ! "$CodePoint_Decimal" -eq 64 ] && [ ! "$CodePoint_Decimal" -eq 96 ]; then
         printf -v Prefixed_CodePoint "\\\\x%X" "$CodePoint_Decimal"
     elif [ "$CodePoint_Decimal" -le 65535 ]; then
         printf -v Prefixed_CodePoint "\\\\u%04X" "$CodePoint_Decimal"
@@ -367,35 +373,20 @@ AddUnicodePrefix2CodePoint() {
     fi
 }
 
-AddUnicodePrefix2String() {
-    Prefixed_String=""
-    printf -v String_Decimal "%u" $1
-
-    if [ "$String_Decimal" -le 159 ] && [ ! "$String_Decimal" -eq 36  ] && [ ! "$String_Decimal" -eq 64 ] && [ ! "$String_Decimal" -eq 96 ]; then
-        printf -v Prefixed_String "%s\\\\x%X" "$Prefixed_String" "$String_Decimal"
-    elif [ "$String_Decimal" -le 65535 ]; then
-        printf -v Prefixed_String "%s\\\\u%04X" "$Prefixed_String" "$String_Decimal"
-    else
-        printf -v Prefixed_String "%s\\\\U%08X" "$Prefixed_String" "$String_Decimal"
-    fi
-}
-
 CreateKompatibleNormalizationTable() {
     Kompatible=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']" -o '0x' -v @cp -o ':0x' -v @dm -n "$UCD_Data" | sed -e 's/ /|0x/g')
     printf "    const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2] = {\n" >> "$SourceFile"
 
     setopt SH_WORD_SPLIT
-
-    while IFS=':|' read -d $'\n' CodePoint Replacement; do
-        AddUnicodePrefix2CodePoint "$CodePoint"
+    while IFS=':|' read -r -d $'\n' CodePoint Replacement; do
         ReplacementString=""
         for ReplacementCodePoint in ${(s/|/)Replacement}; do
-            AddUnicodePrefix2String "$ReplacementCodePoint"
-            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_String"
+            AddUnicodePrefix2CodePoint "$ReplacementCodePoint"
+            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_CodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
+        AddUnicodePrefix2CodePoint "$CodePoint"
+        printf '        {U"%s", U"%s"},\n' "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
     done <<< "$Kompatible"
-
     unset SH_WORD_SPLIT
     
     printf "    };\n\n" >> "$SourceFile"
@@ -406,17 +397,15 @@ CreateCaseFoldTable() {
     printf "    const UTF32 *const CaseFoldTable[CaseFoldTableSize][2] = {\n" >> "$SourceFile"
 
     setopt SH_WORD_SPLIT
-
-    while IFS=':|' read -d $'\n' CodePoint Replacement; do
-        AddUnicodePrefix2CodePoint "$CodePoint"
+    while IFS=':|' read -r -d $'\n' CodePoint Replacement; do
         ReplacementString=""
         for ReplacementCodePoint in ${(s/|/)Replacement}; do
-            AddUnicodePrefix2String "$ReplacementCodePoint"
-            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_String"
+            AddUnicodePrefix2CodePoint "$ReplacementCodePoint"
+            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_CodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
+        AddUnicodePrefix2CodePoint "$CodePoint"
+        printf '        {U"%s", U"%s"},\n' "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
     done <<< "$CaseFold"
-
     unset SH_WORD_SPLIT
 
     printf "    };\n\n" >> "$SourceFile"
@@ -425,18 +414,17 @@ CreateCaseFoldTable() {
 CreateCanonicalNormalizationTable() {
     Canonical=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != @cp and @dm != '#' and @dt = 'can']" -o '0x' -v @cp -o ':0x' -v @dm -n "$UCD_Data" | sed -e 's/ /|0x/g')
     printf "    const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {\n" >> "$SourceFile"
-    setopt SH_WORD_SPLIT
 
-    while IFS=':|' read -d $'\n' CodePoint Replacement; do
-        AddUnicodePrefix2CodePoint "$CodePoint"
+    setopt SH_WORD_SPLIT
+    while IFS=':|' read -r -d $'\n' CodePoint Replacement; do
         ReplacementString=""
         for ReplacementCodePoint in ${(s/|/)Replacement}; do
-            AddUnicodePrefix2String "$ReplacementCodePoint"
-            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_String"
+            AddUnicodePrefix2CodePoint "$ReplacementCodePoint"
+            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_CodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
+        AddUnicodePrefix2CodePoint "$CodePoint"
+        printf '        {U"%s", U"%s"},\n' "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
     done <<< "$Canonical"
-
     unset SH_WORD_SPLIT
 
     printf "    };\n\n" >> "$SourceFile"
@@ -459,6 +447,7 @@ CreateTables() {
     CreateKompatibleNormalizationTable
     CreateCaseFoldTable
     CreateCanonicalNormalizationTable
+
     CreateSourceFileBottom
 }
 
@@ -527,7 +516,9 @@ CheckUnicodeVersion() {
 # if the file exists check the version number against the latest release of Unicode
 # If the file does not exist create it and start downloading the UCd and writing the tables
 
-LibraryPath="$(dirname "$(dirname "$(dirname "$(echo "$(cd "$(dirname "$0")"; pwd)/$(basename "$1")")")")")"
+ProjectDirectory=$(dirname "$0")
+BaseDirectory=$(dirname "$ProjectDirectory")
+printf -v LibraryPath "%s/%s" "$BaseDirectory" "Library"
 printf -v HeaderFile "%s/%s" "$LibraryPath" "include/TextIO/Private/TextIOTables.h"
 printf -v SourceFile "%s/%s" "$LibraryPath" "src/TextIO/Private/TextIOTables.c"
 TempFolder=$(mktemp -d)

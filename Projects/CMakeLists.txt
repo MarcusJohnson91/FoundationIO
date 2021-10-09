@@ -33,7 +33,7 @@ GetVersionString(${VERSION_DIRECTORY} VERSION_STRING)
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
     message("We're checking if TextIOTables.h should be updated, it could take a few seconds to about 12 minutes.")
     execute_process(
-    COMMAND sh "${LIBRARY_DIRECTORY}/include/TextIO/Private/TextIOTables_Create.sh"                                              "${LIBRARY_DIRECTORY}/include/TextIO/Private/TextIOTables.h"
+    COMMAND sh "${BASE_DIRECTORY}/Projects/TextIOTables_Create.sh"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE TextIOTables_Create_Status 
     RESULTS_VARIABLE STDOUT
