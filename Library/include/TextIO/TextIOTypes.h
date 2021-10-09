@@ -393,10 +393,6 @@ typedef                   char32_t                             CharSet32;
 #endif /* PlatformIO_Language */
 #endif /* UTF32_MakeStringImmutable */
 
-#ifndef                   PlatformIO_MakeStringSet
-#define                   PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
-#endif
-
 #endif /* TextIOTypes_PropertyConversion32 */
   
 typedef const UTF8     ImmutableChar_UTF8;
@@ -407,9 +403,13 @@ typedef const UTF8     *const ImmutableString_UTF8;
 typedef const UTF16    *const ImmutableString_UTF16;
 typedef const UTF32    *const ImmutableString_UTF32;
 
-typedef const UTF8     *const *const ImmutableStringSet_UTF8;
-typedef const UTF16    *const *const ImmutableStringSet_UTF16;
-typedef const UTF32    *const *const ImmutableStringSet_UTF32;
+typedef const UTF8     *const ImmutableStringSet_UTF8[];
+typedef const UTF16    *const ImmutableStringSet_UTF16[];
+typedef const UTF32    *const ImmutableStringSet_UTF32[];
+
+typedef const UTF8     *MutableStringSet_UTF8[];
+typedef const UTF16    *MutableStringSet_UTF16[];
+typedef const UTF32    *MutableStringSet_UTF32[];
 
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8               (1)
@@ -427,6 +427,8 @@ typedef const UTF32    *const *const ImmutableStringSet_UTF32;
 #define                   UTF8String(Literal)                   _Generic(Literal, unsigned char:(UTF8*) u8##Literal, unsigned char*:(UTF8*) u8##Literal, signed char:(UTF8*) u8##Literal, signed char*:(UTF8*) u8##Literal, char:(UTF8*) u8##Literal, char*:(UTF8*) u8##Literal, const unsigned char: (const UTF8*) u8##Literal, const unsigned char*: (const UTF8*) u8##Literal, const signed char: (const UTF8*) u8##Literal, const signed char*: (const UTF8*) u8##Literal, const char: (const UTF8*) u8##Literal, const char*: (const UTF8*) u8##Literal)
     // Create the string literal, but at the end create a NULL; so I guess count the number of variadic arguments, cloud just add an empty string manually...
 #define                   UTF8StringSet(...)                    {__VA_ARGS__, UTF8String("\0")}
+#define UTF8String2(A) u8##A
+#define IMPLEMENT_MODULE(name) UTF8String2(A)
 #define                   UTF8Character(Literal)                _Generic((0,Literal), unsigned char:(UTF8) u8##Literal, signed char:(UTF8) u8##Literal, char:(UTF8) u8##Literal)
 #endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize8 */

@@ -322,13 +322,13 @@ extern "C" {
                     }
                 }
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-                UTF8 **GeneratedHelp8 = UTF8_StringSet_Encode((ImmutableStringSet_UTF32) GeneratedHelp);
+                UTF8 **GeneratedHelp8 = UTF8_StringSet_Encode(GeneratedHelp);
                 for (uint64_t String = 0; String < StringSetSize; String++) {
                     UTF8_File_WriteString(stdout, GeneratedHelp8[String]);
                 }
                 UTF8_StringSet_Deinit(GeneratedHelp8);
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-                UTF16 **GeneratedHelp16 = UTF16_StringSet_Encode((ImmutableStringSet_UTF32) GeneratedHelp);
+                UTF16 **GeneratedHelp16 = UTF16_StringSet_Encode(GeneratedHelp);
                 for (uint64_t String = 0; String < StringSetSize; String++) {
                     UTF16_File_WriteString(stdout, GeneratedHelp16[String]);
                 }
@@ -413,7 +413,7 @@ extern "C" {
         UTF32 **StringSet               = NULL;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-        StringSet                       = (UTF32**) UTF8_StringSet_Decode((ImmutableStringSet_UTF8) Arguments);
+        StringSet                       = (UTF32**) UTF8_StringSet_Decode(Arguments);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
         StringSet                       = (UTF32**) UTF8_StringSet_Decode(reinterpret_cast<ImmutableStringSet_UTF8>( const_cast<PlatformIO_Immutable(void **)>(Arguments)));
 #endif
@@ -617,7 +617,7 @@ extern "C" {
                 free(CaseFolded);
                 Arguments32[Arg]    = Normalized;
             }
-            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, (ImmutableStringSet_UTF32) Arguments32);
+            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 free(Arguments32[Arg]);
             }
@@ -640,7 +640,7 @@ extern "C" {
                 free(CaseFolded);
                 Arguments32[Arg]    = Normalized;
             }
-            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, (ImmutableStringSet_UTF32) Arguments32);
+            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 free(Arguments32[Arg]);
             }

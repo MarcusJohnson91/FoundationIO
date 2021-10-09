@@ -11,7 +11,7 @@ extern "C" {
 
     bool Test_UTF8_Deformat(SecureRNG *Secure) {
         bool TestPassed      = No;
-        ImmutableStringSet_UTF8 DeformatTest1 = (ImmutableStringSet_UTF8) UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
+        UTF8 **DeformatTest1 = UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
         bool  SubString2     = UTF8_Compare(DeformatTest1[1], UTF8String("1234"));
         bool  SubString3     = UTF8_Compare(DeformatTest1[2], UTF8String("Positional"));
@@ -31,7 +31,7 @@ extern "C" {
 
 
 
-    bool Test_UTF8_Format(void) {
+    bool Test_UTF8_Format(SecureRNG *Secure) {
         /*
          TestIO Notes:
 
@@ -246,15 +246,16 @@ extern "C" {
         return TestPassed;
 
         TestCase TestCase_Format8 = {
-            .Function       = Test_UTF8_Format,
-            .State      = TestState_Enabled,
+            .Function    = Test_UTF8_Format(Secure),
+            .State       = TestState_Enabled,
             .Expectation = Outcome_Passed, // TestOutcome?
         };
     }
 
     int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = false;
-        TestSuitePassed           = Test_UTF8_Format();
+        SecureRNG *Secure         = SecureRNG_Init(4096);
+        TestSuitePassed           = Test_UTF8_Format(Secure);
         return TestSuitePassed;
     }
 

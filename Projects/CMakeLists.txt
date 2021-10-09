@@ -169,6 +169,7 @@ ${CMAKE_C_FLAGS} \
 -Wno-pointer-sign \
 -Wno-reserved-id-macro \
 -Wno-sign-conversion \
+-Wreserved-identifier \
 -Wenum-conversion \
 -Wswitch-enum \
 -Bsymbolic \
@@ -182,6 +183,7 @@ ${CMAKE_C_FLAGS} \
 -fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 -fno-optimize-sibling-calls \
+-fstack-check \
 -DDEBUG=1 \
 -g3 \
 -O1 \
@@ -198,6 +200,7 @@ ${CMAKE_C_FLAGS} \
 -fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 -fno-optimize-sibling-calls \
+-fstack-check \
 -DDEBUG=1 \
 -g \
 -Ofast \
@@ -260,6 +263,7 @@ ${CMAKE_C_FLAGS} \
 -Wmissing-format-attribute \
 -Wmissing-noreturn \
 -Wswitch-enum \
+-Wreserved-identifier \
 -Bsymbolic \
 -fno-semantic-interposition \
 -fvisibility-inlines-hidden \
@@ -270,6 +274,7 @@ set(CMAKE_C_FLAGS_DEBUG " \
 ${CMAKE_C_FLAGS} \
 -fno-omit-frame-pointer \
 -fsanitize=address,undefined \
+-fstack-check \
 -DDEBUG=1 \
 -g \
 -O1 \
@@ -285,6 +290,7 @@ ${CMAKE_C_FLAGS} \
 -fno-omit-frame-pointer \
 -fsanitize=address,undefined \
 -fno-omit-frame-pointer \
+-fstack-check \
 -DDEBUG=1 \
 -g \
 -Ofast \

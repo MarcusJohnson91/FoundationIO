@@ -477,6 +477,10 @@ extern "C" {
 
 #endif /* PlatformIO_TargetOS is some kind of Windows */
 
+#if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
+#define _GNU_SOURCE /* Needed for syscalls like getrandom */
+#endif /* Linux */
+
 #include <stdarg.h>     /* Included for va_list, va_copy */
 #include <stdbool.h>    /* Included for bool */
 #include <stdint.h>     /* Included for u/intX_t */
@@ -486,8 +490,8 @@ extern "C" {
 
 #if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #include <dlfcn.h>      /* Included for shared library support */
-#include <sys/socket.h> /* Included for socket support */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
+#include <sys/socket.h> /* Included for socket support */
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <Windows.h>    /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #endif /* PlatformIO_TargetOSIsPOSIX */
@@ -505,6 +509,10 @@ extern "C" {
 #define             PlatformIO_HiddenSymbol                                             __attribute__((visibility("hidden")))
 #endif /* Compiler is MSVC */
 #endif /* PlatformIO_HiddenSymbol */
+
+#ifndef             PlatformIO_Enum2Index
+#define             PlatformIO_Enum2Index(EnumName)                                     (EnumName - 1)
+#endif /* PlatformIO_Enum2Index */
 
 
     /*!

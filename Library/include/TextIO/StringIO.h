@@ -547,7 +547,48 @@ extern "C" {
      @param            String                            The string to convert.
      */
     UTF8              *UTF16_Convert(ImmutableString_UTF16 String);
-    
+
+    /* TextIOTables Operations */
+    /*!
+     @abstract                                           Checks if a given CodePoint is in the specified Table from TextIO.
+     @param            Table                             The table to check.
+     @param            TableSize                         The size of the table.
+     @param            CodePoint                         The codepoint to check.
+     */
+    bool               UTF32_IsCodePointInTable(const UTF32 *Table, uint64_t TableSize, UTF32 CodePoint);
+
+    /*!
+     @abstract                                           Get the CodePoint's CombiningCharacterClass value.
+     @param            CodePoint                         The codepoint to check.
+     */
+    CodePointClass     UTF32_GetCharacterClassOfCodePoint(UTF32 CodePoint);
+
+    /*!
+     @abstract                                           Get the CodePoint's integer value; if not an integer returns 0.
+     @param            CodePoint                         The codepoint to check.
+     */
+    int64_t            UTF32_GetIntegerValueOfCodePoint(UTF32 CodePoint);
+
+    /*!
+     @abstract                                           Get the CodePoint's decimal value; Specialized for `float`.
+     @param            CodePoint                         The codepoint to check.
+     */
+    float              UTF32_GetDecimalValueOfCodePoint32(UTF32 CodePoint);
+
+    /*!
+     @abstract                                           Get the CodePoint's decimal value; Specialized for `double`.
+     @param            CodePoint                         The codepoint to check.
+     */
+    double             UTF32_GetDecimalValueOfCodePoint64(UTF32 CodePoint);
+
+    /*!
+     @abstract                                           Do a string search on the casefold/normalization tables.
+     @param            Table                             CaseFold/Normalizaton table.
+     @param            TableSize                         The number of entries in the table.
+     @param            String2Replace                    The codepoint to check.
+     @param            String2ReplaceSize                The size of the string2replace, makes lookup way faster.
+     */
+    UTF32             *UTF32_GetReplacementStringFromTable(UTF32 *Table, uint64_t TableSize, UTF32 *String2Replace, uint64_t String2ReplaceSize);
     /*!
      @abstract                                           Casefolds string for case insensitive comparison.
      @remark                                             Uppercase CodePoints are connverted to lowercase for the comparison
@@ -597,6 +638,7 @@ extern "C" {
      @param            NormalizedForm                    The type of normalization to use on the String.
      */
     UTF32             *UTF32_Normalize(ImmutableString_UTF32 String, StringIO_NormalizationForms NormalizedForm);
+    /* TextIOTables Operations */
     
     /*!
      @abstract                                           Extracts a Grapheme from String.
@@ -1438,14 +1480,14 @@ extern "C" {
      @param            StringSet                         The StringSet to encode.
      @return                                             Returns the encoded StringSet.
      */
-    UTF8             **UTF8_StringSet_Encode(ImmutableStringSet_UTF32 StringSet);
+    UTF8             **UTF8_StringSet_Encode(MutableStringSet_UTF32 StringSet);
     
     /*!
      @abstract                                           Encodes a StringSet to a UTF16_StringSet.
      @param            StringSet                         The StringSet to encode.
      @return                                             Returns the encoded StringSet.
      */
-    UTF16            **UTF16_StringSet_Encode(ImmutableStringSet_UTF32 StringSet);
+    UTF16            **UTF16_StringSet_Encode(MutableStringSet_UTF32 StringSet);
     
     /*!
      @abstract                                           Creates a String from a StringSet.

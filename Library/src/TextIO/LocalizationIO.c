@@ -242,13 +242,13 @@ extern "C" {
     UTF8 **Localize_UTF8_GetGroupingSize(void) {
         UTF8 **GroupingSize = NULL;
         LocalizationIO_Init();
-        struct lconv *Locale                            = localeconv();
+        struct lconv *Locale                    = localeconv();
         ImmutableString_UTF8 GroupingSizeString = UTF8_Clone((ImmutableString_UTF8) Locale->grouping);
-        ImmutableString_UTF8 Delimiters[2]      = PlatformIO_MakeStringSet(2, UTF8String("/"), UTF8String("\\"));
+        ImmutableStringSet_UTF8 Delimiters      = UTF8StringSet(UTF8String("/"), UTF8String("\\"));
 #if (PlatformIO_Language == PlatformIO_LanguageIsC)
-        GroupingSize = UTF8_Split(GroupingSizeString, (ImmutableStringSet_UTF8) Delimiters);
+        GroupingSize      = UTF8_Split(GroupingSizeString, Delimiters);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        GroupingSize      = UTF8_Split((ImmutableString_UTF8) GroupingSizeString, (ImmutableStringSet_UTF8) Delimiters);
+        GroupingSize      = UTF8_Split(GroupingSizeString, Delimiters);
 #endif
         return GroupingSize;
     }
@@ -257,13 +257,13 @@ extern "C" {
         UTF16 **GroupingSize = NULL;
         LocalizationIO_Init();
         struct lconv *Locale                       = localeconv();
-        UTF8 *        GroupingSizeString           = UTF8_Clone((ImmutableString_UTF8) Locale->grouping);
-        ImmutableString_UTF8 Delimiters[2] = PlatformIO_MakeStringSet(2, UTF8String("/"), UTF8String("\\"));
+        UTF8         *GroupingSizeString           = UTF8_Clone((ImmutableString_UTF8) Locale->grouping);
+        ImmutableStringSet_UTF8 Delimiters         = UTF8StringSet(UTF8String("/"), UTF8String("\\"));
         
-        UTF8 ** GroupingSize8  = UTF8_Split((ImmutableString_UTF8) GroupingSizeString, (ImmutableStringSet_UTF8) Delimiters);
-        UTF32 **GroupingSize32 = UTF8_StringSet_Decode((ImmutableStringSet_UTF8) GroupingSize8);
+        UTF8 ** GroupingSize8  = UTF8_Split(GroupingSizeString, Delimiters);
+        UTF32 **GroupingSize32 = UTF8_StringSet_Decode(GroupingSize8);
         UTF8_StringSet_Deinit(GroupingSize8);
-        GroupingSize = UTF16_StringSet_Encode((ImmutableStringSet_UTF32) GroupingSize32);
+        GroupingSize = UTF16_StringSet_Encode(GroupingSize32);
         UTF32_StringSet_Deinit(GroupingSize32);
         return GroupingSize;
     }

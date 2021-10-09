@@ -21,7 +21,6 @@ extern "C" {
      Automatic Test Generation:
 
      Instrument the functions to see when and where branching occurs and to refine the randomly generated data
-
      */
 
     /*

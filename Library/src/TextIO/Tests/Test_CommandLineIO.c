@@ -19,17 +19,12 @@ extern "C" {
         CommandLineIO_SetMinOptions(CLI, 2);
 
         uint64_t FakeArgC = 4;
-        UTF8 **FakeArgV   = UTF8_StringSet_Init(FakeArgC);
-        FakeArgV[0]       = UTF8String("--Input");
-        FakeArgV[1]       = UTF8String("/Fake/Path/For/Testing.png");
-        FakeArgV[2]       = UTF8String("--Output");
-        FakeArgV[3]       = UTF8String("/Fake/Path/For/Testing.jpg");
-
+        ImmutableStringSet_UTF8 FakeArgV = UTF8StringSet(UTF8String("--Input"), UTF8String("/Fake/Path/For/Testing.png"), UTF8String("--Output"), UTF8String("/Fake/Path/For/Testing.jpg"));
         /*
          Now we should test case conversion, and maybe option shortening and all kinds of other things
          */
 
-        CommandLineIO_UTF8_ParseOptions(CLI, 4, (ImmutableStringSet_UTF8) FakeArgV);
+        CommandLineIO_UTF8_ParseOptions(CLI, 4, FakeArgV);
 
         CommandLineIO_Deinit(CLI);
         

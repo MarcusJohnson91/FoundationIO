@@ -1700,7 +1700,7 @@ extern "C" {
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit((UTF32*) Format32);
                 UTF32_Deinit((UTF32*) Formatted32);
-                StringSet                  = UTF8_StringSet_Encode((ImmutableStringSet_UTF32) Strings32);
+                StringSet                  = UTF8_StringSet_Encode(Strings32);
                 UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {
@@ -1724,7 +1724,7 @@ extern "C" {
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
                 UTF32_Deinit(Formatted32);
-                StringSet                  = UTF16_StringSet_Encode((ImmutableStringSet_UTF32) Strings32);
+                StringSet                  = UTF16_StringSet_Encode(Strings32);
                 UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {

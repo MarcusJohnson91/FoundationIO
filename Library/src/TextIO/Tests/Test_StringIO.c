@@ -8,12 +8,8 @@ extern "C" {
     
     bool Test_StringSet(SecureRNG *Secure) {
         bool TestPassed = Yes;
-        ImmutableString_UTF8 StringSet[4] = {
-            [0] = UTF8String("String1"),
-            [1] = UTF8String("String2"),
-            [2] = UTF8String("String3"),
-        };
-        uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet);
+        ImmutableStringSet_UTF8 StringSet = UTF8StringSet(UTF8String("String1"), UTF8String("String2"), UTF8String("String3"));
+        uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet); // 14?!
         if (NumStrings != 3) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings is %llu but should be 3"), NumStrings);
             TestPassed = No;
@@ -23,10 +19,7 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Size of StringSet's Strings doesn't = 7"));
         }
         /* So far so good, now lets test Allocation, Assignment, and Deinitalization */
-        UTF8 **StringSet2 = UTF8_StringSet_Init(3);
-        UTF8_StringSet_Attach(StringSet2, StringSet[0], 0);
-        UTF8_StringSet_Attach(StringSet2, StringSet[1], 1);
-        UTF8_StringSet_Attach(StringSet2, StringSet[2], 2);
+        ImmutableStringSet_UTF8 StringSet2 = UTF8StringSet(UTF8String("String1"), UTF8String("String2"), UTF8String("String3"));
         
         if (StringSet[0] != StringSet2[0]) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Addresses don't match"));

@@ -2,6 +2,18 @@
 #include "../include/TextIO/LogIO.h"      /* Included for Logging */
 #include "../include/TextIO/StringIO.h"   /* Included for UTF-X operations */
 
+#if    ((PlatformIO_TargetOS & PlatformIO_TargetOSIsBSD) == PlatformIO_TargetOSIsBSD) || ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
+// Use epoll
+#include <sys/epoll.h>
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+// use IO Completion Ports
+#endif
+
+/* Old Headers, cleanup after refactoring */
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #include <aio.h>                          /* Included for aio_read and aio_write */
 #include <fcntl.h>                        /* Included for open */
@@ -13,7 +25,8 @@
 #include <netinet/ip.h>                   /* Included for Socket API */
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <process.h>
-#endif
+#endif /* TargetOS */
+/* Old Headers, cleanup after refactoring */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
