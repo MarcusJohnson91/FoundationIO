@@ -18,7 +18,7 @@ extern "C" {
             String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
-                String[Index]   = 0x88;
+                String[Index]   = 0x38;
             }
 #endif
             if (String == NULL) {
@@ -37,7 +37,11 @@ extern "C" {
             String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
-                String[Index]   = 0x1616;
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrder_BE)
+                String[Index]   = 0x3136;
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrder_LE)
+                String[Index]   = 0x3631;
+#endif /* Byte Order */
             }
 #endif
             if (String == NULL) {
@@ -56,7 +60,11 @@ extern "C" {
             String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t Index = 0ULL; Index < NumCodePoints; Index++) {
-                String[Index]   = 0x32323232;
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrder_BE)
+                String[Index]   = 0x3332;
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrder_LE)
+                String[Index]   = 0x3233;
+#endif /* Byte Order */
             }
 #endif
             if (String == NULL) {
@@ -2668,7 +2676,74 @@ extern "C" {
         }
         return Inserted;
     }
-    
+
+    /* TextIOTables Operations */
+    bool UTF32_IsCodePointInTable(const UTF32 *Table, uint64_t TableSize, UTF32 CodePoint) {
+        bool Match = No;
+        for (uint64_t Index = 0; Index < TableSize; Index++) {
+            if (CodePoint == Table[Index]) {
+                Match = Yes;
+                break;
+            }
+        }
+        return Match;
+    }
+
+    CodePointClass UTF32_GetCharacterClassOfCodePoint(UTF32 CodePoint) {
+        CodePointClass CharacterClass = CodePointClass_Unspecified;
+        for (uint64_t Index = 0; Index < CombiningCharacterClassTableSize; Index++) {
+            if (CodePoint == CombiningCharacterClassTable[Index][0]) {
+                CharacterClass = CombiningCharacterClassTable[Index][1];
+                break;
+            }
+        }
+        return CharacterClass;
+    }
+
+    int64_t UTF32_GetIntegerValueOfCodePoint(UTF32 CodePoint) {
+        int64_t Integer = 0;
+        for (uint64_t Index = 0; Index < IntegerValueTableSize; Index++) {
+            if (CodePoint == IntegerValueTable[Index][0]) {
+                Integer = IntegerValueTable[Index][1];
+                break;
+            }
+        }
+        return Integer;
+    }
+
+    float UTF32_GetDecimalValueOfCodePoint32(UTF32 CodePoint) {
+        int64_t Integer = 0;
+        for (uint64_t Index = 0; Index < IntegerValueTableSize; Index++) {
+            if (CodePoint == IntegerValueTable[Index][0]) {
+                Integer = IntegerValueTable[Index][1];
+                break;
+            }
+        }
+        return Integer;
+    }
+
+    double UTF32_GetDecimalValueOfCodePoint64(UTF32 CodePoint) {
+        double Decimal = 0.0;
+        for (uint64_t Index = 0; Index < DecimalValueTableSize; Index++) {
+            if (CodePoint == DecimalValueTable[Index][0]) {
+                Decimal = DecimalValueTable[Index][1] / DecimalValueTable[Index][2];
+                break;
+            }
+        }
+        return Decimal;
+    }
+
+    UTF32 *UTF32_GetReplacementStringFromTable(UTF32 *Table, uint64_t TableSize, UTF32 *String2Replace, uint64_t String2ReplaceSize) {
+        UTF32 *Replacement = NULL;
+        for (uint64_t Index = 0; Index < TableSize; Index++) {
+            // Shit, gotta do string comparisons
+            /*
+             Loop over the table of replacement strings, checking the length of each one, we really should have the size of each replacement string in the tables
+             */
+        }
+        return Replacement;
+    }
+
     UTF8 *UTF8_CaseFold(ImmutableString_UTF8 String) {
         UTF8 *CaseFolded      = NULL;
         if (String != NULL) {
@@ -2743,64 +2818,6 @@ extern "C" {
         }
         return CaseFoldedString;
     }
-    
-    typedef enum StringIO_CombiningCharacterClasses {
-        CCCOverlay                           = 1,
-        CCCNukta                             = 7,
-        CCCKanaVoicing                       = 8,
-        CCCVirama                            = 9,
-        CCC10                                = 10,
-        CCC11                                = 11,
-        CCC12                                = 12,
-        CCC13                                = 13,
-        CCC14                                = 14,
-        CCC15                                = 15,
-        CCC16                                = 16,
-        CCC17                                = 17,
-        CCC18                                = 18,
-        CCC19                                = 19,
-        CCC20                                = 20,
-        CCC21                                = 21,
-        CCC22                                = 22,
-        CCC23                                = 23,
-        CCC24                                = 24,
-        CCC25                                = 25,
-        CCC26                                = 26,
-        CCC27                                = 27,
-        CCC28                                = 28,
-        CCC29                                = 29,
-        CCC30                                = 30,
-        CCC31                                = 31,
-        CCC32                                = 32,
-        CCC33                                = 33,
-        CCC34                                = 34,
-        CCC35                                = 35,
-        CCC36                                = 36,
-        CCC84                                = 84,
-        CCC91                                = 91,
-        CCC103                               = 103,
-        CCC107                               = 107,
-        CCC118                               = 118,
-        CCC122                               = 122,
-        CCC129                               = 129,
-        CCC130                               = 130,
-        CCC132                               = 132,
-        CCCAttachBelowLeft                   = 200,
-        CCCAttachBelow                       = 202,
-        CCCAttachAbove                       = 214,
-        CCCAttachAboveRight                  = 216,
-        CCCAttachBelowLeft2                  = 218,
-        CCCAttachBelow2                      = 220,
-        CCCAttachBelowRight2                 = 222,
-        CCCAttachLeft                        = 224,
-        CCCAttachRight                       = 226,
-        CCCAttachAboveLeft2                  = 228,
-        CCCAttachAbove2                      = 230,
-        CCCAttachAboveRight2                 = 232,
-        CCCAttachDoubleBelow                 = 233,
-        CCCAttachDoubleAbove                 = 234,
-        CCCAttachIOTASubscript               = 240,
-    } StringIO_CombiningCharacterClasses;
     
     static UTF32 *UTF32_Reorder(UTF32 *String) { // Stable sort
         uint64_t CodePoint  = 1ULL;
@@ -2937,6 +2954,7 @@ extern "C" {
         }
         return NormalizedString;
     }
+    /* TextIOTables Operations */
     
     int64_t UTF8_String2Integer(TextIO_Bases Base, ImmutableString_UTF8 String) { // Replaces atoi, atol, strtol, strtoul,
         int64_t Value = 0LL;
@@ -3483,7 +3501,7 @@ extern "C" {
         if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);
             UTF32   **Strings2Remove32          = UTF8_StringSet_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_Trim((ImmutableString_UTF32) String32, Type, (ImmutableStringSet_UTF32) Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim((ImmutableString_UTF32) String32, Type, Strings2Remove32);
             UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF8_Encode(Trimmed32);
             UTF32_Deinit(String32);
@@ -3502,7 +3520,7 @@ extern "C" {
         if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF16_Decode(String);
             UTF32   **Strings2Remove32          = UTF16_StringSet_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_Trim((ImmutableString_UTF32) String32, Type, (ImmutableStringSet_UTF32) Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
             UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF16_Encode(Trimmed32);
             UTF32_Deinit(String32);
@@ -3609,9 +3627,9 @@ extern "C" {
     UTF8 **UTF8_Split(ImmutableString_UTF8 String, ImmutableStringSet_UTF8 Delimiters) {
         UTF8 **SplitString                                 = NULL;
         if (String != NULL && Delimiters != NULL) {
-            ImmutableString_UTF32  String32      = UTF8_Decode(String);
-            ImmutableStringSet_UTF32 Delimiters32  = (ImmutableStringSet_UTF32) UTF8_StringSet_Decode(Delimiters);
-            ImmutableStringSet_UTF32 SplitString32 = (ImmutableStringSet_UTF32) UTF32_Split(String32, Delimiters32);
+            ImmutableString_UTF32  String32        = UTF8_Decode(String);
+            UTF32 **Delimiters32  = UTF8_StringSet_Decode(Delimiters);
+            UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
             UTF32_Deinit((UTF32*) String32);
             UTF32_StringSet_Deinit((UTF32**) Delimiters32);
             SplitString           = UTF8_StringSet_Encode(SplitString32);
@@ -3628,10 +3646,10 @@ extern "C" {
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF16_Decode(String);
             UTF32 **Delimiters32  = UTF16_StringSet_Decode(Delimiters);
-            ImmutableStringSet_UTF32 SplitString32 = (ImmutableStringSet_UTF32) UTF32_Split((ImmutableString_UTF32) String32, (ImmutableStringSet_UTF32) Delimiters32);
+            UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
             UTF32_Deinit(String32);
             UTF32_StringSet_Deinit((UTF32**) Delimiters32);
-            SplitString           = UTF16_StringSet_Encode((ImmutableStringSet_UTF32) SplitString32);
+            SplitString           = UTF16_StringSet_Encode(SplitString32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
@@ -4304,7 +4322,7 @@ extern "C" {
     uint64_t UTF8_StringSet_GetNumStrings(ImmutableStringSet_UTF8 StringSet) {
         uint64_t NumStrings = 0ULL;
         if (StringSet != NULL) {
-            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
+            while (StringSet[NumStrings][0] != PlatformIO_NULLTerminator) {
                 NumStrings += 1;
             }
         } else {
@@ -4316,7 +4334,7 @@ extern "C" {
     uint64_t UTF16_StringSet_GetNumStrings(ImmutableStringSet_UTF16 StringSet) {
         uint64_t NumStrings = 0ULL;
         if (StringSet != NULL) {
-            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
+            while (StringSet[NumStrings][0] != PlatformIO_NULLTerminator) {
                 NumStrings += 1;
             }
         } else {
@@ -4328,7 +4346,7 @@ extern "C" {
     uint64_t UTF32_StringSet_GetNumStrings(ImmutableStringSet_UTF32 StringSet) {
         uint64_t NumStrings = 0ULL;
         if (StringSet != NULL) {
-            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
+            while (StringSet[NumStrings][0] != PlatformIO_NULLTerminator) {
                 NumStrings += 1;
             }
         } else {
@@ -4444,7 +4462,7 @@ extern "C" {
         return Decoded;
     }
     
-    UTF8 **UTF8_StringSet_Encode(ImmutableStringSet_UTF32 StringSet) {
+    UTF8 **UTF8_StringSet_Encode(MutableStringSet_UTF32 StringSet) {
         UTF8 **Encoded              = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings     = UTF32_StringSet_GetNumStrings(StringSet);
@@ -4456,14 +4474,13 @@ extern "C" {
             } else {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate decoded StringSet"));
             }
-            
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return Encoded;
     }
     
-    UTF16 **UTF16_StringSet_Encode(ImmutableStringSet_UTF32 StringSet) {
+    UTF16 **UTF16_StringSet_Encode(MutableStringSet_UTF32 StringSet) {
         UTF16 **Encoded             = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings     = UTF32_StringSet_GetNumStrings(StringSet);
@@ -4486,7 +4503,7 @@ extern "C" {
         UTF8 *Flattened = NULL;
         if (StringSet != NULL) {
             UTF32 **StringSet32 = UTF8_StringSet_Decode(StringSet);
-            UTF32  *Flattened32 = UTF32_StringSet_Flatten((ImmutableStringSet_UTF32) StringSet32);
+            UTF32  *Flattened32 = UTF32_StringSet_Flatten(StringSet32);
             UTF32_StringSet_Deinit(StringSet32);
             Flattened           = UTF8_Encode(Flattened32);
             UTF32_Deinit(Flattened32);
@@ -4500,7 +4517,7 @@ extern "C" {
         UTF16 *Flattened        = NULL;
         if (StringSet != NULL) {
             UTF32 **StringSet32 = UTF16_StringSet_Decode(StringSet);
-            UTF32  *Flattened32 = UTF32_StringSet_Flatten((ImmutableStringSet_UTF32) StringSet32);
+            UTF32  *Flattened32 = UTF32_StringSet_Flatten(StringSet32);
             UTF32_StringSet_Deinit(StringSet32);
             Flattened           = UTF16_Encode(Flattened32);
             UTF32_Deinit(Flattened32);
@@ -4576,28 +4593,6 @@ extern "C" {
         }
     }
     /* StringSet Functions */
-
-    /* StringIO_Slice Functions */
-    typedef struct StringIO_Slice {
-        size_t   StartInCodeUnits;
-        size_t   EndInCodeUnits;
-    } StringIO_Slice;
-
-    StringIO_Slice StringIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits) {
-        StringIO_Slice Slice;
-        Slice.StartInCodeUnits = StartInCodeUnits;
-        Slice.EndInCodeUnits   = EndInCodeUnits;
-        return Slice;
-    }
-
-    size_t StringIO_Slice_GetStartInCodeUnits(StringIO_Slice Slice) {
-        return Slice.StartInCodeUnits;
-    }
-
-    size_t StringIO_Slice_GetEndInCodeUnits(StringIO_Slice Slice) {
-        return Slice.EndInCodeUnits;
-    }
-    /* StringIO_Slice Functions */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

@@ -139,13 +139,71 @@ extern "C" {
                    WhitespaceType_Insignificant          = 1,
                    WhitespaceType_Significant            = 2,
     } StringIO_WhitespaceTypes;
-    
+
     /*!
-     @typedef          StringIO_Slice
-     @abstract                                           Contains the start and end position (in CodeUnits) of a string for immutable access.
+     @enum         CodePointClass
+     @abstract                                           Should whitespace be ignored or not?
+     @constant     CodePointClass_Unspecified            Unknown TrimString command.
      */
-    typedef struct     StringIO_Slice                    StringIO_Slice;
-    
+    typedef enum CodePointClass {
+        CodePointClass_Unspecified                       = 0,
+        CodePointClass_CCCOverlay                        = 1,
+        CodePointClass_CCCNukta                          = 7,
+        CodePointClass_CCCKanaVoicing                    = 8,
+        CodePointClass_CCCVirama                         = 9,
+        CodePointClass_CCC10                             = 10,
+        CodePointClass_CCC11                             = 11,
+        CodePointClass_CCC12                             = 12,
+        CodePointClass_CCC13                             = 13,
+        CodePointClass_CCC14                             = 14,
+        CodePointClass_CCC15                             = 15,
+        CodePointClass_CCC16                             = 16,
+        CodePointClass_CCC17                             = 17,
+        CodePointClass_CCC18                             = 18,
+        CodePointClass_CCC19                             = 19,
+        CodePointClass_CCC20                             = 20,
+        CodePointClass_CCC21                             = 21,
+        CodePointClass_CCC22                             = 22,
+        CodePointClass_CCC23                             = 23,
+        CodePointClass_CCC24                             = 24,
+        CodePointClass_CCC25                             = 25,
+        CodePointClass_CCC26                             = 26,
+        CodePointClass_CCC27                             = 27,
+        CodePointClass_CCC28                             = 28,
+        CodePointClass_CCC29                             = 29,
+        CodePointClass_CCC30                             = 30,
+        CodePointClass_CCC31                             = 31,
+        CodePointClass_CCC32                             = 32,
+        CodePointClass_CCC33                             = 33,
+        CodePointClass_CCC34                             = 34,
+        CodePointClass_CCC35                             = 35,
+        CodePointClass_CCC36                             = 36,
+        CodePointClass_CCC84                             = 84,
+        CodePointClass_CCC91                             = 91,
+        CodePointClass_CCC103                            = 103,
+        CodePointClass_CCC107                            = 107,
+        CodePointClass_CCC118                            = 118,
+        CodePointClass_CCC122                            = 122,
+        CodePointClass_CCC129                            = 129,
+        CodePointClass_CCC130                            = 130,
+        CodePointClass_CCC132                            = 132,
+        CodePointClass_CCCAttachBelowLeft                = 200,
+        CodePointClass_CCCAttachBelow                    = 202,
+        CodePointClass_CCCAttachAbove                    = 214,
+        CodePointClass_CCCAttachAboveRight               = 216,
+        CodePointClass_CCCAttachBelowLeft2               = 218,
+        CodePointClass_CCCAttachBelow2                   = 220,
+        CodePointClass_CCCAttachBelowRight2              = 222,
+        CodePointClass_CCCAttachLeft                     = 224,
+        CodePointClass_CCCAttachRight                    = 226,
+        CodePointClass_CCCAttachAboveLeft2               = 228,
+        CodePointClass_CCCAttachAbove2                   = 230,
+        CodePointClass_CCCAttachAboveRight2              = 232,
+        CodePointClass_CCCAttachDoubleBelow              = 233,
+        CodePointClass_CCCAttachDoubleAbove              = 234,
+        CodePointClass_CCCAttachIOTASubscript            = 240,
+    } CodePointClass;
+
     /*!
      @abstract                                           Creates a UTF8 string plus a NULL terminator.
      @param            NumCodeUnits                      The size of the string not counting the NULL terminator.
@@ -1428,29 +1486,6 @@ extern "C" {
      */
     void               UTF32_StringSet_Deinit(UTF32 **StringSet);
     /* StringSet Functions */
-
-    /* StringIO_Slice Functions */
-    /*!
-     @abstract                                           Creates an instance of a StringIO_Slice.
-     @param            StartInCodeUnits                  Where should the string start?
-     @param            EndInCodeUnits                    Where should the string end?
-     */
-    StringIO_Slice        StringIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits);
-
-    /*!
-     @abstract                                           Where does this slice start?
-     @param            Slice                             The instance of the StringIO_Slice.
-     @return                                             The Start of the StringIO_Slice in CodeUnits.
-     */
-    size_t             StringIO_Slice_GetStartInCodeUnits(StringIO_Slice Slice);
-
-    /*!
-     @abstract                                           Where does this slice end?
-     @param            Slice                             The instance of the StringIO_Slice.
-     @return                                             The End of the StringIO_Slice in CodeUnits.
-     */
-    size_t             StringIO_Slice_GetEndInCodeUnits(StringIO_Slice Slice);
-    /* StringIO_Slice Functions */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

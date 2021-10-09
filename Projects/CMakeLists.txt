@@ -59,6 +59,7 @@ set(LIBRARY_SOURCE
 "${LIBRARY_DIRECTORY}/src/MathIO.c"
 "${LIBRARY_DIRECTORY}/src/NetworkIO.c"
 "${LIBRARY_DIRECTORY}/src/PlatformIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/TextIOTypes.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/CommandLineIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/FormatIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/LocalizationIO.c"
