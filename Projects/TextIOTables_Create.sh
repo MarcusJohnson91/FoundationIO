@@ -355,27 +355,28 @@ CreateGraphemeExtensionTable() {
 }
 
 AddUnicodePrefix2CodePoint() {
+    Prefixed_CodePoint=""
     printf -v CodePoint_Decimal "%u" $1
 
     if [ "$CodePoint_Decimal" -le 159 ] && [ ! "$CodePoint_Decimal" -eq 36  ] && [ ! "$CodePoint_Decimal" -eq 64 ] && [ ! "$CodePoint_Decimal" -eq 96 ]; then
-        Prefixed_CodePoint=$(printf "\\\\x%X" "$CodePoint_Decimal")
+        printf -v Prefixed_CodePoint "\\\\x%X" "$CodePoint_Decimal"
     elif [ "$CodePoint_Decimal" -le 65535 ]; then
-        Prefixed_CodePoint=$(printf "\\\\u%04X" "$CodePoint_Decimal")
+        printf -v Prefixed_CodePoint "\\\\u%04X" "$CodePoint_Decimal"
     else
-        Prefixed_CodePoint=$(printf "\\\\U%08X" "$CodePoint_Decimal")
+        printf -v Prefixed_CodePoint "\\\\U%08X" "$CodePoint_Decimal"
     fi
 }
 
 AddUnicodePrefix2String() {
     Prefixed_String=""
-    printf -v StringCodePoint_Decimal "%u" $1
+    printf -v String_Decimal "%u" $1
 
-    if [ "$CodePoint_Decimal" -le 159 ] && [ ! "$CodePoint_Decimal" -eq 36  ] && [ ! "$CodePoint_Decimal" -eq 64 ] && [ ! "$CodePoint_Decimal" -eq 96 ]; then
-        Prefixed_String=$(printf "%s\\\\x%X" "$Prefixed_String" "$CodePoint_Decimal")
-    elif [ "$StringCodePoint_Decimal" -le 65535 ]; then
-        Prefixed_String=$(printf "%s\\\\u%04X" "$Prefixed_String" "$CodePoint_Decimal")
+    if [ "$String_Decimal" -le 159 ] && [ ! "$String_Decimal" -eq 36  ] && [ ! "$String_Decimal" -eq 64 ] && [ ! "$String_Decimal" -eq 96 ]; then
+        printf -v Prefixed_String "%s\\\\x%X" "$Prefixed_String" "$String_Decimal"
+    elif [ "$String_Decimal" -le 65535 ]; then
+        printf -v Prefixed_String "%s\\\\u%04X" "$Prefixed_String" "$String_Decimal"
     else
-        Prefixed_String=$(printf "%s\\\\U%08X" "$Prefixed_String" "$CodePoint_Decimal")
+        printf -v Prefixed_String "%s\\\\U%08X" "$Prefixed_String" "$String_Decimal"
     fi
 }
 
@@ -386,13 +387,13 @@ CreateKompatibleNormalizationTable() {
     setopt SH_WORD_SPLIT
 
     while IFS=':|' read -d $'\n' CodePoint Replacement; do
-        ReplacementString=""
-        for CodePoint in ${(s/|/)Replacement}; do
-            AddUnicodePrefix2String "$CodePoint"
-            ReplacementString=$(printf "%s%s" "$ReplacementString" "$Prefixed_CodePoint")
-        done
         AddUnicodePrefix2CodePoint "$CodePoint"
-        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$Prefixed_String" >> "$SourceFile"
+        ReplacementString=""
+        for ReplacementCodePoint in ${(s/|/)Replacement}; do
+            AddUnicodePrefix2String "$ReplacementCodePoint"
+            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_String"
+        done
+        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
     done <<< "$Kompatible"
 
     unset SH_WORD_SPLIT
@@ -407,13 +408,13 @@ CreateCaseFoldTable() {
     setopt SH_WORD_SPLIT
 
     while IFS=':|' read -d $'\n' CodePoint Replacement; do
-        ReplacementString=""
-        for CodePoint in ${(s/|/)Replacement}; do
-            AddUnicodePrefix2String "$CodePoint"
-            ReplacementString=$(printf "%s%s" "$ReplacementString" "$Prefixed_CodePoint")
-        done
         AddUnicodePrefix2CodePoint "$CodePoint"
-        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$Prefixed_String" >> "$SourceFile"
+        ReplacementString=""
+        for ReplacementCodePoint in ${(s/|/)Replacement}; do
+            AddUnicodePrefix2String "$ReplacementCodePoint"
+            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_String"
+        done
+        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
     done <<< "$CaseFold"
 
     unset SH_WORD_SPLIT
@@ -424,17 +425,16 @@ CreateCaseFoldTable() {
 CreateCanonicalNormalizationTable() {
     Canonical=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != @cp and @dm != '#' and @dt = 'can']" -o '0x' -v @cp -o ':0x' -v @dm -n "$UCD_Data" | sed -e 's/ /|0x/g')
     printf "    const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {\n" >> "$SourceFile"
-
     setopt SH_WORD_SPLIT
 
     while IFS=':|' read -d $'\n' CodePoint Replacement; do
-        ReplacementString=""
-        for CodePoint in ${(s/|/)Replacement}; do
-            AddUnicodePrefix2String "$CodePoint"
-            ReplacementString=$(printf "%s%s" "$ReplacementString" "$Prefixed_CodePoint")
-        done
         AddUnicodePrefix2CodePoint "$CodePoint"
-        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$Prefixed_String" >> "$SourceFile"
+        ReplacementString=""
+        for ReplacementCodePoint in ${(s/|/)Replacement}; do
+            AddUnicodePrefix2String "$ReplacementCodePoint"
+            printf -v ReplacementString "%s%s" "$ReplacementString" "$Prefixed_String"
+        done
+        printf "        {U\"%s\", U\"%s\"},\n" "$Prefixed_CodePoint" "$ReplacementString" >> "$SourceFile"
     done <<< "$Canonical"
 
     unset SH_WORD_SPLIT
@@ -528,8 +528,8 @@ CheckUnicodeVersion() {
 # If the file does not exist create it and start downloading the UCd and writing the tables
 
 LibraryPath="$(dirname "$(dirname "$(dirname "$(echo "$(cd "$(dirname "$0")"; pwd)/$(basename "$1")")")")")"
-HeaderFile=$(printf "%s/%s" "$LibraryPath" "include/TextIO/Private/TextIOTables.h")
-SourceFile=$(printf "%s/%s" "$LibraryPath" "src/TextIO/Private/TextIOTables.c")
+printf -v HeaderFile "%s/%s" "$LibraryPath" "include/TextIO/Private/TextIOTables.h"
+printf -v SourceFile "%s/%s" "$LibraryPath" "src/TextIO/Private/TextIOTables.c"
 TempFolder=$(mktemp -d)
 FreeSpaceInBytes=$(df -H "$TempFolder" | awk '{printf $7}' | cut -c 6-)
 curl -s "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" -o "$TempFolder/readme.txt"
