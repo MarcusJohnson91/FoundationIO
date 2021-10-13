@@ -27,6 +27,10 @@ set(VERSION_DIRECTORY   "${BASE_DIRECTORY}/Library/include/Private/Version" CACH
 set(VERSION_STRING      "")
 set(BUILD_DIRECTORY     "${BASE_DIRECTORY}/BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}/bin)
+
 include(GetVersion.cmake)
 GetVersionString(${VERSION_DIRECTORY} VERSION_STRING)
 
@@ -65,12 +69,12 @@ set(LIBRARY_SOURCE
 "${LIBRARY_DIRECTORY}/src/TextIO/LocalizationIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/LogIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/StringIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/SyntaxIO.c"
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     set(LIBRARY_SOURCE "${LIBRARY_SOURCE}" "${LIBRARY_DIRECTORY}/src/TestIO.c") #Only compile TestIO into FoundationIO if we're in debug mode and linking the test programs
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-
 
 set(PRIVATE_SOURCE
 "${LIBRARY_DIRECTORY}/src/TextIO/Private/TextIOTables.c"
@@ -104,7 +108,8 @@ target_include_directories(FoundationIO PUBLIC "${LIBRARY_DIRECTORY}/include")
 target_include_directories(FoundationIO PUBLIC "${LIBRARY_DIRECTORY}/include/TextIO")
 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
-    set(CMAKE_INSTALL_PREFIX "/usr/local/FoundationIO") # and lets alias the executables and library back to the normal /usr/local location
+    set(CMAKE_INSTALL_PREFIX "/usr/local/FoundationIO")
+    # and lets alias the library back to the normal /usr/local location
 elseif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_WIN32)
     set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO")
 endif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
@@ -123,10 +128,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 
         set(UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} ${Test_Name})
 
-        add_test(${Test_Name} "${CMAKE_CURRENT_BINARY_DIR}/${Test_Name}")
+        add_test(${Test_Name} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${Test_Name}")
 
         set_tests_properties(${Test_Name} PROPERTIES TIMEOUT 15)
-
     endmacro(register_test)
 
     register_test(AsynchronousIO)
@@ -142,7 +146,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     register_test(LogIO)
     register_test(StringIO)
 
-    add_custom_target(All_Tests ALL DEPENDS ${UNIT_TEST_TARGETS})
+    add_custom_target(All_Tests Test DEPENDS ${UNIT_TEST_TARGETS})
     add_custom_command(TARGET All_Tests COMMENT "Run tests" POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
