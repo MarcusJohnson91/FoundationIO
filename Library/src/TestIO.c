@@ -160,9 +160,12 @@ extern "C" {
     static UTF32 UTF32_GenerateCodePoint(SecureRNG *Random) {
         UTF32 CodePoint          = 0UL;
         if (Random != NULL) {
+            CodePoint            = (UTF32) SecureRNG_GenerateInteger(Random, UTF16HighSurrogateStart - 1);
+            /*
             UTF32  CodePointHigh = (UTF32) SecureRNG_GenerateIntegerInRange(Random, 1, 0xD7FF);
             UTF32  CodePointLow  = (UTF32) SecureRNG_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
             CodePoint            = CodePointLow | CodePointHigh;
+             */
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }

@@ -293,7 +293,8 @@ extern "C" {
                     uint8_t  Bits2Get          = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                     uint8_t  BufferShift       = BitsInCurrentByte % 8;
                     uint64_t BufferMask        = (Exponentiate(2, Bits2Get) - 1) << BufferShift;
-                    uint8_t  ExtractedBits     = Random->EntropyPool[Bits2Bytes(RoundingType_Down, Random->BitOffset)] & BufferMask;
+                    uint64_t BufferOffset      = Bits2Bytes(RoundingType_Down, Random->BitOffset);
+                    uint8_t  ExtractedBits     = Random->EntropyPool[BufferOffset] & BufferMask;
                     uint8_t  ValueShift        = NumBits - Bits2Read;
                     Bits                     <<= ValueShift;
                     Bits                      |= ExtractedBits;
@@ -304,7 +305,7 @@ extern "C" {
             } else {
                 SecureRNG_Erase(Random, 0xFF);
                 SecureRNG_Seed(Random);
-                SecureRNG_Mix(Random);
+                //SecureRNG_Mix(Random);
                 Bits                           = SecureRNG_ExtractBits(Random, NumBits);
             }
         } else if (Random == NULL) {
@@ -326,7 +327,7 @@ extern "C" {
                 Random->NumBits       = EntropyPoolSize * 8;
                 Random->BitOffset     = 0ULL;
                 SecureRNG_Seed(Random);
-                SecureRNG_Mix(Random);
+                //SecureRNG_Mix(Random);
             } else {
                 SecureRNG_Deinit(Random);
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate EntropyPool"));

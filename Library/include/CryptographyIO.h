@@ -18,6 +18,16 @@
 extern "C" {
 #endif
 
+    /*
+     Blake3 Modes: Hashing, Keyed Hashing, Key Derivitation
+
+     Tree, each blocck 1024 bytes, last block may be shorter
+
+     Blake3 IV: 0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL
+
+     
+     */
+
     /*!
      @abstract                              Forward declare BitBuffer
      */
