@@ -31,8 +31,10 @@ extern "C" {
     bool Test_UTF8_Graphemes(SecureRNG *Secure) {
         bool TestPassed = No;
         UTF8 *Grapheme1 = UTF8String("🇺🇸");
+        UTF8 *Grapheme2 = UTF8String("NumGraphemes = 16");
         uint8_t Grapheme1Size = UTF8_GetStringSizeInGraphemes(Grapheme1);
-        if (Grapheme1Size == 1) {
+        uint8_t Grapheme2Size = UTF8_GetStringSizeInGraphemes(Grapheme2);
+        if (Grapheme1Size == 1 && Grapheme2Size == 16) {
             TestPassed = Yes;
         }
         return TestPassed;
@@ -61,11 +63,14 @@ extern "C" {
     bool Test_UTF16_EncodeDecode(SecureRNG *Secure) {
         bool TestPassed = Yes;
         if (Secure != NULL) {
-            uint64_t  NumCodePoints                      = SecureRNG_GenerateInteger(Secure, 16);
+            uint64_t  NumCodePoints               = SecureRNG_GenerateInteger(Secure, 16);
             ImmutableString_UTF32 GeneratedString = UTF32_GenerateString(Secure, NumCodePoints);
             ImmutableString_UTF16 Generated16     = UTF16_Encode(GeneratedString);
             ImmutableString_UTF32 Decoded16       = UTF16_Decode(Generated16);
-            TestPassed                                   = UTF32_CompareSubString(GeneratedString, Decoded16, 0, 0);
+            TestPassed                            = UTF32_Compare(GeneratedString, Decoded16);
+            UTF32_Deinit(GeneratedString);
+            UTF16_Deinit(Generated16);
+            UTF32_Deinit(Decoded16);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
@@ -106,30 +111,15 @@ extern "C" {
     
     bool Test_UTF8_StitchSubString(SecureRNG *Secure) {
         bool TestPassed                         = No;
-        ImmutableString_UTF8 BananaBread = UTF8_StitchSubString(UTF8String("Banana NUT Bread"), 8, 4);
+        ImmutableString_UTF8 BananaBread        = UTF8_StitchSubString(UTF8String("Banana NUT Bread"), 8, 4);
         TestPassed                              = UTF8_Compare(BananaBread, UTF8String("Banana Bread"));
         return TestPassed;
     }
 
     bool Test_UTF8_StringSet(SecureRNG *Secure) {
         bool TestPassed                    = No;
-        UTF8 **StringSet8                  = UTF8_StringSet_Init(4);
-        if (StringSet8[0] == (UTF8*) 0x8888888888888888) {
-            TestPassed = Yes;
-        }
-        ImmutableString_UTF8 One   = UTF8String("One");
-        ImmutableString_UTF8 Two   = UTF8String("Two");
-        ImmutableString_UTF8 Three = UTF8String("Three");
-        ImmutableString_UTF8 Four  = UTF8String("Four");
-        StringSet8[0]                      = One;
-        StringSet8[1]                      = Two;
-        StringSet8[2]                      = Three;
-        StringSet8[3]                      = &Four;
-        bool Bool1                         = UTF8_Compare(StringSet8[0], One);
-        bool Bool2                         = UTF8_Compare(StringSet8[1], Two);
-        bool Bool3                         = UTF8_Compare(StringSet8[2], Three);
-        bool Bool4                         = UTF8_Compare(StringSet8[3], Four);
-        return (Bool1 + Bool2 + Bool3 + Bool4) / 4;
+        ImmutableStringSet_UTF8 StringSet  = UTF8StringSet(UTF8String("One"), UTF8String("Two"), UTF8String("Three"), UTF8String("Four"));
+        return TestPassed;
     }
     
     bool Test_UTF8_Reverse(SecureRNG *Secure) {
@@ -200,7 +190,7 @@ extern "C" {
     int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = No;
         SecureRNG *Random         = SecureRNG_Init(16 * 1024);
-        TestSuitePassed           = Test_StringSet(Random);
+        //TestSuitePassed           = Test_StringSet(Random);
         TestSuitePassed           = Test_UTF8_Graphemes(Random);
         //TestSuitePassed           = Test_UTF8_StringSet(Random);
         //TestSuitePassed           = Test_UTF16_EncodeDecode(Random);

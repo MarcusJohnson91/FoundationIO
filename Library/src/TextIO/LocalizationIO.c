@@ -52,13 +52,9 @@ extern "C" {
         LocalizationIO_Init();
 #if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         /* POSIX uses ISO 639-1 if possible, otherwise ISO 639-2 */
-#if (PlatformIO_Language == PlatformIO_LanguageIsC)
-        UTF8 *LocaleAll = (UTF8 *) setlocale(LC_ALL, NULL);
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        UTF8 *LocaleAll    = reinterpret_cast<UTF8 *>(setlocale(LC_ALL, NULL));
-#endif
+        UTF8    *LocaleAll      = PlatformIO_Cast(UTF8*, setlocale(LC_ALL, NULL));
         uint64_t EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
-        UTF8 *   LanguageString = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
+        UTF8    *LanguageString = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
         uint64_t StringSize     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) {
             if (UTF8_Compare(LanguageString, UTF8String("en"))) {
@@ -83,11 +79,7 @@ extern "C" {
     LocalizationIO_RegionIDs Localize_GetRegionID(void) {
         LocalizationIO_RegionIDs RegionID = RegionID_Unspecified;
 #if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-#if (PlatformIO_Language == PlatformIO_LanguageIsC)
-        UTF8 *LocaleAll = (UTF8 *) setlocale(LC_ALL, NULL);
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        UTF8 *LocaleAll    = reinterpret_cast<UTF8 *>(setlocale(LC_ALL, NULL));
-#endif
+        UTF8    *LocaleAll  = PlatformIO_Cast(UTF8*, setlocale(LC_ALL, NULL));
         
         uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) {
@@ -103,11 +95,7 @@ extern "C" {
         TextIO_StringTypes Encoding = StringType_Unspecified;
 #if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         LocalizationIO_Init();
-#if (PlatformIO_Language == PlatformIO_LanguageIsC)
-        UTF8 *LocaleString = (UTF8 *) getenv((const char *) "LANG");
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        UTF8 *LocaleString = reinterpret_cast<UTF8 *>(getenv(reinterpret_cast<const char *>("LANG")));
-#endif
+        UTF8 *LocaleString              = PlatformIO_Cast(UTF8*, getenv("LANG"));
         if (LocaleString != NULL) {
             uint64_t StringSize         = UTF8_GetStringSizeInCodeUnits(LocaleString);
             uint64_t Offset             = UTF8_FindSubString(LocaleString, UTF8String("."), 0, 1);
@@ -135,11 +123,7 @@ extern "C" {
         }
 #elif (PlatformIO_TargetOS == FoundtionIOWindowsOS)
         LocalizationIO_Init();
-#if (PlatformIO_Language == PlatformIO_LanguageIsC)
-        UTF16 *LocaleString = (UTF16 *) _wgetenv(L"LANG");
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        UTF16 *LocaleString = reinterpret_cast<UTF16 *>(_wgetenv(L"LANG"));
-#endif
+        UTF16 *LocaleString = PlatformIO_Cast(UTF16*, _wgetenv(L"LANG"));
         
         UTF16 *LocaleString = getenv((ImmutableString_UTF8) "LANG");
         if (LocaleString != NULL) {

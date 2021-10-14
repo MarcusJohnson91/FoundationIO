@@ -412,11 +412,7 @@ extern "C" {
     UTF32 **CommandLineIO_GetArgumentStringSet(void **Arguments) {
         UTF32 **StringSet               = NULL;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-        StringSet                       = (UTF32**) UTF8_StringSet_Decode(Arguments);
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        StringSet                       = (UTF32**) UTF8_StringSet_Decode(reinterpret_cast<ImmutableStringSet_UTF8>( const_cast<PlatformIO_Immutable(void **)>(Arguments)));
-#endif
+        StringSet                       = (UTF32**) UTF8_StringSet_Decode(PlatformIO_Cast(StringSet_UTF8, Arguments));
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
         uint64_t NumArguments           = (uint64_t) __argc;
         StringSet                       = UTF32_StringSet_Init(NumArguments);
