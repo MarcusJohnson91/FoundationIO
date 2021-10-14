@@ -63,13 +63,13 @@ extern "C" {
         UTF8 *SecurityName8 = NULL;
         ImmutableString_UTF8 WarnString = Severities[Severity - 1];
         if (Log_ProgramName8 != NULL) {
-            uint64_t Size      = snprintf(NULL, 0, UTF8String("%s's %s in %s: "), Log_ProgramName8, WarnString, FunctionName);
+            uint64_t Size      = snprintf(NULL, 0, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
-            snprintf(SecurityName8, Size, UTF8String("%s's %s in %s: "), Log_ProgramName8, WarnString, FunctionName);
+            snprintf(SecurityName8, Size, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
         } else {
-            uint64_t Size      = snprintf(NULL, 0, UTF8String("%s in %s: "), WarnString, FunctionName);
+            uint64_t Size      = snprintf(NULL, 0, "%s in %s: ", WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
-            snprintf(SecurityName8, Size, UTF8String("%s in %s: "), WarnString, FunctionName);
+            snprintf(SecurityName8, Size, "%s in %s: ", WarnString, FunctionName);
         }
 
         va_list Arguments;

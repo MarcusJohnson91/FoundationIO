@@ -113,7 +113,7 @@ extern "C" {
      @typedef      GUUIDString
      @abstract                                     A GUUID string is the GUUID with dashes and a NULL terminator
      */
-    typedef        uint8_t                         GUUIDString[GUUIDString_Size + PlatformIO_NULLTerminatorSize];
+    typedef        uint8_t                         GUUIDString[GUUIDString_Size + TextIO_NULLTerminatorSize];
 
     /*!
      @typedef      SecureRNG

@@ -52,7 +52,7 @@ extern "C" {
                 uint8_t GroupCount = 0;
                 uint8_t DigitCount = 0;
                 uint8_t CodeUnit   = 1;
-                while (Address[CodeUnit] != PlatformIO_NULLTerminator) {
+                while (Address[CodeUnit] != TextIO_NULLTerminator) {
                     if (Address[CodeUnit - 1] == U':' && Address[CodeUnit] == U':') {
                         
                     }

@@ -267,7 +267,7 @@ extern "C" {
     
     void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, ImmutableStringSet_UTF32 Strings, PlatformIO_Immutable(uint64_t *) Numerator, PlatformIO_Immutable(uint64_t *) Denominator) {
         if (CLI != NULL) {
-            uint64_t *StringSize = (uint64_t*) calloc(NumItems2Display + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
+            uint64_t *StringSize = (uint64_t*) calloc(NumItems2Display + TextIO_NULLTerminatorSize, sizeof(uint64_t));
             for (uint8_t Item = 0; Item < NumItems2Display; Item++) {
                 StringSize[Item] = UTF32_GetStringSizeInCodePoints(Strings[Item]);
             }
@@ -280,7 +280,7 @@ extern "C" {
                 uint64_t TerminalWidth       = CommandLineIO_GetTerminalWidth() / 2;
                 UTF8    *Indicator           = UTF8_Init(TerminalWidth);
                 UTF8_Set(Indicator, '-', TerminalWidth);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%l32s %llu/%llu %llu/%llu%s]%s"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%l32s %llu/%llu %llu/%llu%s]%s"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, TextIO_NewLine8);
                 UTF8_File_WriteString(stdout, FormattedString);
                 free(Indicator);
             }
@@ -296,7 +296,7 @@ extern "C" {
         if (CLI != NULL) {
             UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
-            UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%s"), Name, PlatformIO_NewLine8);
+            UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%s"), Name, TextIO_NewLine8);
             UTF8_File_WriteString(stdout, ProgramsOptions);
             free(Name);
             free(ProgramsOptions);
@@ -314,11 +314,11 @@ extern "C" {
             
             for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
                 CommandLineIO_SwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
-                GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%l32s: %l32s%l32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, PlatformIO_NewLine32);
+                GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%l32s: %l32s%l32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, TextIO_NewLine32);
                 
                 if (CurrentSwitchType == SwitchType_Parent && CLI->Switches[Switch].NumChildren > 0) {
                     for (uint64_t Child = 0ULL; Child < CLI->Switches[Switch].NumChildren; Child++) {
-                        GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%l32s: %l32s%l32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, PlatformIO_NewLine32);
+                        GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%l32s: %l32s%l32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, TextIO_NewLine32);
                     }
                 }
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
@@ -345,20 +345,20 @@ extern "C" {
         if (CLI != NULL) {
             UTF32 *License = NULL;
             if (CLI->LicenseType == LicenseType_Permissive || CLI->LicenseType == LicenseType_Copyleft) {
-                License = UTF32_Format(UTF32String("Released under the \"%l32s\" license, you can see the details of this license at: %l32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : PlatformIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
+                License = UTF32_Format(UTF32String("Released under the \"%l32s\" license, you can see the details of this license at: %l32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : TextIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
             } else if (CLI->LicenseType == LicenseType_Proprietary) {
-                License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%l32s%l32s%l32s"), PlatformIO_NewLine32, PlatformIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
+                License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%l32s%l32s%l32s"), TextIO_NewLine32, TextIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
             } else {
                 Log(Severity_USER, PlatformIO_FunctionName, UTF8String("LicenseType isn't set"));
             }
             
             UTF32 *Banner32 = UTF32_Format(UTF32String("%l32s, v. %l32s by %l32s © %l32s, %l32s, %l32s"),
-                                           CLI->ProgramName        != NULL ? CLI->ProgramName        : PlatformIO_InvisibleString32,
-                                           CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : PlatformIO_InvisibleString32,
-                                           CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : PlatformIO_InvisibleString32,
-                                           CLI->ProgramCopyright   != NULL ? CLI->ProgramCopyright   : PlatformIO_InvisibleString32,
-                                           CLI->ProgramDescription != NULL ? CLI->ProgramDescription : PlatformIO_InvisibleString32,
-                                           License                 != NULL ? License                 : PlatformIO_InvisibleString32
+                                           CLI->ProgramName        != NULL ? CLI->ProgramName        : TextIO_InvisibleString32,
+                                           CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : TextIO_InvisibleString32,
+                                           CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : TextIO_InvisibleString32,
+                                           CLI->ProgramCopyright   != NULL ? CLI->ProgramCopyright   : TextIO_InvisibleString32,
+                                           CLI->ProgramDescription != NULL ? CLI->ProgramDescription : TextIO_InvisibleString32,
+                                           License                 != NULL ? License                 : TextIO_InvisibleString32
                                            );
             UTF32_Deinit(License);
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
@@ -816,7 +816,7 @@ extern "C" {
         uint64_t  EscapeSequenceSize   = 0;
         uint64_t  EscapeSequenceOffset = 0;
         uint64_t  CodePoint            = 0;
-        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+        while (String[CodePoint] != TextIO_NULLTerminator) {
             if (String[CodePoint] == UTF32Character('\x1B')) {
                 EscapeSequenceOffset   = CodePoint;
                 EscapeSequenceSize    += 1;

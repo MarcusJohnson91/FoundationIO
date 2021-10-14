@@ -17,6 +17,78 @@
 extern "C" {
 #endif
 
+#ifndef TextIO_NULLTerminator
+#define TextIO_NULLTerminator                                           (0)
+#endif
+
+#ifndef TextIO_NULLTerminatorSize
+#define TextIO_NULLTerminatorSize                                       (1)
+#endif
+
+#ifndef TextIO_UNCPathPrefix8
+#define TextIO_UNCPathPrefix8                                           UTF8String("//?/")
+#endif
+
+#ifndef TextIO_InvisibleString32
+#define TextIO_InvisibleString32                                        UTF32String("\u00A0")
+#endif
+
+#ifndef TextIO_WideCharTypeIsUTF32
+#define TextIO_WideCharTypeIsUTF32                                      (1)
+#endif
+
+#ifndef TextIO_WideCharTypeIsUTF16
+#define TextIO_WideCharTypeIsUTF16                                      (2)
+#endif
+
+#ifndef TextIO_WideCharType
+#if   (WCHAR_MAX == 0x7FFFFFFF || WCHAR_MAX == 0xFFFFFFFF)
+#define TextIO_WideCharType                                             TextIO_WideCharTypeIsUTF32
+#elif (WCHAR_MAX == 0x7FFF || WCGAR_MAX == 0xFFFF)
+#define TextIO_WideCharType                                             TextIO_WideCharTypeIsUTF16
+#endif /* WCHAR_MAX */
+#endif /* TextIO_WideCharType */
+
+#ifndef             TextIO_NewLine8
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#define             TextIO_NewLine8                                                 UTF8String("\n")
+#define             TextIO_NewLine8Size                                             (1)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#define             TextIO_NewLine8                                                 UTF8String("\r\n")
+#define             TextIO_NewLine8Size                                             (2)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
+#define             TextIO_NewLine8                                                 UTF8String("\r")
+#define             TextIO_NewLine8Size                                             (1)
+#endif /* PlatformIO_TargetOS */
+#endif /* TextIO_NewLine8 */
+
+#ifndef             TextIO_NewLine16
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#define             TextIO_NewLine16                                                UTF16String("\n")
+#define             TextIO_NewLine16Size                                            (1)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#define             TextIO_NewLine16                                                UTF16String("\r\n")
+#define             TextIO_NewLine16Size                                            (2)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
+#define             TextIO_NewLine16                                                UTF16String("\r")
+#define             TextIO_NewLine16Size                                            (1)
+#endif /* PlatformIO_TargetOS */
+#endif /* TextIO_NewLine16 */
+
+
+#ifndef             TextIO_NewLine32
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#define             TextIO_NewLine32                                                UTF32String("\n")
+#define             TextIO_NewLine32Size                                            (1)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#define             TextIO_NewLine32                                                UTF32String("\r\n")
+#define             TextIO_NewLine32Size                                            (2)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
+#define             TextIO_NewLine32                                                UTF32String("\r")
+#define             TextIO_NewLine32Size                                            (1)
+#endif /* PlatformIO_TargetOS */
+#endif /* TextIO_NewLine32 */
+
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #if defined(__has_include) && __has_include(<uchar.h>)
 #include <uchar.h>
@@ -90,26 +162,20 @@ extern "C" {
 #endif /* PlatformIO_Compiler */
 #endif /* __CHAR32_TYPE__ */
   
-#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC23)
-  typedef __CHAR8_TYPE__  char8_t;
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX20)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC23)
   typedef __CHAR8_TYPE__  char8_t;
 #endif
   
-#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC11)
-  typedef __CHAR16_TYPE__  char16_t;
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC11)
   typedef __CHAR16_TYPE__  char16_t;
 #endif
   
-#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC11)
-  typedef __CHAR32_TYPE__  char32_t;
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC11)
   typedef __CHAR32_TYPE__  char32_t;
 #endif
 
-#ifndef                   FoundationIO_StringTypes8
-#define                   FoundationIO_StringTypes8 (1)
+#ifndef                   TextIO_StringTypes8
+#define                   TextIO_StringTypes8 (1)
 #ifdef                    UTF8
 #undef                    UTF8
 #endif /* UTF8 */
@@ -124,10 +190,10 @@ typedef                   char8_t                              UTF8;
 @abstract                 CharSet8                             is for non-Unicode character sets.
 */
 typedef                   char8_t                              CharSet8;
-#endif /* FoundationIO_StringTypes8 */
+#endif /* TextIO_StringTypes8 */
 
-#ifndef                   FoundationIO_StringTypes16
-#define                   FoundationIO_StringTypes16 (2)
+#ifndef                   TextIO_StringTypes16
+#define                   TextIO_StringTypes16 (2)
 #ifdef                    UTF16
 #undef                    UTF16
 #endif /* UTF16 */
@@ -142,10 +208,10 @@ typedef                   char16_t                             UTF16;
 @abstract                 CharSet16                            is for non-Unicode character sets.
 */
 typedef                   char16_t                             CharSet16;
-#endif /* FoundationIO_StringTypes16 */
+#endif /* TextIO_StringTypes16 */
 
-#ifndef                   FoundationIO_StringTypes32
-#define                   FoundationIO_StringTypes32 (4)
+#ifndef                   TextIO_StringTypes32
+#define                   TextIO_StringTypes32 (4)
 #ifdef                    UTF32
 #undef                    UTF32
 #endif /* UTF32 */
@@ -160,7 +226,7 @@ typedef                   char32_t                             UTF32;
 @abstract                 CharSet32                            is for non-Unicode character sets.
  */
 typedef                   char32_t                             CharSet32;
-#endif /* FoundationIO_StringTypes32 */
+#endif /* TextIO_StringTypes32 */
 
 #ifndef                   TextIOTypes_PropertyConversion8
 #define                   TextIOTypes_PropertyConversion8  (1)
@@ -403,6 +469,10 @@ typedef const UTF8     *const ImmutableString_UTF8;
 typedef const UTF16    *const ImmutableString_UTF16;
 typedef const UTF32    *const ImmutableString_UTF32;
 
+typedef const UTF8     *StringSet_UTF8;
+typedef const UTF16    *StringSet_UTF16;
+typedef const UTF32    *StringSet_UTF32;
+
 typedef const UTF8     *const ImmutableStringSet_UTF8[];
 typedef const UTF16    *const ImmutableStringSet_UTF16[];
 typedef const UTF32    *const ImmutableStringSet_UTF32[];
@@ -411,83 +481,47 @@ typedef const UTF8     *MutableStringSet_UTF8[];
 typedef const UTF16    *MutableStringSet_UTF16[];
 typedef const UTF32    *MutableStringSet_UTF32[];
 
-#ifndef                   FoundationIO_Unicodize8
-#define                   FoundationIO_Unicodize8               (1)
+#ifndef                   TextIO_Unicodize8
+#define                   TextIO_Unicodize8               (1)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX20)
-#define                   UTF8String(Literal)                   reinterpret_cast<ImmutableString_UTF8>(const_cast<ImmutableString_UTF8>(u8##Literal))
+#define                   UTF8String(Literal)                   PlatformIO_Cast(ImmutableString_UTF8, u8##Literal)
 #define                   UTF8StringSet(...)                    {__VA_ARGS__, UTF8String("\0")}
-#define                   UTF8Character(Literal)                reinterpret_cast<ImmutableChar_UTF8>(u8##Literal)
-#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX20)
-#define                   UTF8String(Literal)                   reinterpret_cast<ImmutableString_UTF8>(u8##Literal)
-#define                   UTF8StringSet(...)                    {__VA_ARGS__, UTF8String("\0")}
-#define                   UTF8Character(Literal)                reinterpret_cast<ImmutableChar_UTF8>(u8##Literal)
-#endif
+#define                   UTF8Character(Literal)                PlatformIO_Cast(ImmutableChar_UTF8, u8##Literal)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF8String(Literal)                   _Generic(Literal, unsigned char:(UTF8*) u8##Literal, unsigned char*:(UTF8*) u8##Literal, signed char:(UTF8*) u8##Literal, signed char*:(UTF8*) u8##Literal, char:(UTF8*) u8##Literal, char*:(UTF8*) u8##Literal, const unsigned char: (const UTF8*) u8##Literal, const unsigned char*: (const UTF8*) u8##Literal, const signed char: (const UTF8*) u8##Literal, const signed char*: (const UTF8*) u8##Literal, const char: (const UTF8*) u8##Literal, const char*: (const UTF8*) u8##Literal)
-    // Create the string literal, but at the end create a NULL; so I guess count the number of variadic arguments, cloud just add an empty string manually...
 #define                   UTF8StringSet(...)                    {__VA_ARGS__, UTF8String("\0")}
 #define UTF8String2(A) u8##A
 #define IMPLEMENT_MODULE(name) UTF8String2(A)
 #define                   UTF8Character(Literal)                _Generic((0,Literal), unsigned char:(UTF8) u8##Literal, signed char:(UTF8) u8##Literal, char:(UTF8) u8##Literal)
 #endif /* PlatformIO_Language */
-#endif /* FoundationIO_Unicodize8 */
+#endif /* TextIO_Unicodize8 */
 
-#ifndef                   FoundationIO_Unicodize16
-#define                   FoundationIO_Unicodize16              (2)
+#ifndef                   TextIO_Unicodize16
+#define                   TextIO_Unicodize16              (2)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
-#define                   UTF16String(Literal)                  reinterpret_cast<ImmutableString_UTF16>(const_cast<ImmutableString_UTF16>(u##Literal))
+#define                   UTF16String(Literal)                  PlatformIO_Cast(ImmutableString_UTF16, u##Literal)
 #define                   UTF16StringSet(...)                   {__VA_ARGS__, UTF16String("\0")}
-#define                   UTF16Character(Literal)               reinterpret_cast<ImmutableChar_UTF16>(u##Literal)
-#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
-#define                   UTF16String(Literal)                  reinterpret_cast<ImmutableString_UTF16>(const_cast<ImmutableString_UTF16>(u##Literal))
-#define                   UTF16StringSet(...)                   {__VA_ARGS__, UTF16String("\0")}
-#define                   UTF16Character(Literal)               reinterpret_cast<ImmutableChar_UTF16>(u##Literal)
-#endif
+#define                   UTF16Character(Literal)               PlatformIO_Cast(ImmutableChar_UTF16, u##Literal)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16String(Literal)                  _Generic((0,Literal), unsigned short:(UTF16*) u##Literal, unsigned short*:(UTF16*) u##Literal, signed short:(UTF16*) u##Literal, signed short*:(UTF16*) u##Literal, const unsigned short:(UTF16*) u##Literal, const unsigned short*:(UTF16*) u##Literal, const signed short:(UTF16*) u##Literal, const signed short*:(UTF16*) u##Literal, unsigned char:(UTF16*) u##Literal, unsigned char*:(UTF16*) u##Literal, signed char:(UTF16*) u##Literal, signed char*:(UTF16*) u##Literal, char:(UTF16*) u##Literal, char*:(UTF16*) u##Literal, const unsigned char:(UTF16*) u##Literal, const unsigned char*:(UTF16*) u##Literal, const signed char:(UTF16*) u##Literal, const signed char*:(UTF16*) u##Literal, const char:(UTF16*) u##Literal, const char*:(UTF16*) u##Literal)
 #define                   UTF16StringSet(...)                   {__VA_ARGS__, UTF16String("\0")}
-#define                   UTF16Character(Literal)               (ImmutableChar_UTF16)   u##Literal
+#define                   UTF16Character(Literal)               PlatformIO_Cast(ImmutableChar_UTF16, u##Literal)
 #endif /* PlatformIO_Language */
-#endif /* FoundationIO_Unicodize16 */
+#endif /* TextIO_Unicodize16 */
 
-#ifndef                   FoundationIO_Unicodize32
-#define                   FoundationIO_Unicodize32              (4)
+#ifndef                   TextIO_Unicodize32
+#define                   TextIO_Unicodize32              (4)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
-#define                   UTF32String(Literal)                  reinterpret_cast<ImmutableString_UTF32>(const_cast<ImmutableString_UTF32>(U##Literal))
+#define                   UTF32String(Literal)                  PlatformIO_Cast(ImmutableString_UTF32, U##Literal)
 #define                   UTF32StringSet(...)                   {__VA_ARGS__, UTF32String("\0")}
-#define                   UTF32Character(Literal)               reinterpret_cast<ImmutableChar_UTF32>(U##Literal)
-#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
-#define                   UTF32String(Literal)                  reinterpret_cast<ImmutableString_UTF32>(const_cast<ImmutableString_UTF32>(U##Literal))
-#define                   UTF32StringSet(...)                   {__VA_ARGS__, UTF32String("\0")}
-#define                   UTF32Character(Literal)               reinterpret_cast<ImmutableChar_UTF32>(U##Literal)
-#endif
+#define                   UTF32Character(Literal)               PlatformIO_Cast(ImmutableChar_UTF32, U##Literal)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32String(Literal)                  _Generic((0,Literal), unsigned int:(UTF32*) U##Literal, unsigned int*:(UTF32*) U##Literal, signed int:(UTF32*) U##Literal, signed int*:(UTF32*) U##Literal, const unsigned int:(UTF32*) U##Literal, const unsigned int*:(UTF32*) U##Literal, const signed int:(UTF32*) U##Literal, const signed int*:(UTF32*) U##Literal, unsigned char:(UTF32*) U##Literal, unsigned char*:(UTF32*) U##Literal, signed char:(UTF32*) U##Literal, signed char*:(UTF32*) U##Literal, char:(UTF32*) U##Literal, char*:(UTF32*) U##Literal, const unsigned char:(UTF32*) U##Literal, const unsigned char*:(UTF32*) U##Literal, const signed char:(UTF32*) U##Literal, const signed char*:(UTF32*) U##Literal, const char:(UTF32*) U##Literal, const char*:(UTF32*) U##Literal)
 #define                   UTF32StringSet(...)                   {__VA_ARGS__, UTF32String("\0")}
 /* TODO: ^Not sure how if programming model (LP64 vs ILP64 etc) needs to be handled or not, so I'll skip it */
 #define                   UTF32Character(Literal)               U##Literal
 #endif /* PlatformIO_Language */
-#endif /* FoundationIO_Unicodize32 */
-
-#ifndef                   FoundationIO_Stringize
-#define                   FoundationIO_Stringize                (1)
-#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
-#define                   UTF32String(Literal)                  reinterpret_cast<ImmutableString_UTF32>(const_cast<ImmutableString_UTF32>(U##Literal))
-#define                   UTF32Character(Literal)               reinterpret_cast<ImmutableChar_UTF32>(U##Literal)
-#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
-#define                   UTF32String(Literal)                  reinterpret_cast<ImmutableString_UTF32>(const_cast<ImmutableString_UTF32>(U##Literal))
-#define                   UTF32Character(Literal)               reinterpret_cast<ImmutableChar_UTF32>(U##Literal)
-#endif
-#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define                   FoundationIO_String(OutputVariable, Literal) _Generic((OutputVariable), const UTF8*:u8##Literal, UTF8*:u8##Literal, const UTF16*:u##Literal, UTF16*:u##Literal, const UTF32*:U##Literal, UTF32*:U##Literal)
-/* TODO: ^Not sure how if programming model (LP64 vs ILP64 etc) needs to be handled or not, so I'll skip it */
-#define                   UTF32Character(Literal)               U##Literal
-#endif /* PlatformIO_Language */
-#endif /* FoundationIO_Unicodize32 */
+#endif /* TextIO_Unicodize32 */
 
     /*!
      @enum                TextIO_StringTypes

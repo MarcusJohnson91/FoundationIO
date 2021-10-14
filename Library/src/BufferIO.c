@@ -590,7 +590,7 @@ extern "C" {
         if (BitB != NULL) {
             int64_t  OriginalOffset       = BitBuffer_GetPosition(BitB);
             uint64_t Extracted            = 1;
-            while (Extracted != PlatformIO_NULLTerminator) {
+            while (Extracted != TextIO_NULLTerminator) {
                 Extracted                 = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
                 uint8_t  CodeUnitSize     = UTF8_GetCodePointSizeInCodeUnits((UTF8) Extracted);
                 StringSize               += CodeUnitSize;
@@ -619,7 +619,7 @@ extern "C" {
         if (BitB != NULL) {
             int64_t  OriginalOffset       = BitBuffer_GetPosition(BitB);
             uint64_t Extracted            = 1;
-            while (Extracted != PlatformIO_NULLTerminator) {
+            while (Extracted != TextIO_NULLTerminator) {
                 Extracted                 = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
                 uint8_t  CodeUnitSize     = UTF8_GetCodePointSizeInCodeUnits((UTF16) Extracted);
                 StringSize               += CodeUnitSize;
@@ -806,7 +806,7 @@ extern "C" {
     void BitBuffer_WriteUTF8(BitBuffer *BitB, ImmutableString_UTF8 String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t CodeUnit      = 0ULL;
-            while (String2Write[CodeUnit] != PlatformIO_NULLTerminator) {
+            while (String2Write[CodeUnit] != TextIO_NULLTerminator) {
                 BitBuffer_Append_NearByte_FarBit(BitB, UTF8CodeUnitSizeInBits, String2Write[CodeUnit]);
                 CodeUnit          += 1;
             }
@@ -823,7 +823,7 @@ extern "C" {
     void BitBuffer_WriteUTF16(BitBuffer *BitB, ImmutableString_UTF16 String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t CodeUnit = 0ULL;
-            while (String2Write[CodeUnit] != PlatformIO_NULLTerminator) {
+            while (String2Write[CodeUnit] != TextIO_NULLTerminator) {
                 BitBuffer_Append_NearByte_FarBit(BitB, UTF16CodeUnitSizeInBits, String2Write[CodeUnit]);
                 CodeUnit          += 1;
             }

@@ -183,40 +183,16 @@ extern "C" {
 #define             PlatformIO_BuildTypeIsRelease                                       (2)
 #endif
 
-#ifndef             PlatformIO_ByteOrder_Unknown
-#define             PlatformIO_ByteOrder_Unknown                                        (0)
+#ifndef             PlatformIO_ByteOrderIsUnknown
+#define             PlatformIO_ByteOrderIsUnknown                                        (0)
 #endif
 
-#ifndef             PlatformIO_ByteOrder_BE
-#define             PlatformIO_ByteOrder_BE                                             (1)
+#ifndef             PlatformIO_ByteOrderIsBE
+#define             PlatformIO_ByteOrderIsBE                                             (1)
 #endif
 
-#ifndef             PlatformIO_ByteOrder_LE
-#define             PlatformIO_ByteOrder_LE                                             (2)
-#endif
-
-#ifndef             PlatformIO_NULLTerminator
-#define             PlatformIO_NULLTerminator                                           (0)
-#endif
-
-#ifndef             PlatformIO_NULLTerminatorSize
-#define             PlatformIO_NULLTerminatorSize                                       (1)
-#endif
-
-#ifndef             PlatformIO_UNCPathPrefix8
-#define             PlatformIO_UNCPathPrefix8                                           UTF8String("//?/")
-#endif
-
-#ifndef             PlatformIO_InvisibleString32
-#define             PlatformIO_InvisibleString32                                        UTF32String("\u00A0")
-#endif
-
-#ifndef             PlatformIO_WideCharTypeIsUTF32
-#define             PlatformIO_WideCharTypeIsUTF32                                      (1)
-#endif
-
-#ifndef             PlatformIO_WideCharTypeIsUTF16
-#define             PlatformIO_WideCharTypeIsUTF16                                      (2)
+#ifndef             PlatformIO_ByteOrderIsLE
+#define             PlatformIO_ByteOrderIsLE                                             (2)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionC
@@ -281,34 +257,23 @@ extern "C" {
 #endif /* PlatformIO_Language */
 #endif /* PlatformIO_Mutable */
 
-    /*!
-     @abstract      PlatformIO_Volatile is for pointers and arrays.
-     @remark        Makes the pointer and the data it points to volatile.
-     */
-#ifndef             PlatformIO_Volatile
-#define             PlatformIO_Volatile(PointerType)                                    volatile PointerType volatile
-#endif /* PlatformIO_Volatile */
-
-#ifndef             PlatformIO_Literal
-#define             PlatformIO_Literal(NewType, UnconstType, Literal)
+#ifndef             PlatformIO_Cast
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#undef              PlatformIO_Literal
-#define             PlatformIO_Literal(NewType, UnconstType, Literal)                   (NewType const) Literal
+#define             PlatformIO_Cast(Type, Thing2Cast) ((Type) Thing2Cast)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#undef              PlatformIO_Literal
-#define             PlatformIO_Literal(NewType, UnconstType, Literal)                   reinterpret_cast<NewType>(const_cast<NewType>(Literal))
-#endif /* PlatformIO_Language */
-#endif /* PlatformIO_Literal */
+#define             PlatformIO_Cast(Type, Thing2Cast) reinterpret_cast<Type>(Thing2Cast)
+#endif /* Language */
+#endif /* PlatformIO_Cast */
 
 #ifndef             PlatformIO_FunctionName
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define             PlatformIO_FunctionName                                             (ImmutableString_UTF8) __func__
+#define             PlatformIO_FunctionName                                             PlatformIO_Cast(ImmutableString_UTF8, __func__)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define             PlatformIO_FunctionName                                             reinterpret_cast<const UTF8*>(__PRETTY_FUNCTION__)
+#define             PlatformIO_FunctionName                                             PlatformIO_Cast(ImmutableString_UTF8, __PRETTY_FUNCTION__)
 #endif /* Language */
 #endif /* PlatformIO_FunctionName */
 
-#if  !defined(PlatformIO_TargetOS)
+#ifndef PlatformIO_TargetOS
 #if   defined(__APPLE__) && defined(__MACH__)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX | PlatformIO_TargetOSIsApple)
 #elif defined(Macintosh) || defined(macintosh)
@@ -350,54 +315,13 @@ extern "C" {
 
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrder_BE)
+#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsBE)
 #elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrder_LE)
+#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsLE)
 #endif /* __BYTE_ORDER__ */
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
-#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrder_LE)
+#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsLE)
 #endif /* PlatformIO_Compiler */
-
-#ifndef             PlatformIO_NewLine8
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-#define             PlatformIO_NewLine8                                                 UTF8String("\n")
-#define             PlatformIO_NewLine8Size                                             (1)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-#define             PlatformIO_NewLine8                                                 UTF8String("\r\n")
-#define             PlatformIO_NewLine8Size                                             (2)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
-#define             PlatformIO_NewLine8                                                 UTF8String("\r")
-#define             PlatformIO_NewLine8Size                                             (1)
-#endif /* PlatformIO_TargetOS */
-#endif /* PlatformIO_NewLine8 */
-
-#ifndef             PlatformIO_NewLine16
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-#define             PlatformIO_NewLine16                                                UTF16String("\n")
-#define             PlatformIO_NewLine16Size                                            (1)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-#define             PlatformIO_NewLine16                                                UTF16String("\r\n")
-#define             PlatformIO_NewLine16Size                                            (2)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
-#define             PlatformIO_NewLine16                                                UTF16String("\r")
-#define             PlatformIO_NewLine16Size                                            (1)
-#endif /* PlatformIO_TargetOS */
-#endif /* PlatformIO_NewLine16 */
-
-
-#ifndef             PlatformIO_NewLine32
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-#define             PlatformIO_NewLine32                                                UTF32String("\n")
-#define             PlatformIO_NewLine32Size                                            (1)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-#define             PlatformIO_NewLine32                                                UTF32String("\r\n")
-#define             PlatformIO_NewLine32Size                                            (2)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
-#define             PlatformIO_NewLine32                                                UTF32String("\r")
-#define             PlatformIO_NewLine32Size                                            (1)
-#endif /* PlatformIO_TargetOS */
-#endif /* PlatformIO_NewLine32 */
-
 
 #if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #ifndef             _LARGEFILE_SOURCE
@@ -495,12 +419,6 @@ extern "C" {
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <Windows.h>    /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #endif /* PlatformIO_TargetOSIsPOSIX */
-
-#if   (WCHAR_MAX == 0x7FFFFFFF || WCHAR_MAX == 0xFFFFFFFF)
-#define             PlatformIO_WideCharType                                             PlatformIO_WideCharTypeIsUTF32
-#elif (WCHAR_MAX == 0x7FFF || WCGAR_MAX == 0xFFFF)
-#define             PlatformIO_WideCharType                                             PlatformIO_WideCharTypeIsUTF16
-#endif /* WCHAR_MAX */
 
 #ifndef             PlatformIO_HiddenSymbol
 #if (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)

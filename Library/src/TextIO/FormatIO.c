@@ -405,7 +405,7 @@ extern "C" {
                 if (Specifier > 0) { // Don't re-parse previously visited Specifiers
                     CodePoint      = Specifiers->Specifiers[Specifier - 1].FormatEnd + 1;
                 }
-                while (Specifiers->Specifiers[Specifier].FormatStart == 0x7FFFFFFFFFFFFFFE && Format[CodePoint] != PlatformIO_NULLTerminator) {
+                while (Specifiers->Specifiers[Specifier].FormatStart == 0x7FFFFFFFFFFFFFFE && Format[CodePoint] != TextIO_NULLTerminator) {
                     if (Format[CodePoint] == U'%') {
                         Specifiers->Specifiers[Specifier].FormatStart = CodePoint;
                         CodePoint += 1;
@@ -414,7 +414,7 @@ extern "C" {
                         CodePoint += 1;
                     }
                 }
-                while (Specifiers->Specifiers[Specifier].FormatEnd == 0x7FFFFFFFFFFFFFFE && Format[CodePoint] != PlatformIO_NULLTerminator) {
+                while (Specifiers->Specifiers[Specifier].FormatEnd == 0x7FFFFFFFFFFFFFFE && Format[CodePoint] != TextIO_NULLTerminator) {
                     switch (Format[CodePoint]) {
                         case U'%':
                         case U'a':
@@ -461,7 +461,7 @@ extern "C" {
              
              */
             
-            while (Specifier < Specifiers->NumSpecifiers && Format[CodePoint] != PlatformIO_NULLTerminator && Specifiers->Specifiers[Specifier].FormatStart == 0x7FFFFFFFFFFFFFFE) {
+            while (Specifier < Specifiers->NumSpecifiers && Format[CodePoint] != TextIO_NULLTerminator && Specifiers->Specifiers[Specifier].FormatStart == 0x7FFFFFFFFFFFFFFE) {
                 FormatIO_FindSpecifierBoundaries(Format, Specifiers);
                 
                 CodePoint = Specifiers->Specifiers[Specifier].FormatEnd;
@@ -1272,9 +1272,9 @@ extern "C" {
     
     static uint64_t UTF32_LocateNextPercent(ImmutableString_UTF32 String) {
         uint64_t NextPercent     = -1;
-        if (String != PlatformIO_NULLTerminator) {
+        if (String != TextIO_NULLTerminator) {
             uint64_t CodePoint   = 0ULL;
-            while (String[CodePoint] != PlatformIO_NULLTerminator && String[CodePoint] != UTF32Character('%')) {
+            while (String[CodePoint] != TextIO_NULLTerminator && String[CodePoint] != UTF32Character('%')) {
                 CodePoint       += 1;
             }
             NextPercent          = CodePoint;
@@ -1325,7 +1325,7 @@ extern "C" {
                     
                     SubstitutionSize           = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Specifier].Argument);
                     if (FormattedCodePoint >= Specifiers->Specifiers[Specifier].FormatStart && FormattedCodePoint <= Specifiers->Specifiers[Specifier].FormatEnd) {
-                        while (Specifiers->Specifiers[Specifier].Argument[SubstitutionCodePoint] != PlatformIO_NULLTerminator) {
+                        while (Specifiers->Specifiers[Specifier].Argument[SubstitutionCodePoint] != TextIO_NULLTerminator) {
                             Formatted[FormattedCodePoint] = Specifiers->Specifiers[Specifier].Argument[SubstitutionCodePoint];
                             FormatCodePoint              += 1;
                             SubstitutionCodePoint        += 1;
@@ -1507,7 +1507,7 @@ extern "C" {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
-            while (String[CodeUnit] != PlatformIO_NULLTerminator) {
+            while (String[CodeUnit] != TextIO_NULLTerminator) {
                 if (String[CodeUnit] == '%') {
                     NumSpecifiers     += 1;
                 }
@@ -1523,7 +1523,7 @@ extern "C" {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
-            while (String[CodeUnit] != PlatformIO_NULLTerminator) {
+            while (String[CodeUnit] != TextIO_NULLTerminator) {
                 if (String[CodeUnit] == UTF16Character('%')) {
                     NumSpecifiers     += 1;
                 }
@@ -1539,7 +1539,7 @@ extern "C" {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodePoint             = 0ULL;
         if (String != NULL) {
-            while (String[CodePoint] != PlatformIO_NULLTerminator) {
+            while (String[CodePoint] != TextIO_NULLTerminator) {
                 if (String[CodePoint] == UTF32Character('%')) {
                     NumSpecifiers     += 1;
                 }
