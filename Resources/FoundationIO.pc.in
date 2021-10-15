@@ -1,6 +1,14 @@
-name: FoundationIO
-description: FoundationIO's purpose is to provide a consistent interface between platforms that is safer and easier to use.
-AsynchronousIO: Async reading and writing to file and socket descriptors.
+prefix=${CMAKE_INSTALL_PREFIX}
+exec_prefix=${CMAKE_INSTALL_PREFIX}
+includedir=${CMAKE_INSTALL_PREFIX}/include
+libdir=${CMAKE_INSTALL_PREFIX}/lib
+Libs: -L${CMAKE_INSTALL_PREFIX}/lib -l:FoundationIO.@DynlibExt@
+Cflags: -I${CMAKE_INSTALL_PREFIX}/include
+Version: @VERSION_STRING@
+
+name:               FoundationIO
+description:        FoundationIO's purpose is to provide a consistent interface between platforms that is safer and easier to use.
+AsynchronousIO:     Async reading and writing to file and socket descriptors.
 BufferIO:           Bitwise reading and writing to buffers.
 CryptographyIO:     en/de cryption algorithms as well as randomness generation.
 FileIO:             File and Path handling functions.
@@ -14,14 +22,3 @@ TextIO:             The Unicode handling portion of FoundationIO, consists of:
     LocalizationIO: Culture aware Unicode handling, sorting, etc.
     FormatIO:       Unicode aware printf replacement.
     LogIO:          Unicode aware error logging.
-
-Provides Unicode text handling: command-line parsing, localization, formatting, logging, and general operations;
-bitstream operations, encryption, unit testing, platform-specific interoperability, and math functions.
-
-prefix=${CMAKE_INSTALL_PREFIX}
-exec_prefix=${CMAKE_INSTALL_PREFIX}
-includedir=${CMAKE_INSTALL_PREFIX}/include
-libdir=${CMAKE_INSTALL_PREFIX}/lib
-Libs: -L${CMAKE_INSTALL_PREFIX}/lib -l:FoundationIO.@DynlibExt@
-Cflags: -I${CMAKE_INSTALL_PREFIX}/include
-Version: @VERSION_STRING@

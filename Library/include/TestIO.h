@@ -100,23 +100,19 @@ extern "C" {
      */
     typedef struct SecureRNG SecureRNG;
 
-    typedef bool (*TestIO_TestFunction)(SecureRNG *Secure);
+    typedef TestIO_TestOutcomes (*TestIO_TestFunction)(SecureRNG *Secure);
 
     typedef struct TestCase {
         UTF8                *Name;
         TestIO_TestFunction  Function;
         TestIO_TestStates    State;
         TestIO_TestOutcomes  Expectation;
-        TestIO_TestOutcomes  Outcome; // the actual pass/fail value from the test when it ran
-        // We need to know what the result should be, but should it go in the TestCase? if so, how do we handle strings vs scalars, etc?
+        TestIO_TestOutcomes  Result;
     } TestCase;
 
     typedef struct TestSuite {
-        TestCase            *Tests;
-        TestIO_TestOutcomes *Outcomes; // Array so we know which tests failed, but it shouldn't be just the failures, it should be for every test
-        uint64_t             NumTests;
-        uint64_t             NumCorrectOutcomes; // The number of times the outcome was what was expected
-        uint64_t             NumCompleted; // Where in the suite are we, how many tests have completed?
+        uint64_t  NumTests;
+        TestCase *Tests;
     } TestSuite;
     /*
      What if We register each Test in just one Variadic call, then we'd know the size the make the array as well as each index
