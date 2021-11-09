@@ -420,18 +420,25 @@ extern "C" {
 #include <Windows.h>    /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #endif /* PlatformIO_TargetOSIsPOSIX */
 
-#ifndef             PlatformIO_HiddenSymbol
-#if (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
-#define             PlatformIO_HiddenSymbol
-#else
-#define             PlatformIO_HiddenSymbol                                             __attribute__((visibility("hidden")))
-#endif /* Compiler is MSVC */
-#endif /* PlatformIO_HiddenSymbol */
+#ifndef             PlatformIO_Public
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#define             PlatformIO_Public                                                   __attribute__((visibility("default")))
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define             PlatformIO_Public                                                   __declspec(dllexport)
+#endif /* PlatformIO_Compiler */
+#endif /* PlatformIO_Public */
+
+#ifndef             PlatformIO_Private
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#define             PlatformIO_Private                                                  __attribute__((visibility("hidden")))
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define             PlatformIO_Private                                                  __declspec(dllexport)
+#endif /* PlatformIO_Compiler */
+#endif /* PlatformIO_Private */
 
 #ifndef             PlatformIO_Enum2Index
 #define             PlatformIO_Enum2Index(EnumName)                                     (EnumName - 1)
 #endif /* PlatformIO_Enum2Index */
-
 
     /*!
      @abstract      Gets the total amount of memory in the system.
