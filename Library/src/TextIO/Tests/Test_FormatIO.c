@@ -48,7 +48,7 @@ extern "C" {
          */
 
         bool TestPassed  = false;
-        ImmutableString_UTF32 String32_1   = UTF32String("%l32s");
+        ImmutableString_UTF32 String32_1   = UTF32String("%U32s");
         ImmutableString_UTF32 String32_2   = UTF32String("wat");
         ImmutableString_UTF32 TestU32      = UTF32_Format(String32_1, String32_2);
         if (UTF32_Compare(TestU32, String32_2)) {
@@ -57,10 +57,10 @@ extern "C" {
             printf("%s\n", UTF8String("Test1 Failed"));
         }
       
-        ImmutableString_UTF16 String16_1   = UTF16String("%l16s");
+        ImmutableString_UTF16 String16_1   = UTF16String("%U16s");
         ImmutableString_UTF16 String16_2   = UTF16String("wat");
-        ImmutableString_UTF16 Testl16      = UTF16_Format(String16_1, String16_2);
-        if (UTF16_Compare(Testl16, String16_2)) {
+        ImmutableString_UTF16 TestU16      = UTF16_Format(String16_1, String16_2);
+        if (UTF16_Compare(TestU16, String16_2)) {
             printf("%s\n", UTF8String("Test1 Passed"));
         } else {
             printf("%s\n", UTF8String("Test1 Failed"));

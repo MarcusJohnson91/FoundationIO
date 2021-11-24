@@ -1473,7 +1473,7 @@ extern "C" {
                  
                  ----
                  
-                 %l32s is for type specific formatters
+                 %U32s is for type specific formatters
                  */
                 FormatIO_BaseTypes     BaseType = Specifiers->Specifiers[Specifier].BaseType;
                 FormatIO_ModifierTypes Modifier = Specifiers->Specifiers[Specifier].ModifierType;

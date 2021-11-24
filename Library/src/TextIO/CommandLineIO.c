@@ -280,7 +280,7 @@ extern "C" {
                 uint64_t TerminalWidth       = CommandLineIO_GetTerminalWidth() / 2;
                 UTF8    *Indicator           = UTF8_Init(TerminalWidth);
                 UTF8_Set(Indicator, '-', TerminalWidth);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%l32s %llu/%llu %llu/%llu%s]%s"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, TextIO_NewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%U32s %llu/%llu %llu/%llu%s]%s"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, TextIO_NewLine8);
                 UTF8_File_WriteString(stdout, FormattedString);
                 free(Indicator);
             }
@@ -314,11 +314,11 @@ extern "C" {
             
             for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
                 CommandLineIO_SwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
-                GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%l32s: %l32s%l32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, TextIO_NewLine32);
+                GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%U32s: %U32s%U32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, TextIO_NewLine32);
                 
                 if (CurrentSwitchType == SwitchType_Parent && CLI->Switches[Switch].NumChildren > 0) {
                     for (uint64_t Child = 0ULL; Child < CLI->Switches[Switch].NumChildren; Child++) {
-                        GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%l32s: %l32s%l32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, TextIO_NewLine32);
+                        GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%U32s: %U32s%U32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, TextIO_NewLine32);
                     }
                 }
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
@@ -345,14 +345,14 @@ extern "C" {
         if (CLI != NULL) {
             UTF32 *License = NULL;
             if (CLI->LicenseType == LicenseType_Permissive || CLI->LicenseType == LicenseType_Copyleft) {
-                License = UTF32_Format(UTF32String("Released under the \"%l32s\" license, you can see the details of this license at: %l32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : TextIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
+                License = UTF32_Format(UTF32String("Released under the \"%U32s\" license, you can see the details of this license at: %U32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : TextIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
             } else if (CLI->LicenseType == LicenseType_Proprietary) {
-                License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%l32s%l32s%l32s"), TextIO_NewLine32, TextIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
+                License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%U32s%U32s%U32s"), TextIO_NewLine32, TextIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
             } else {
                 Log(Severity_USER, PlatformIO_FunctionName, UTF8String("LicenseType isn't set"));
             }
             
-            UTF32 *Banner32 = UTF32_Format(UTF32String("%l32s, v. %l32s by %l32s © %l32s, %l32s, %l32s"),
+            UTF32 *Banner32 = UTF32_Format(UTF32String("%U32s, v. %U32s by %U32s © %U32s, %U32s, %U32s"),
                                            CLI->ProgramName        != NULL ? CLI->ProgramName        : TextIO_InvisibleString32,
                                            CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : TextIO_InvisibleString32,
                                            CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : TextIO_InvisibleString32,
@@ -773,11 +773,11 @@ extern "C" {
         UTF32 *IntegerB  = UTF32_Integer2String(Base_Integer | Base_Radix10, Blue);
         DigitSize       += 8;
         if ((ColorType & ColorType_Foreground) == ColorType_Foreground) {
-            UTF32 *Formatted = UTF32_Format(UTF32String("%l32c[38;2;%l32s;%l32s;%l32s;m"), U'\x1B', IntegerR, IntegerG, IntegerB);
+            UTF32 *Formatted = UTF32_Format(UTF32String("%U32c[38;2;%U32s;%U32s;%U32s;m"), U'\x1B', IntegerR, IntegerG, IntegerB);
             Colorized        = UTF32_Insert(String, Formatted, 0);
             UTF32_Deinit(Formatted);
         } else if ((ColorType & ColorType_Background) == ColorType_Background) {
-            UTF32 *Formatted = UTF32_Format(UTF32String("%l32c[48;2;%l32s;%l32s;%l32s:m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
+            UTF32 *Formatted = UTF32_Format(UTF32String("%U32c[48;2;%U32s;%U32s;%U32s:m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
             Colorized        = UTF32_Insert(String, Formatted, 0);
             UTF32_Deinit(Formatted);
         }
