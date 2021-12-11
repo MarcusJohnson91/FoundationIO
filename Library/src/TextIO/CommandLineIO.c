@@ -5,13 +5,16 @@
 #include "../../include/TextIO/StringIO.h"      /* Included for StringIO's declarations */
 
 #if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <signal.h>                             /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                          /* Included for the terminal size */
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
 #include <pty.h>                                /* Included for winsize, TIOCGWINSZ */
 #else
 #endif /* PlatformIO_TargetOSIsLinux */
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <wincon.h>                             /* Included for getting the terminal size */
 #endif
 
@@ -44,6 +47,7 @@ extern "C" {
      */
     
     typedef struct CommandLineOption {
+        uint64_t *Children;
         UTF32    *Argument;
         uint64_t  SwitchID;
         uint64_t  NumChildren;
@@ -51,11 +55,11 @@ extern "C" {
     } CommandLineOption;
     
     typedef struct CommandLineSwitch {
+        uint64_t                     *IncompatibleOptions;
+        uint64_t                     *Children;
         UTF32                        *Name;
         UTF32                        *Description;
         UTF32                        *Argument;
-        uint64_t                     *IncompatibleOptions;
-        uint64_t                     *Children;
         uint64_t                      OptionID;
         uint64_t                      NumIncompatibleOptions;
         uint64_t                      NumChildren;
@@ -65,6 +69,8 @@ extern "C" {
     } CommandLineSwitch;
     
     typedef struct CommandLineIO {
+        CommandLineSwitch          *Switches;
+        CommandLineOption          *Options;
         UTF32                     **Tokens;
         UTF32                      *ProgramName;
         UTF32                      *ProgramAuthor;
@@ -74,8 +80,6 @@ extern "C" {
         UTF32                      *ProgramLicenseName;
         UTF32                      *ProgramLicenseDescription;
         UTF32                      *ProgramLicenseURL;
-        CommandLineSwitch          *Switches;
-        CommandLineOption          *Options;
         uint64_t                    NumSwitches;
         uint64_t                    NumOptions;
         uint64_t                    MinOptions;

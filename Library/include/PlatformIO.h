@@ -3,17 +3,13 @@
  @author          Marcus Johnson
  @copyright       2017+
  @version         2.0.0
- @brief           This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
+ @brief           This header contains preprocessor macros for generic functions in FoundationIO.
  */
 
 #pragma once
 
 #ifndef FoundationIO_PlatformIO_H
 #define FoundationIO_PlatformIO_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef             Yes
 #define             Yes                                                                 (1)
@@ -313,6 +309,30 @@ extern "C" {
 #endif /* Compiler */
 #endif /* CompilerVersion */
 
+#ifndef             PlatformIO_Executable
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
+#define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsMachO)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
+#define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsPE)
+#else
+#define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsElf)
+#endif /* TargetOS */
+#endif /* PlatformIO_Executable */
+
+#ifndef            PlatformIO_Is
+#define            PlatformIO_Is(Macro2Check, Value2Check) ((Macro2Check & Value2Check) == Value2Check)
+#endif /* PlatformIO_Is */
+
+#ifndef             PlatformIO_ArraySet
+#define             PlatformIO_ArraySet(Type)                      (const Type *const *const)
+#endif /* PlatformIO_ArraySet */
+
+#ifndef             PlatformIO_Redefine
+#define             PlatformIO_Redefine(Macro2Redefine, Value2Assign) PlatformIO_SaveMacro(Macro2Redefine)
+#undef  Macro2Redefine
+#define Macro2Redefine Value2Assign
+#endif /* PlatformIO_Redefine */
+
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsBE)
@@ -440,13 +460,36 @@ extern "C" {
 #define             PlatformIO_Enum2Index(EnumName)                                     (EnumName - 1)
 #endif /* PlatformIO_Enum2Index */
 
+#ifndef             PlatformIO_Unused
+#if (PlatformIO_Language == PlatformIO_LanguageIsC) && (PlatformIO_LanguageVersionC >= PlatformIO_LanguageVersionC23)
+#define             PlatformIO_Unused(Type)                                             Type [[maybe_unused]]
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC) && (PlatformIO_LanguageVersionC < PlatformIO_LanguageVersionC23)
+#if (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#define             PlatformIO_Unused(Type)                                             Type __attribute__((unused))
+#else
+#define             PlatformIO_Unused(Type)                                             Type
+#endif /* Compiler */
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX) && (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX17)
+#define             PlatformIO_Unused(Type)                                             Type [[maybe_unused]]
+#endif /* Language */
+#endif /* PlatformIO_Unused */
+
+#ifndef             PlatformIO_Concat
+#define             PlatformIO_Concat1(A, B) A##B
+#define             PlatformIO_Concat(A, B)  PlatformIO_Concat1(A, B)
+#endif /* PlatformIO_Concat */
+
+#ifndef             PlatformIO_Stringify8
+#define             PlatformIO_Stringify8(X) UTF8String(#X)
+#endif /* PlatformIO_Stringify8 */
+
+#ifndef             PlatformIO_Expand
+#define             PlatformIO_Expand(...) __VA_ARGS__
+#endif /* PlatformIO_Expand */
+
     /*!
      @abstract      Gets the total amount of memory in the system.
      */
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
-    
-#ifdef __cplusplus
-}
-#endif /* Extern C */
 
 #endif /* FoundationIO_PlatformIO_H */

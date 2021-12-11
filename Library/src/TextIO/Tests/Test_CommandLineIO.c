@@ -12,22 +12,21 @@ extern "C" {
         Help        = 2,
         NumSwitches = Help + 1,
     } Switches;
-    
-    int main(const int argc, const char *argv[]) {
-        CommandLineIO *CLI = CommandLineIO_Init(NumSwitches);
-        
+
+    void *CommandLineIO_FixtureInit(PlatformIO_Unused(TestIO_Enviroment*) Enviroment) {
+        CommandLineIO           *CLI     = CommandLineIO_Init(NumSwitches);
+        CommandLineIO_SetHelpOption(CLI, Help);
         CommandLineIO_SetMinOptions(CLI, 2);
 
-        uint64_t FakeArgC = 4;
-        ImmutableStringSet_UTF8 FakeArgV = UTF8StringSet(UTF8String("--Input"), UTF8String("/Fake/Path/For/Testing.png"), UTF8String("--Output"), UTF8String("/Fake/Path/For/Testing.jpg"));
-        /*
-         Now we should test case conversion, and maybe option shortening and all kinds of other things
-         */
+    TestIO_RegisterSuiteWithFixtures(CommandLineIO, CommandLineIO_FixtureInit, CommandLineIO_Deinit);
 
+    static const TestIO_Suite *SuiteSet[] = {
+//#repeat(TestIO_Internal_SuiteCount, TestIO_SuiteSet_WriteName)
+    };
+    
+    int main(const int argc, const char *argv[]) {
+        CommandLineIO *CLI = NULL; // Get TestIO to compile, gonna have to get this from the Fixture; So in TestIO_Suite we need a variable to contain Fixture data
         CommandLineIO_UTF8_ParseOptions(CLI, 4, FakeArgV);
-
-        CommandLineIO_Deinit(CLI);
-        
         return 0;
     }
     

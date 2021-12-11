@@ -1,5 +1,7 @@
 CommitID.h
 # ^ We don't want to commit this file, we just want cmake to generate it
+*.p
+# ^ used for tracking macro expansions
 *.a
 *.bak
 *.cab

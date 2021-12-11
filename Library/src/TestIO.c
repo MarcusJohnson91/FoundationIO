@@ -17,8 +17,25 @@
 extern "C" {
 #endif
 
-    /*
-     Automatic Test Generation:
+    const TestIO_Case NULLCase = {
+        .Name        = NULL,
+        .Function    = NULL,
+        .State       = TestState_Unspecified,
+        .Expectation = Outcome_Unspecified,
+    };
+
+    const TestIO_Suite NULLSuite = {
+        .Name     = NULL,
+        .Init     = NULL,
+        .Deinit   = NULL,
+        .NumTests = 0,
+        .Tests    = &NULLCase,
+    };
+
+    extern const int *__start_foo;
+
+    extern PlatformIO_ArraySet(TestIO_Suite) __TestIO_Suites_Start = NULLSuite;
+    extern PlatformIO_ArraySet(TestIO_Suite) __TestIO_Suites_Stop  = NULLSuite;
 
      Instrument the functions to see when and where branching occurs and to refine the randomly generated data
      */
@@ -44,28 +61,36 @@ extern "C" {
      */
 
 
+    void TestIO_Run(size_t SecureRNGSize) {
+        uint64_t NumSuites = 0;
+        for (TestIO_Suite *Suite = __TestIO_Suites_Start; Suite < __TestIO_Suites_Stop; Suite++) {
+            // Ok, so we have the actual test suite.
+            /*
+             Ok, so we're going to make an ArraySet of TestIO_Suites, aka a series of TestIO_Suite followed by a NULL
+             */
+        }
+        //while (SuiteStart != Suites_End) {
+        Section += sizeof(TestIO_Suite);
+        size_t NumCases = 0;
+        Section += NumCases * sizeof(TestIO_Case);
+        NumSuites += 1;
+        //}
 
-
-
-
-
-
-
-
-
-
-/*
-    static void RunTests_ReallocateHelper(TestSuite *Suite) {
-        if (Suite != NULL) {
-            realloc(Suite->UnexpectedFailues, sizeof(uint64_t) * Suite->UnexpectedFailureSize * 2);
-            Suite->UnexpectedFailureSize *= 2;
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("TestSuite Pointer is NULL"));
+        TestIO_Suite **Suites = calloc(NumSuites, sizeof(TestIO_Suite));
+        SecureRNG *Secure                              = SecureRNG_Init(SecureRNGSize);
+        uint64_t NumEnabledTests                       = 0ULL;
+        for (uint64_t Suite = 0; Suite < NumSuites; Suite++) {
+            for (uint64_t Test = 0; Test < Suites[Suite]->NumTests; Test++) {
+                if (Suites[Suite]->Tests[Test].State == TestState_Enabled) {
+                    NumEnabledTests                   += 1;
+                    Suites[Suite]->Tests[Test].Result  = Suites[Suite]->Tests[Test].Function(Secure);
+                }
+            }
         }
     }
- */
-
-    void TestIO_RunTests(TestSuite *Suite) {
+    */
+    static ImmutableStringSet_UTF8 UTF8_TestIO_GetFunctionNamesAsStringSet(TestIO_Suite *Suite) {
+        ImmutableStringSet_UTF8 StringSet = NULL;
         if (Suite != NULL) {
             uint64_t NumEnabledTests               = 0ULL;
             for (uint64_t Test = 0; Test < Suite->NumTests; Test++) {

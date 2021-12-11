@@ -7,10 +7,14 @@
 extern "C" {
 #endif
 
-    TestSuite *BufferIOTests;
-
-    /*
-     How to test:
+    void *BitBuffer_Fixture_Init(PlatformIO_Unused(TestIO_Enviroment *Enviroment)) {
+        BitBuffer *Buffer = BitBuffer_Init(64);
+        uint8_t   *Array  = BitBuffer_GetArray(Buffer);
+        for (uint8_t Byte = 0; Byte < 64; Byte++) {
+            Array[Byte]   = 0xFE;
+        }
+        return Buffer;
+    }
 
      Write 3 fields, all with a leading and trailing one, and a variable number of 0's in between.
 

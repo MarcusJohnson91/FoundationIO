@@ -6,14 +6,8 @@
 - Currently, there's no stable API, let alone ABI. I break shit constantly because i'm very indecisive.
 
 # Versioning:
-- FoundationIO's version scheme is based on Semantic versioning.
-- What is Semantic Versioning?
-* Semantic versioning is a scheme for versioning software.
-* There are three digits, seperated by periods, that denote the Major, Minor, and Patch fields respectively in Semantic versioning, we add a fourth field, the CommitID; "Major.Minor.Patch:CommitID".
-* The CommitID field is seperated from the rest of the version string with a colon ':'.
-* The CommitID field should be entirely ignored by third party developers and users, unless you're filing a bug report.
-* The purpose of the CommitID field is to track where exactly issues appeared and to help fix issues more quickly.
-* So if you're using FoundationIO in one of your projects, feel free to use the Major, Minor, and Patch fields in the version string, but do not rely on the CommitID for anything.
+- FoundationIO's version scheme is based on Semantic versioning; there's an API level and ABI level for each component in FoundationIO.
+* Format: APILevel.ABILevel.CommitID
 
 # License:
 FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.

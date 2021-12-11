@@ -1,10 +1,13 @@
 /*!
- @header          TestIO.h
- @author          Marcus Johnson
- @copyright       2021+
- @version         1.0.0
- @brief           This header contains types, functions, and tables for automated testing.
- @terminology     Test Case: individual test; Test Suite: group of similar test cases;
+ @header      TestIO.h
+ @author      Marcus Johnson
+ @copyright   2021+
+ @version     2.0.0
+ @brief       This header contains types, functions, and tables for automated testing.
+ @terminology
+ Case:        Individual test.
+ Fixture:     Operate on a user defined type.
+ Suite:       Group of similar test cases.
  */
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */
@@ -20,58 +23,21 @@
 extern "C" {
 #endif
 
-    /*
-     So, FoundationIO_String(Tokens32.ProcS, "<?"), is a valid expression.
-
-     So, maybe we can use _Generic, __COUNTER__, and macros to assign tests to a test suite
-     */
-
-    /*
-     Test Grouping:
-     So, Each Module needs to be tested, BufferIO, FileIO, CommandLineIO, etc
-     within each Module there needs to be tests for each data structure and function.
-     within each function there needs to be an individual test case.
-
-     Ok, so each data structure tested needs to have it's own Test Suite.
-
-     So, what's the Hierarchy here?
-
-     We can run very small tests, like making sure an individual function for example Minimum works.
-
-     but how do we make sure that larger structures work, like making sure a JPEG decoder works?
-
-     Bottom up testing is the approach I want to use with TestIO.
-
-     Make sure everything works individually, then increase the complexity of the system til it's at full capacity and still works together.
-
-     So, maybe we can break that into phases:
-
-     The Individual Test
-
-     The Compound Test
-
-     FunctionTest and ComponentTest could be the struct names for the subsystems?
-
-     A FunctionTest verifies the behavior of an individual function.
-
-     A ComponentTest verifies everything works together
-
-     A function test takes no arguments, they're just hard coded negative zero positive is the general pattern.
-
-     A Component Test requires some state but how do we Genericify that?
-
-     Well, we can approach it similar to MediaIO; void pointer, ElementSize, NumElements.
-
-     but that would only work for 1D arrays? how do you take the address of a 4D array?
-
-     Well, a 4D array would be an implementation detail that the component would need to create.
-
-     Also, one other thing I'd like to do is store the time it takes for the test to run so we can track that information too.
-     */
+    /* Disable warnings about redefining the Suite macro */
+#if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmacro-redefined"
+#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsGCC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmacro-redefined"
+#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsMSVC)
+#pragma warning (push)
+#pragma warning (disable : 4005)
+#endif
 
     /*!
      @enum         TestIO_TestStates
-     @abstract                                    Defines the state of each test.
+     @abstract                                    Is the test enabled or disabled?
      @constant     TestState_Unspecified          Invalid state.
      @constant     TestState_Enabled              The test is enabled.
      @constant     TestState_Disabled             The test is disabled.
@@ -84,10 +50,10 @@ extern "C" {
 
     /*!
      @enum         TestIO_TestOutcomes
-     @abstract                                    Defines the result of each test.
+     @abstract                                    Did the test pass or fail?
      @constant     Outcome_Unspecified            Invalid state.
-     @constant     Outcome_Passed                 The test is enabled.
-     @constant     Outcome_Failed                 The test is disabled.
+     @constant     Outcome_Passed                 The test passed.
+     @constant     Outcome_Failed                 The test failed.
      */
     typedef enum TestIO_TestOutcomes {
         Outcome_Unspecified            = 0,
@@ -96,50 +62,172 @@ extern "C" {
     } TestIO_TestOutcomes;
 
     /*!
-     @typedef Forward declared from CryptographyIO
-     */
-    typedef struct SecureRNG SecureRNG;
-
-    typedef TestIO_TestOutcomes (*TestIO_TestFunction)(SecureRNG *Secure);
-
-    typedef struct TestCase {
-        UTF8                *Name;
-        TestIO_TestFunction  Function;
-        TestIO_TestStates    State;
-        TestIO_TestOutcomes  Expectation;
-        TestIO_TestOutcomes  Result;
-    } TestCase;
-
-    typedef struct TestSuite {
-        uint64_t  NumTests;
-        TestCase *Tests;
-    } TestSuite;
-    /*
-     What if We register each Test in just one Variadic call, then we'd know the size the make the array as well as each index
-     */
-
-    void TestIO_RunTests(TestSuite *Suite);
-
-    bool TestIO_RegisterCase(TestSuite *Suite, UTF8 *FunctionName, TestIO_TestFunction Function2Test, TestIO_TestStates State, TestIO_TestOutcomes Expectation);
-
-#ifndef TestIO_Register
-#define TestIO_Register(Suite, Function2Test, State, Expectation) \
-TestIO_RegisterCase(Suite, UTF8String("##Function2Test"), Function2Test, State, Expectation)
-#endif
-/*
-#ifndef TestIO_RegisterCase
-#define TestIO_RegisterCase(...) Error_Do_Not_Call_TestIO_RegisterCase_Directly \
-//#error("Do not call TestIO_RegisterCase directly, use TestIO_Register to call it for you")
-#endif
- */
-
-    // Always use the macro "func" instead of calling "_func" directly.
-    #define func(dummy, ...) (_func)(dummy, __VA_ARGS__, NULL)
-
-    /*!
-     @abstract                                     Forward Declaration of CryptographyIO's SecureRNG.
+     @abstract                                    Forward Declaration of CryptographyIO's SecureRNG.
      */
     typedef struct SecureRNG                      SecureRNG;
+    typedef        TestIO_TestOutcomes          (*TestIO_TestFunction)(SecureRNG *Secure);
+
+    typedef struct TestIO_Enviroment {
+        jmp_buf Enviroment;
+    } TestIO_Enviroment;
+
+    typedef void*                               (*TestIO_FixtureInit)(PlatformIO_Unused(TestIO_Enviroment *Enviroment));
+    typedef void                                (*TestIO_FixtureDeinit)(void *Deinit, PlatformIO_Unused(TestIO_Enviroment *Enviroment));
+
+    /*!
+     @abstract                                    Defines a test case.
+     @variable     Name                           The name of the test.
+     @variable     Function                       A function pointer to the actual test.
+     @variable     TimeElapsed                    The amount of time it took the test to run.
+     @variable     State                          Is the test enbled or disabled?
+     @variable     Expectation                    Should the test pass or fail, what is expected to happen?
+     @variable     Result                         The actual observed value of the test after running.
+     */
+    typedef struct TestIO_Case {
+        TestIO_TestFunction            Function;
+        const UTF8                    *Name;
+        uint64_t                       TimeElapsed;
+        TestIO_TestStates              State;
+        TestIO_TestOutcomes            Expectation;
+        TestIO_TestOutcomes            Result;
+    } TestIO_Case;
+
+    typedef struct TestIO_Suite {
+        void                          *FixtureState;
+        TestIO_FixtureInit             Init;
+        TestIO_FixtureDeinit           Deinit;
+        const TestIO_Case             *Tests;
+        size_t                         NumTests;
+        const UTF8                    *Name;
+    } TestIO_Suite;
+
+    extern const TestIO_Suite NULLSuite;
+
+#ifndef          TestIO_Internal_NumSuites
+#define          TestIO_Internal_NumSuites 0
+#endif /* TestIO_Internal_NumSuites */
+
+#ifndef          TestIO_Internal_SuiteNames
+#define          TestIO_Internal_SuiteNames NULLSuite
+#endif /* TestIO_Internal_SuiteNames */
+
+#ifndef          TestIO_Internal_PushMacro
+#define          TestIO_Internal_PushMacro(MacroName) _Pragma("push_macro(" MacroName ")")
+#endif /* TestIO_Internal_Suite_SaveNames */
+
+#ifndef          TestIO_Internal_Suite_SaveNames
+#define          TestIO_Internal_Suite_SaveNames _Pragma("push_macro(\"TestIO_Internal_SuiteNames\")")
+#ifdef           TestIO_Internal_SuiteNames
+#undef           TestIO_Internal_SuiteNames
+#endif
+#endif /* TestIO_Internal_Suite_SaveNames */
+
+#ifndef          TestIO_Internal_Suite_RestoreNames
+#define          TestIO_Internal_Suite_RestoreNames _Pragma("pop_macro(\"TestIO_Internal_SuiteNames\")")
+#endif /* TestIO_Internal_Suite_RestoreNames */
+
+#ifndef TestIO_Internal_List_AddSuite
+#define TestIO_Internal_List_AddSuite(TestSuite_Name) TestIO_Internal_Suite_SaveNames
+#define TestIO_Internal_SuiteNames TestSuite_Name
+#endif /* TestIO_Internal_List_AddSuite */
+
+    /* We also need to create a counter variable to store the number of cases */
+#ifndef TestIO_ReserveCasesForSuite
+#define TestIO_ReserveCasesForSuite(TestSuite_Name)
+#if !defined( TestIO_Suite_CasesFor_##TestSuite_Name ) /* Must have the ugly ass space so it's not concatted */
+#define TestIOSuite_CasesFor_##TestSuite_Name
+#else
+#error "TestIOSuite_CasesFor_##TestSuite_Name is already registered, are you trying to create two suites with the same name?"
+#endif /* is TestIO_Suite_CasesFor_##TestSuiteName defined? */
+#endif /* TestIO_ReserveCasesForSuite */
+
+#ifndef TestIO_CreateTestCounterForSuite
+#define TestIO_CreateTestCounterForSuite(TestSuite_Name)
+#ifndef TestIOSuite_##TestSuite_Name##_NumTests
+#define TestIOSuite_##TestSuite_Name##_NumTests
+#else
+#error "TestIOSuite_##TestSuite_Name##_NumTests is already registered, are you trying to create two suites with the same name?"
+#endif /* TestIO_CreateTestCounterForSuite */
+
+#ifndef TestIO_Internal_IncrementNumTests
+#define TestIO_Internal_IncrementNumTests(TestSuite_Name)
+    __increment(TestIOSuite_##TestSuite_Name##_NumTests)
+#endif /* TestIO_Internal_IncrementNumTests */
+
+#ifndef TestIO_Internal_RegisterTestWithSuite
+#define TestIO_Internal_RegisterTestWithSuite(TestSuite_Name, TestCase_Name)
+    _Pragma("push_macro(\"TestIOSuite_CasesFor_##TestSuite_Name\")")
+#undef PlatformIO_Expand(TestIOSuite_CasesFor_##TestSuite_Name)
+#define PlatformIO_Expand(TestIOSuite_CasesFor_##TestSuite_Name) TestCase_Name
+#endif /* TestIO_Internal_RegisterTestWithSuite */
+
+#ifndef TestIO_RegisterSuite
+#define TestIO_RegisterSuite(TestSuite_Name)                                                                 \
+TestIO_ReserveCasesForSuite(TestSuite_Name)                                                                  \
+TestIO_CreateTestCounterForSuite(TestSuite_Name)                                                             \
+static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) = {         \
+.Init   = NULL,                                                                                      \
+.Deinit = NULL,                                                                                      \
+.Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))), \
+};
+    __increment(TestIO_Internal_NumSuites) /* Increment the count of TestIO_Suites each time RegisterSuite* macros are called */
+#define TestIO_Internal_SuiteNames PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))
+    _Pragma("push_macro(\"TestIO_Internal_SuiteNames\")")
+#undef TestIO_Internal_SuiteNames
+#endif /* TestIO_RegisterSuite */
+
+#ifndef TestIO_RegisterSuiteWithFixtures
+#define TestIO_RegisterSuiteWithFixtures(TestSuite_Name, Fixture_Init, Fixture_Deinit)                      \
+TestIO_ReserveCasesForSuite(TestSuite_Name)                                                                 \
+TestIO_CreateTestCounterForSuite(TestSuite_Name)                                                            \
+static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) = {        \
+.Init   = Fixture_Init,                                                                             \
+.Deinit = Fixture_Deinit,                                                                           \
+.Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))),\
+};
+    __increment(TestIO_Internal_NumSuites)
+#define TestIO_Internal_SuiteNames PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))
+    _Pragma("push_macro(\"TestIO_Internal_SuiteNames\")")
+#undef TestIO_Internal_SuiteNames
+#endif /* TestIO_RegisterSuiteWithFixtures */
+
+#ifndef            TestIO_RegisterTest
+#define            TestIO_RegisterTest(TestSuite_Name, Function2Test, TestState, Outcome) \
+TestIO_Internal_IncrementNumTests(TestSuite_Name)                                         \
+static const TestIO_Case TestIOCase_##Function2Test = {                                   \
+.Function    = Function2Test,                                                             \
+.State       = TestState,                                                                 \
+.Expectation = Outcome,                                                                   \
+.Name        = PlatformIO_Stringify(Function2Test),                                       \
+};
+#endif /* TestIO_RegisterTest */
+
+    /*
+     I need an ArraySet of SuiteNames
+
+     #define TestIO_GetSuiteName _Pragma(pop_macro("TestIO_Internal_SuiteName"))
+     static const TestIO_Suite **SuiteArraySet = {
+     [__COUNTER__] = &TestIO_GetSuiteName;
+     ];
+
+     that's all fine and dandy; the problem is, how do I wrap the index to the address-of part into a damn loop at compile time?
+
+     As for push_macro/pop_macro, each time the name macro is set, we could set a count variable
+     */
+
+    /*
+     Register each suite:
+
+     So, we have a macro that contains the number of suites, which is defined as __COUNTER__ + 1
+
+     then we somehow have a macro that loops over the counter macro until it's 0, decrementing each time.
+
+     we set each Test_Suite's name to a macro and use push_macro to add them all to the same variable.
+
+     then we loop over the thing, using pop_macro to get the name of the registered suite.
+     */
+
+    void           TestIO_Summarize(TestIO_Suite *Suite);
 
     /*!
      @abstract                                    Gets how accurate the clock is.
@@ -156,7 +244,16 @@ TestIO_RegisterCase(Suite, UTF8String("##Function2Test"), Function2Test, State, 
      @param        Random                         Pointer to an instance of SecureRNG, from CryptographyIO.
      @param        NumCodePoints                  The number of CodePoints, for the String's size.
      */
-    UTF32         *UTF32_GenerateString(SecureRNG *Random, uint64_t NumCodePoints);
+    UTF32         *TestIO_Random_GetString(SecureRNG *Random, uint64_t NumCodePoints);
+
+    /* Re-enable warnings about redefining macros */
+#if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang)
+#pragma clang diagnostic pop
+#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsGCC)
+#pragma GCC diagnostic pop
+#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsMSVC)
+#pragma warning(pop)
+#endif
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
