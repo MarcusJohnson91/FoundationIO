@@ -7,6 +7,18 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+    typedef enum UTF8Constants {
+        UTF8Header_2CodeUnits   = 0xC0,
+        UTF8Header_3CodeUnits   = 0xE0,
+        UTF8Header_4CodeUnits   = 0xF0,
+        UTF8Header_Contine      = 0x80,
+        UTF8Max_ASCII           = 0x7F,
+        UTF8Mask6Bit            = 0x3F,
+        UTF8Mask5Bit            = 0x1F,
+        UTF8Mask4Bit            = 0xF,
+        UTF8Mask3Bit            = 0x7,
+    } UTF8Constants;
     
     static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + TextIO_NULLTerminatorSize] = {0, 0, 0, 0, 0};
     static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + TextIO_NULLTerminatorSize] = {0, 0, 0};
@@ -108,23 +120,26 @@ extern "C" {
     
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
         uint8_t CodePointSize = 0;
-        if (((CodeUnit & 0x80) >> 7) == 0) {
-            CodePointSize     = 1;
-        } else if (((CodeUnit & 0xF8) >> 3) == 0x1E) {
-            CodePointSize     = 4;
-        } else if (((CodeUnit & 0xF0) >> 4) == 0x0E) {
-            CodePointSize     = 3;
-        } else if (((CodeUnit & 0xE0) >> 5) == 0x06) {
-            CodePointSize     = 2;
-        } else if (((CodeUnit & 0xC0) >> 6) == 0x02) {
-            CodePointSize     = 1;
+        switch (CodeUnit & 0xF8) {
+            case UTF8Header_4CodeUnits:
+                CodePointSize = 4;
+                break;
+            case UTF8Header_3CodeUnits:
+                CodePointSize = 3;
+                break;
+            case UTF8Header_2CodeUnits:
+                CodePointSize = 2;
+                break;
+            default:
+                CodePointSize = 1;
+                break;
         }
         return CodePointSize;
     }
     
     uint8_t UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit) {
         uint8_t CodePointSize = 0;
-        if (CodeUnit < UTF16HighSurrogateStart || CodeUnit > UTF16LowSurrogateEnd) {
+        if (CodeUnit < UTF16HighSurrogateStart || (CodeUnit > UTF16LowSurrogateEnd && CodeUnit <= UTF16MaxCodeUnitValue)) {
             CodePointSize     = 1;
         } else if (CodeUnit >= UTF16HighSurrogateStart && CodeUnit <= UTF16LowSurrogateEnd) {
             CodePointSize     = 2;
@@ -150,7 +165,7 @@ extern "C" {
     
     uint8_t UTF32_GetCodePointSizeInUTF16CodeUnits(UTF32 CodePoint) {
         uint8_t UTF16CodeUnits = 0;
-        if (CodePoint <= 0xFFFF) {
+        if (CodePoint <= UTF16MaxCodeUnitValue) {
             UTF16CodeUnits     = 1;
         } else if (CodePoint >= 0x10000 && CodePoint <= UnicodeMaxCodePoint) {
             UTF16CodeUnits     = 2;
@@ -164,33 +179,33 @@ extern "C" {
             uint8_t CodePointSize             = UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0]);
             switch (CodePointSize) {
                 case 1:
-                    CodePoint                 =  CodeUnits[0] & 0x7F;
+                    CodePoint                 =  CodeUnits[0] & UTF8Max_ASCII;
                     break;
                 case 2:
-                    CodePoint                |= (CodeUnits[0] & 0x1F) << 6;
+                    CodePoint                |= (CodeUnits[0] & UTF8Mask5Bit) << 6;
                     if (CodeUnits[1] != TextIO_NULLTerminator) {
-                        CodePoint            |= (CodeUnits[1] & 0x3F) << 0;
+                        CodePoint            |= (CodeUnits[1] & UTF8Mask6Bit) << 0;
                     }
                     break;
                 case 3:
-                    CodePoint                |= (CodeUnits[0] & 0x0F) << 12;
+                    CodePoint                |= (CodeUnits[0] & UTF8Mask4Bit) << 12;
                     if (CodeUnits[1] != TextIO_NULLTerminator) {
-                        CodePoint            |= (CodeUnits[1] & 0x1F) << 6;
+                        CodePoint            |= (CodeUnits[1] & UTF8Mask5Bit) << 6;
                     }
                     if (CodeUnits[2] != TextIO_NULLTerminator) {
-                        CodePoint            |= (CodeUnits[2] & 0x1F) << 0;
+                        CodePoint            |= (CodeUnits[2] & UTF8Mask5Bit) << 0;
                     }
                     break;
                 case 4:
                     CodePoint                |= (CodeUnits[0] & 0x07) << 18;
                     if (CodeUnits[1] != TextIO_NULLTerminator) {
-                        CodePoint            |= (CodeUnits[1] & 0x3F) << 12;
+                        CodePoint            |= (CodeUnits[1] & UTF8Mask6Bit) << 12;
                     }
                     if (CodeUnits[2] != TextIO_NULLTerminator) {
-                        CodePoint            |= (CodeUnits[2] & 0x3F) <<  6;
+                        CodePoint            |= (CodeUnits[2] & UTF8Mask6Bit) <<  6;
                     }
                     if (CodeUnits[3] != TextIO_NULLTerminator) {
-                        CodePoint            |= (CodeUnits[3] & 0x3F) <<  0;
+                        CodePoint            |= (CodeUnits[3] & UTF8Mask6Bit) <<  0;
                     }
                     break;
             }
@@ -238,35 +253,24 @@ extern "C" {
     
     static void UTF8_EncodeCodePoint(UTF32 CodePoint) {
         uint8_t CodeUnitSize                          = UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint);
-        typedef enum UTF8Constants {
-            UTF8Header_2Byte        = 0xC0,
-            UTF8Header_3Byte        = 0xE0,
-            UTF8Header_4Byte        = 0xF0,
-            UTF8Header_Contine      = 0x80,
-            UTF8Range_ASCII         = 0x7F,
-            UTF8Mask6Bit            = 0x3F,
-            UTF8Mask5Bit            = 0x1F,
-            UTF8Mask4Bit            = 0xF,
-            UTF8Mask3Bit            = 0x7,
-        } UTF8Constants;
         switch (CodeUnitSize) {
             case 1:
-                StringIO_PreallocateCodePoint_UTF8[0] = (CodePoint & UTF8Range_ASCII);
+                StringIO_PreallocateCodePoint_UTF8[0] = (CodePoint & UTF8Max_ASCII);
                 break;
             case 2:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_2Byte   | (CodePoint & (UTF8Mask5Bit << 6)) >> 6;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine | (CodePoint &  UTF8Mask6Bit);
+                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_2CodeUnits | (CodePoint & (UTF8Mask5Bit << 6)) >> 6;
+                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint &  UTF8Mask6Bit);
                 break;
             case 3:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_3Byte   | (CodePoint & (UTF8Mask4Bit << 12)) >> 12;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
-                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine | (CodePoint & UTF8Mask6Bit);
+                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_3CodeUnits | (CodePoint & (UTF8Mask4Bit << 12)) >> 12;
+                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
+                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
                 break;
             case 4:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_4Byte   | (CodePoint & (UTF8Mask3Bit << 18)) >> 18;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine | (CodePoint & (UTF8Mask6Bit << 12)) >> 12;
-                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
-                StringIO_PreallocateCodePoint_UTF8[3] = UTF8Header_Contine | (CodePoint & UTF8Mask6Bit);
+                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_4CodeUnits | (CodePoint & (UTF8Mask3Bit << 18)) >> 18;
+                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 12)) >> 12;
+                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
+                StringIO_PreallocateCodePoint_UTF8[3] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
                 break;
         }
     }
@@ -465,7 +469,7 @@ extern "C" {
     
     static bool UTF32_CodePointIsGraphemeExtender(UTF32 CodePoint) {
         bool IsGraphemeExtender    = No;
-        if (CodePoint > 0x7F) {
+        if (CodePoint > UTF8Max_ASCII) {
             for (uint64_t GraphemeExtender = 0ULL; GraphemeExtender < GraphemeExtensionTableSize; GraphemeExtender++) {
                 if (CodePoint == GraphemeExtensionTable[GraphemeExtender]) {
                     IsGraphemeExtender = Yes;
@@ -513,35 +517,6 @@ extern "C" {
     }
     
     uint64_t UTF16_GetWordSizeInCodePoints(ImmutableString_UTF16 String, uint64_t OffsetInCodeUnits) {
-        uint64_t WordSize = 0ULL;
-        if (String != NULL) {
-            
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
-        return WordSize;
-    }
-    
-    
-    
-    
-    /*
-     
-     Break API:
-     
-     We have a string: "Hi, I'm a string!"
-     
-     What properties do we want to get from this string?
-     
-     The number of CodeUnits, CodePoints, Graphemes, Words, Lines/Sentences, Paragraphs?, and the number of CodeUnits, CodePoints, and Graphemes in each Word, Line/Sentence, Paragraph
-     
-     We can get the size of Words, Sentences, Paragraphs in CodeUnits, CodePoints, Graphemes with the normal functions, all we have to do is find the Size of the Word, Sentence, Paragraph first so it can be split or at least indexed.
-     
-     Should Words include punctuation, or should punctuation be it's own word?
-     
-     */
-    
-    uint64_t UTF32_GetWordSizeInCodePoints(ImmutableString_UTF32 String, uint64_t OffsetInCodeUnits) {
         uint64_t WordSize = 0ULL;
         if (String != NULL) {
             
@@ -1175,20 +1150,20 @@ extern "C" {
     }
     
     bool UTF32_HasNewLine(ImmutableString_UTF32 String) {
-        bool StringHasNewLine            = No;
+        bool HasNewLine                  = No;
         if (String != NULL) {
-            uint64_t CodePoint           = 1ULL;
+            uint64_t CodePoint           = 0ULL;
+            /*
+             Loop over the LineBreak table, if a character matches skip it, loop until the end of the string
+             */
             while (String[CodePoint] != TextIO_NULLTerminator) {
-                if (String[CodePoint] == 0x0A) {
-                    StringHasNewLine     = Yes;
+                uint8_t LBIndex = 0;
+                if (String[CodePoint] == LineBreakTable[LBIndex]) {
+                    // LineBreak found, set HasNewLine to true and break
+                    HasNewLine = true;
+                    return HasNewLine;
                 }
-                if (String[CodePoint - 1] == 0x0D && String[CodePoint] == 0x0A) {
-                    StringHasNewLine     = Yes;
-                }
-                if (String[CodePoint] == 0x0D) {
-                    StringHasNewLine     = Yes;
-                }
-                CodePoint               += 1;
+                CodePoint += 1;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
