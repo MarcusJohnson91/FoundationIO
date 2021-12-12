@@ -50,26 +50,26 @@ extern "C" {
 #endif /* TextIO_WideCharType */
 
 #ifndef             TextIO_NewLine8
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #define             TextIO_NewLine8                                                 UTF8String("\n")
 #define             TextIO_NewLine8Size                                             (1)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #define             TextIO_NewLine8                                                 UTF8String("\r\n")
 #define             TextIO_NewLine8Size                                             (2)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsClassicMac)
 #define             TextIO_NewLine8                                                 UTF8String("\r")
 #define             TextIO_NewLine8Size                                             (1)
 #endif /* PlatformIO_TargetOS */
 #endif /* TextIO_NewLine8 */
 
 #ifndef             TextIO_NewLine16
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #define             TextIO_NewLine16                                                UTF16String("\n")
 #define             TextIO_NewLine16Size                                            (1)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #define             TextIO_NewLine16                                                UTF16String("\r\n")
 #define             TextIO_NewLine16Size                                            (2)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsClassicMac)
 #define             TextIO_NewLine16                                                UTF16String("\r")
 #define             TextIO_NewLine16Size                                            (1)
 #endif /* PlatformIO_TargetOS */
@@ -77,13 +77,13 @@ extern "C" {
 
 
 #ifndef             TextIO_NewLine32
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #define             TextIO_NewLine32                                                UTF32String("\n")
 #define             TextIO_NewLine32Size                                            (1)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #define             TextIO_NewLine32                                                UTF32String("\r\n")
 #define             TextIO_NewLine32Size                                            (2)
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsClassicMac)
 #define             TextIO_NewLine32                                                UTF32String("\r")
 #define             TextIO_NewLine32Size                                            (1)
 #endif /* PlatformIO_TargetOS */

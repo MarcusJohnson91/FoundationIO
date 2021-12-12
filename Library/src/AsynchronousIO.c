@@ -2,28 +2,27 @@
 #include "../include/TextIO/LogIO.h"      /* Included for Logging */
 #include "../include/TextIO/StringIO.h"   /* Included for UTF-X operations */
 
-#if    ((PlatformIO_TargetOS & PlatformIO_TargetOSIsBSD) == PlatformIO_TargetOSIsBSD) || ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsBSD) || PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
-#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
-// Use epoll
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
 #include <sys/epoll.h>
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 // use IO Completion Ports
 #endif
 
 /* Old Headers, cleanup after refactoring */
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <aio.h>                          /* Included for aio_read and aio_write */
 #include <fcntl.h>                        /* Included for open */
 #include <sys/types.h>                    /* Included for Socket API */
 #include <sys/socket.h>                   /* Included for Socket API */
-#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
 #include <sys/socket.h>                   /* Included for Socket API */
 #include <netinet/in.h>                   /* Included for Socket API */
 #include <netinet/ip.h>                   /* Included for Socket API */
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <process.h>
 #endif /* TargetOS */
 /* Old Headers, cleanup after refactoring */
@@ -52,10 +51,10 @@ extern "C" {
     static void AsyncIOStream_FindSize(AsyncIOStream *Stream) {
         if (Stream != NULL && Stream->StreamSize <= 0 && (Stream->StreamType & StreamType_File) == StreamType_File) {
             int64_t OriginalPosition  = lseek(Stream->StreamID, 0, SEEK_CUR);
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             Stream->StreamSize        = lseek(Stream->StreamID, 0, SEEK_END);
             lseek(Stream->StreamID, OriginalPosition, SEEK_SET);
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             Stream->StreamSize        = _lseeki64(Stream->StreamID, 0, SEEK_END);
             _lseeki64(Stream->StreamID, OriginalPosition, SEEK_SET);
 #endif /* PlatformIO_TargetOS */
@@ -93,13 +92,13 @@ extern "C" {
             if (Path8HasBOM) {
                 Path8Offset      = UTF8BOMSizeInCodeUnits;
             }
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #ifndef __STDC_LIB_EXT1__
             Stream->StreamID     = open(&Path8[Path8Offset], Mode); // Use O_LARGEFILE
 #else
             Stream->StreamID     = open_s(&Path8[Path8Offset], Mode);
 #endif
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             UTF16 *Path16        = UTF8_Convert(&Path8[Path8Offset]);
             Stream->StreamID     = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
             UTF16_Deinit(Path16);
@@ -120,7 +119,7 @@ extern "C" {
             if (Path16HasBOM) {
                 Path16Offset      = UTF16BOMSizeInCodeUnits;
             }
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             UTF8 *Path8          = UTF16_Convert(&Path16[Path16Offset]);
 #ifndef __STDC_LIB_EXT1__
             Stream->StreamID     = open(Path8, Mode);
@@ -128,7 +127,7 @@ extern "C" {
             Stream->StreamID     = open_s(Path8, Mode);
 #endif
             UTF8_Deinit(Path8);
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             Stream->StreamID     = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
 #endif
         } else if (Path16 == NULL) {
@@ -142,7 +141,7 @@ extern "C" {
     uint64_t AsyncIOStream_Read(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements) {
         uint64_t NumBytesRead = 0ULL;
         if (Stream != NULL && Array != NULL) {
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             struct sigevent SignalEvent = {
                 .sigev_notify            = 0,
                 .sigev_signo             = 0,
@@ -161,7 +160,7 @@ extern "C" {
                 .aio_lio_opcode = 0, // What operation are we doing?
             };
             aio_read(&Async);
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             
 #endif
         }
@@ -171,7 +170,7 @@ extern "C" {
     uint64_t AsyncIOStream_Write(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements) {
         uint64_t NumBytesWritten = 0ULL;
         if (Stream != NULL && Array != NULL) {
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             struct sigevent SignalEvent = {
                 .sigev_notify            = 0,
                 .sigev_signo             = 0,
@@ -190,7 +189,7 @@ extern "C" {
                 .aio_lio_opcode = 0, // What operation are we doing?
             };
             aio_write(&Async);
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 
 #endif
         }

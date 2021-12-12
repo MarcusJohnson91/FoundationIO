@@ -4,12 +4,12 @@
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
 #include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
 
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
 #include <time.h>                       /* Included for timespec_get */
 #include <mach/mach_time.h>             /* Included for mach_continuous_time */
-#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <time.h>                       /* Included for timespec_get */
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <WinBase.h>                    /* Included for QueryPerformanceCounter */
 #endif
 
@@ -142,15 +142,15 @@ extern "C" {
 
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
         struct timespec Resolution;
         clock_getres(CLOCK_MONOTONIC, &Resolution);
         TimerFrequency = Resolution.tv_nsec;
-#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         struct timespec Resolution;
         clock_getres(CLOCK_MONOTONIC, &Resolution);
         TimerFrequency = Resolution.tv_nsec;
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         LARGE_INTEGER WinFrequency;
         bool Success = QueryPerformanceFrequency(&WinFrequency);
         if (Success) {
@@ -164,12 +164,12 @@ extern "C" {
         uint64_t Time        = 0ULL;
         uint64_t CurrentTime = 0ULL;
         for (uint8_t Loop = 1; Loop <= 3; Loop++) {
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
             CurrentTime      = mach_continuous_time();
-#elif (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux))
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
             struct timespec *TimeSpec = NULL;
             clock_gettime(CLOCK_MONOTONIC, TimeSpec);
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             LARGE_INTEGER WinCounter;
             bool Success    = QueryPerformanceCounter(&WinCounter);
             if (Success) {

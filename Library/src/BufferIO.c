@@ -181,7 +181,7 @@ extern "C" {
                 }
 
                 // Now we need to read in BufferSize - Bytes2Save, starting the array at Bytes2Save
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
                 struct sigevent SignalEvent = {
                     .sigev_notify            = 0,
                     .sigev_signo             = 0,
@@ -202,7 +202,7 @@ extern "C" {
                  aio_read(&Async);
                  */
                 AsyncIOStream_Read(BitB->Input, BitB->Buffer, 1, Bits2Bytes(RoundingType_Down, BitB->NumBits));
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
                 // IO completion ports
 #endif
 

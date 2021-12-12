@@ -1079,13 +1079,13 @@ extern "C" {
         bool PathIsAbsolute = No;
         if (String != NULL) {
             bool StringHasBOM      = UTF8_HasBOM(String);
-#if  ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             if (StringHasBOM && String[UTF8BOMSizeInCodeUnits] != TextIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             } else if (String[UTF8BOMSizeInCodeUnits] != TextIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             if (StringHasBOM && String[0] != 0 && String[1] != 0 && String[2] != 0 && String[3] != 0 && String[4] != 0) {
                 if (((String[3] >= 'A' && String[3] <= 'Z') || (String[3] >= 'a' && String[3] <= 'z')) && String[4] == ':') {
                     PathIsAbsolute = Yes;
@@ -1104,13 +1104,13 @@ extern "C" {
         bool PathIsAbsolute        = No;
         if (String != NULL) {
             bool StringHasBOM      = UTF16_HasBOM(String);
-#if  ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             if (StringHasBOM && String[UTF8BOMSizeInCodeUnits] != TextIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             } else if (String[UTF8BOMSizeInCodeUnits] != TextIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             if (StringHasBOM && String[0] != 0 && String[1] != 0 && String[2] != 0 && String[3] != 0 && String[4] != 0) {
                 if (((String[3] >= 'A' && String[3] <= 'Z') || (String[3] >= 'a' && String[3] <= 'z')) && String[4] == ':') {
                     PathIsAbsolute = Yes;
@@ -1129,13 +1129,13 @@ extern "C" {
         bool PathIsAbsolute        = No;
         if (String != NULL) {
             bool StringHasBOM      = UTF32_HasBOM(String);
-#if  ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             if (StringHasBOM && String[UTF8BOMSizeInCodeUnits] != TextIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             } else if (String[UTF8BOMSizeInCodeUnits] != TextIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             if (StringHasBOM && String[0] != 0 && String[1] != 0 && String[2] != 0 && String[3] != 0 && String[4] != 0) {
                 if (((String[3] >= 'A' && String[3] <= 'Z') || (String[3] >= 'a' && String[3] <= 'z')) && String[4] == ':') {
                     PathIsAbsolute = Yes;

@@ -6,7 +6,7 @@
 #include "../include/TextIO/LogIO.h"      /* Included for Logging */
 #include "../include/TextIO/StringIO.h"   /* Included for StringIO's declarations */
 
-#if   (PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <dirent.h>
 #endif
 
@@ -32,11 +32,11 @@ extern "C" {
         UTF8 *Base = NULL;
         uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
         uint64_t Start                 = Path8SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0 && Path8[Start] != '\\') {
             Start                     -= 1;
         }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         while (Start > 0 && (Path8[Start] != '\\' || Path8[Start] != '/')) {
             Start                     -= 1;
         }
@@ -58,11 +58,11 @@ extern "C" {
         UTF16 *Base = NULL;
         uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
         uint64_t Start                 = Path16SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0 && Path16[Start] != '\\') {
             Start                     -= 1;
         }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         while (Start > 0 && (Path16[Start] != '\\' || Path16[Start] != '/')) {
             Start                     -= 1;
         }
@@ -84,11 +84,11 @@ extern "C" {
         UTF32 *Base = NULL;
         uint64_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
         uint64_t Start                 = Path32SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0 && Path32[Start] != '\\') {
             Start                     -= 1;
         }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         while (Start > 0 && (Path32[Start] != '\\' || Path32[Start] != '/')) {
             Start                     -= 1;
         }
@@ -114,7 +114,7 @@ extern "C" {
          */
         uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
         uint64_t Start                 = Path8SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0) {
             if (Path8[Start] == '\\') { // Stop the loop because we're now in a folder
                 return Base;
@@ -124,7 +124,7 @@ extern "C" {
             }
             Start                     -= 1;
         }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         while (Start > 0) {
             if (Path8[Start] == '\\' || Path8[Start] == '/') { // Stop the loop because we're now in a folder
                 return Base;
@@ -152,7 +152,7 @@ extern "C" {
         UTF16 *Base = NULL;
         uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
         uint64_t Start                 = Path16SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0) {
             if (Path16[Start] == '\\') { // Stop the loop because we're now in a folder
                 return Base;
@@ -162,7 +162,7 @@ extern "C" {
             }
             Start                     -= 1;
         }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         while (Start > 0) {
             if (Path16[Start] == '\\') { // Stop the loop because we're now in a folder
                 return Base;
@@ -190,7 +190,7 @@ extern "C" {
         UTF32 *Base = NULL;
         uint64_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
         uint64_t Start                 = Path32SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0) {
             if (Path32[Start] == '\\') { // Stop the loop because we're now in a folder
                 return Base;
@@ -200,7 +200,7 @@ extern "C" {
             }
             Start                     -= 1;
         }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         while (Start > 0) {
             if (Path32[Start] == '\\') { // Stop the loop because we're now in a folder
                 return Base;
@@ -232,9 +232,9 @@ extern "C" {
         if (Orientation < 0) {
             StringType                      = StringType_UTF8;
         } else if (Orientation > 0) {
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             StringType                      = StringType_UTF32;
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             StringType                      = StringType_UTF16;
 #endif
         }
@@ -461,10 +461,10 @@ extern "C" {
     
     UTF16 *GetCWD(void) {
         UTF16 *CWD = NULL;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         struct stat Info;
         stat(".", &Info);
-#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsWindows) == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         struct __stat64 Info;
         _stat64(".", &Info);
 #endif /* TargetOS */
@@ -517,9 +517,9 @@ extern "C" {
          Well shit that was easy, what now?
          */
         
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         CurrentWorkingPath       = PlatformIO_Cast(UTF8*, getcwd(NULL, 0));
-#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsWindows) == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         UTF16 *CWP16[_MAX_PATH + TextIO_NULLTerminatorSize];
         _wgetcwd(PlatformIO_Cast(wchar_t*, &CWP16), _MAX_PATH);
         CurrentWorkingPath       = UTF16_Convert(CWP16);
@@ -529,9 +529,9 @@ extern "C" {
     
     UTF16 *FileIO_UTF16_GetCurrentWorkingPath(void) {
         UTF16 *CurrentWorkingPath = NULL;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         CurrentWorkingPath        = UTF8_Convert(getcwd(NULL, 0));
-#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsWindows) == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         CurrentWorkingPath        = _wgetcwd(PlatformIO_Cast(wchar_t*, &CWP16), _MAX_PATH);
 #endif /* TargetOS */
         return CurrentWorkingPath;
@@ -556,9 +556,9 @@ extern "C" {
     
     uint64_t FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read) {
         uint64_t BytesRead = 0;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         BytesRead = fread((void*) Buffer, BufferElementSize, Elements2Read, PlatformIO_Mutable(FILE*, File2Read));
-#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         ReadFile(File2Read, Buffer, Elements2Read, &BytesRead, NULL);
 #endif
         return BytesRead;
@@ -568,21 +568,21 @@ extern "C" {
         bool SuccessIsZero      = 1;
         if ((SeekType & SeekType_Beginning) == SeekType_Beginning) {
             // TODO: Maybe we should make sure that SeekSize fits within the file
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             SuccessIsZero       = fseeko(PlatformIO_Cast(FILE*, File2Seek), PlatformIO_Cast(off_t, SeekSizeInBytes), SEEK_SET);
-#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_SET);
 #endif
         } else if ((SeekType & SeekType_Current) == SeekType_Current) {
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             SuccessIsZero       = fseeko(PlatformIO_Cast(FILE*, File2Seek), PlatformIO_Cast(off_t, SeekSizeInBytes), SEEK_CUR);
-#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_CUR);
 #endif
         } else if ((SeekType & SeekType_End) == SeekType_End) {
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             SuccessIsZero       = fseeko(PlatformIO_Cast(FILE*, File2Seek), PlatformIO_Cast(off_t, SeekSizeInBytes), SEEK_END);
-#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_END);
 #endif
         }
@@ -591,9 +591,9 @@ extern "C" {
     
     uint64_t FileIO_Write(PlatformIO_Immutable(FILE *) File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write) {
         uint64_t BytesWritten = 0;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         BytesWritten          = fwrite(Buffer, BufferElementSize, Elements2Write, PlatformIO_Mutable(FILE*, File2Write));
-#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         WriteFile(File2Write, Buffer, Elements2Write, &BytesWritten, NULL);
 #endif
         if (BytesWritten != Elements2Write) {

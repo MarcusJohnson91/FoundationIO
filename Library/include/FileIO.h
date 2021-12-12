@@ -8,7 +8,6 @@
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
-
 #include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
 
 #pragma once

@@ -343,7 +343,7 @@
 #define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsLE)
 #endif /* PlatformIO_Compiler */
 
-#if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #ifndef             _LARGEFILE_SOURCE
 #define             _LARGEFILE_SOURCE                                                   (1)
 #endif
@@ -382,11 +382,11 @@
 #endif
 #endif /* PlatformIO_TargetOSIsPOSIX */
 
-#if  ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
 #define             _DARWIN_USE_64_BIT_INODE                                            (1)
 #endif /* Apple specific macros */
 
-#if (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #ifndef             WIN32_LEAN_AND_MEAN
 #define             WIN32_LEAN_AND_MEAN                                                 (1)
 #endif
@@ -421,7 +421,7 @@
 
 #endif /* PlatformIO_TargetOS is some kind of Windows */
 
-#if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
 #define _GNU_SOURCE /* Needed for syscalls like getrandom */
 #endif /* Linux */
 
@@ -432,11 +432,11 @@
 #include <stdlib.h>     /* Included for calloc/free */
 #include <wchar.h>      /* Included for WCHAR_MAX */
 
-#if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <dlfcn.h>      /* Included for shared library support */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
 #include <sys/socket.h> /* Included for socket support */
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <Windows.h>    /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #endif /* PlatformIO_TargetOSIsPOSIX */
 

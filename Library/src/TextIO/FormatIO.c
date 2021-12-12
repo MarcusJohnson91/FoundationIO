@@ -570,9 +570,9 @@ extern "C" {
                         } else if (CodePoint - 1 >= Specifiers->Specifiers[Specifier].FormatStart) {
                             if (Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 1;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
 #endif
                                 break;
@@ -604,9 +604,9 @@ extern "C" {
                         } else if (CodePoint - 1 >= Specifiers->Specifiers[Specifier].FormatStart) {
                             if (Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 1;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
 #endif
                                 break;
@@ -638,9 +638,9 @@ extern "C" {
                         } else if (CodePoint - 1 >= Specifiers->Specifiers[Specifier].FormatStart) {
                             if (Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 1;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
 #endif
                                 break;
@@ -672,9 +672,9 @@ extern "C" {
                         } else if (CodePoint - 1 >= Specifiers->Specifiers[Specifier].FormatStart) {
                             if (Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 1;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
                                 Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
 #endif
                                 break;
