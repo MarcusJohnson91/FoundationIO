@@ -1045,6 +1045,88 @@ extern "C" {
         free(GUUID);
     }
     /* GUUID */
+
+    /* Standard Functions */
+    size_t BufferIO_MemoryCopy8(uint8_t *restrict Destination, const uint8_t *restrict Source, const size_t NumElements2Copy) { // memcpy
+        size_t ElementsCopied   = 0;
+#pragma omp simd
+        for (size_t Byte = 0; Byte < NumElements2Copy; Byte++) {
+            Destination[Byte]   = Source[Byte];
+            BytesCopied        += 1;
+        }
+        return ElementsCopied;
+    }
+
+    size_t BufferIO_MemoryCopy16(uint64_t *restrict Destination, const uint64_t *restrict Source, const size_t NumElements2Copy) {
+        size_t   ElementsCopied = 0;
+#pragma omp simd
+        for (size_t Element = 0; Element < NumElements2Copy; Element++) {
+            Destination[Element] = Source[Element];
+            ElementsCopied      += 1;
+        }
+        return ElementsCopied;
+    }
+
+    size_t BufferIO_MemoryCopy32(uint64_t *restrict Destination, const uint64_t *restrict Source, const size_t NumElements2Copy) {
+        size_t   ElementsCopied = 0;
+#pragma omp simd
+        for (size_t Element = 0; Element < NumElements2Copy; Element++) {
+            Destination[Element] = Source[Element];
+            ElementsCopied      += 1;
+        }
+        return ElementsCopied;
+    }
+
+    size_t BufferIO_MemoryCopy64(uint64_t *restrict Destination, const uint64_t *restrict Source, const size_t NumElements2Copy) {
+        size_t   ElementsCopied = 0;
+#pragma omp simd
+        for (size_t Element = 0; Element < NumElements2Copy; Element++) {
+            Destination[Element] = Source[Element];
+            ElementsCopied      += 1;
+        }
+        return ElementsCopied;
+    }
+
+    size_t BufferIO_MemorySet8(uint8_t *Array, uint8_t Value2Set, size_t NumElements2Set) { // memset
+        size_t NumElementsSet = 0;
+#pragma omp simd
+        for (size_t Element = 0; Element < NumElementsSet; Element++) {
+            Array[Element]    = Value2Set;
+            NumElementsSet   += 1;
+        }
+        return NumElementsSet;
+    }
+
+    size_t BufferIO_MemorySet16(uint16_t *Array, uint16_t Value2Set, size_t NumElements2Set) {
+        size_t NumElementsSet = 0;
+#pragma omp simd
+        for (size_t Element = 0; Element < NumElementsSet; Element++) {
+            Array[Element]    = Value2Set;
+            NumElementsSet   += 1;
+        }
+        return NumElementsSet;
+    }
+
+    size_t BufferIO_MemorySet32(uint32_t *Array, uint16_t Value2Set, size_t NumElements2Set) {
+        size_t NumElementsSet = 0;
+#pragma omp simd
+        for (size_t Element = 0; Element < NumElementsSet; Element++) {
+            Array[Element]    = Value2Set;
+            NumElementsSet   += 1;
+        }
+        return NumElementsSet;
+    }
+
+    size_t BufferIO_MemorySet64(uint64_t *Array, uint16_t Value2Set, size_t NumElements2Set) {
+        size_t NumElementsSet = 0;
+#pragma omp simd
+        for (size_t Element = 0; Element < NumElementsSet; Element++) {
+            Array[Element]    = Value2Set;
+            NumElementsSet   += 1;
+        }
+        return NumElementsSet;
+    }
+    /* Standard Functions */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
