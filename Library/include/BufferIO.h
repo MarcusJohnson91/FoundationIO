@@ -4,6 +4,7 @@
  @copyright       2015+
  @version         1.0.0
  @brief           This header contains code for reading and writing buffers, and utilities to manage them.
+ @todo            Maybe BufferIO should be renamed ArrayIO?
  */
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */
@@ -310,6 +311,24 @@ extern "C" {
      @return                                       Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes.
      */
     uint8_t       *BitBuffer_ReadGUUID(BitBuffer *BitB, BufferIO_GUUIDTypes GUUIDType);
+
+    /*!
+     @abstract                                     Calculates CRC32 from BitBuffer starting at Offset ending at Offset + NumBytes
+     @param        BitB                            BitBuffer Pointer.
+     @param        Start                           Where to start calculating from.
+     @param        NumBytes                        The number of bytes to calculate.
+     @return                                       Returns the calculated CRC.
+     */
+    uint32_t       BitBuffer_CalculateCRC32(BitBuffer *BitB, uint64_t Start, uint64_t NumBytes);
+
+    /*!
+     @abstract                                     Runs Adler32 hash over the BitBuffer starting at Offset
+     @param        BitB                            The BitBuffer pointer.
+     @param        OffsetInBits                    The Offset into the BitBuffer
+     @param        NumBytes                        The number of bytes to read
+     @return                                       Returns the calculated Adler32.
+     */
+    uint32_t       BitBuffer_CalculateAdler32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes);
 
     /*!
      @abstract                                     Writes bits to the BitBuffer.
