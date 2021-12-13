@@ -5,9 +5,6 @@
 extern "C" {
 #endif
     
-#define NumMD5TestStrings 7
-#define MD5HashSizeInBytes 16
-    
     static const UTF8 *MD5TestStrings[NumMD5TestStrings] = {
         UTF8String(""),
         UTF8String("a"),

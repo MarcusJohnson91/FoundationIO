@@ -46,7 +46,6 @@ extern "C" {
         UTF32    *Argument;
         uint64_t  SwitchID;
         uint64_t  NumChildren;
-        uint64_t *Children;
     } CommandLineOption;
     
     typedef struct CommandLineSwitch {
@@ -285,7 +284,7 @@ extern "C" {
             }
             free(StringSize);
             free(NumProgressIndicatorsPerString);
-            UTF8_Deinit(ActualStrings2Print);
+            UTF8_StringSet_Deinit(ActualStrings2Print);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }

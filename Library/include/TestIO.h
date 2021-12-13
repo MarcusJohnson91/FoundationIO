@@ -13,6 +13,7 @@
 #include "PlatformIO.h"         /* Included for Platform Independence macros */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
 #include "TextIO/LogIO.h"       /* Included for Logging, tests need to log errors */
+#include <setjmp.h>
 
 #pragma once
 
@@ -134,7 +135,7 @@ extern "C" {
     /* We also need to create a counter variable to store the number of cases */
 #ifndef TestIO_ReserveCasesForSuite
 #define TestIO_ReserveCasesForSuite(TestSuite_Name)
-#if !defined( TestIO_Suite_CasesFor_##TestSuite_Name ) /* Must have the ugly ass space so it's not concatted */
+#ifndef PlatformIO_Concat(TestIO_Suite_CasesFor_, TestSuite_Name)
 #define TestIOSuite_CasesFor_##TestSuite_Name
 #else
 #error "TestIOSuite_CasesFor_##TestSuite_Name is already registered, are you trying to create two suites with the same name?"
@@ -180,7 +181,7 @@ static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(Test
 #define TestIO_RegisterSuiteWithFixtures(TestSuite_Name, Fixture_Init, Fixture_Deinit)                      \
 TestIO_ReserveCasesForSuite(TestSuite_Name)                                                                 \
 TestIO_CreateTestCounterForSuite(TestSuite_Name)                                                            \
-static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) = {        \
+const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) = {        \
 .Init   = Fixture_Init,                                                                             \
 .Deinit = Fixture_Deinit,                                                                           \
 .Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))),\
@@ -194,7 +195,7 @@ static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(Test
 #ifndef            TestIO_RegisterTest
 #define            TestIO_RegisterTest(TestSuite_Name, Function2Test, TestState, Outcome) \
 TestIO_Internal_IncrementNumTests(TestSuite_Name)                                         \
-static const TestIO_Case TestIOCase_##Function2Test = {                                   \
+const TestIO_Case TestIOCase_##Function2Test = {                                   \
 .Function    = Function2Test,                                                             \
 .State       = TestState,                                                                 \
 .Expectation = Outcome,                                                                   \

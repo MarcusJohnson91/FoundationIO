@@ -309,6 +309,10 @@
 #endif /* Compiler */
 #endif /* CompilerVersion */
 
+#ifndef            PlatformIO_Is
+#define            PlatformIO_Is(Macro2Check, Value2Check) ((Macro2Check & Value2Check) == Value2Check)
+#endif /* PlatformIO_Is */
+
 #ifndef             PlatformIO_Executable
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
 #define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsMachO)
@@ -318,10 +322,6 @@
 #define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsElf)
 #endif /* TargetOS */
 #endif /* PlatformIO_Executable */
-
-#ifndef            PlatformIO_Is
-#define            PlatformIO_Is(Macro2Check, Value2Check) ((Macro2Check & Value2Check) == Value2Check)
-#endif /* PlatformIO_Is */
 
 #ifndef             PlatformIO_ArraySet
 #define             PlatformIO_ArraySet(Type)                      (const Type *const *const)
