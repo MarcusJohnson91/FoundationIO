@@ -511,6 +511,20 @@ extern "C" {
      @return                                      Returns the number of set bits.
      */
     uint8_t      CountBitsSet(const uint64_t Value);
+
+    /*!
+     @abstract                                    Finds the bit index of the highest set bit.
+     @param      Value                            The number to check.
+     @return                                      Returns the position of the highest set bit.
+     */
+    uint8_t      GetHighestSetBit(uint64_t Value);
+
+    /*!
+     @abstract                                    Rounds a number down to it's closest power of 2 without going over.
+     @param      Value                            The number to check.
+     @return                                      Returns the rounded value
+     */
+    uint64_t     RoundDownToPowerOf2(uint64_t Value);
     
     /*!
      @abstract                                    Value Mod Base, if the remainder is 0 Value is a power of the base.
@@ -536,6 +550,30 @@ extern "C" {
      @return                                      Returns the rotated value.
      */
     uint64_t      Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value);
+
+    uint16_t      PackIntegers8To16(uint8_t Values[2]);
+
+    uint32_t      PackIntegers8To32(uint8_t Values[4]);
+
+    uint64_t      PackIntegers8To64(uint8_t Values[8]);
+
+    uint32_t      PackIntegers16To32(uint16_t Values[2]);
+
+    uint64_t      PackIntegers16To64(uint16_t Values[4]);
+
+    uint64_t      PackIntegers32To64(uint32_t Values[2]);
+
+    void          UnpackInteger16To8(uint16_t Value, uint8_t Returned[2]);
+
+    void          UnpackInteger32To8(uint32_t Value, uint8_t Returned[4]);
+
+    void          UnpackInteger32To16(uint32_t Value, uint16_t Returned[2]);
+
+    void          UnpackInteger64To8(uint64_t Value, uint8_t Returned[8]);
+
+    void          UnpackInteger64To16(uint64_t Value, uint16_t Returned[4]);
+
+    void          UnpackInteger64To32(uint64_t Value, uint32_t Returned[2]);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

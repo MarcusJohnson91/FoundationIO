@@ -460,6 +460,18 @@ extern "C" {
         }
         return NumBitsSet;
     }
+
+    uint8_t GetHighestSetBit(uint64_t Value) { // highest_one
+        uint8_t HighestBit = 0;
+        while (Value >>= 1) {
+            HighestBit    += 1;
+        }
+        return HighestBit;
+    }
+
+    uint64_t RoundDownToPowerOf2(uint64_t Value) { // round_down_to_power_of_2
+        return 1ULL << GetHighestSetBit(Value | 1);
+    }
     
     bool IsPowerOfBase(const uint8_t Base, const uint64_t Value) {
         return Value % Base == 0 ? Yes : No;
@@ -480,13 +492,78 @@ __attribute__((no_sanitize("undefined")))
 #endif
     uint64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value) {
         uint64_t Rotated = 0ULL;
-        static_assert(RotationType != RotationType_Unspecified, "RotationType_Unspecified is invalid");
+        assert(RotationType != RotationType_Unspecified && "RotationType_Unspecified is invalid");
         if (RotationType == RotationType_Left) {
             Rotated     = (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
         } else if (RotationType == RotationType_Right) {
             Rotated     = (Value >> NumBits2Rotate) | (Value << (64 - NumBits2Rotate));
         }
         return Rotated;
+    }
+
+    void UnpackInteger16To8(uint16_t Value, uint8_t Returned[2]) { // UnpackInteger16To8
+        Returned[0] = (uint8_t) Value >> 0;
+        Returned[1] = (uint8_t) Value >> 8;
+    }
+
+    void UnpackInteger32To8(uint32_t Value, uint8_t Returned[4]) { // Store32 = UnpackInteger32To8
+        Returned[0] = (uint8_t) Value >> 0;
+        Returned[1] = (uint8_t) Value >> 8;
+        Returned[2] = (uint8_t) Value >> 16;
+        Returned[3] = (uint8_t) Value >> 24;
+    }
+
+    void UnpackInteger32To16(uint32_t Value, uint16_t Returned[2]) {
+        Returned[0] = (uint16_t) Value >> 0;
+        Returned[1] = (uint16_t) Value >> 16;
+    }
+
+    void UnpackInteger64To8(uint64_t Value, uint8_t Returned[8]) {
+        Returned[0] = (uint8_t) (Value >> 0);
+        Returned[1] = (uint8_t) (Value >> 8);
+        Returned[2] = (uint8_t) (Value >> 16);
+        Returned[3] = (uint8_t) (Value >> 24);
+        Returned[4] = (uint8_t) (Value >> 32);
+        Returned[5] = (uint8_t) (Value >> 40);
+        Returned[6] = (uint8_t) (Value >> 48);
+        Returned[7] = (uint8_t) (Value >> 56);
+    }
+
+    void UnpackInteger64To16(uint64_t Value, uint16_t Returned[4]) {
+        Returned[0] = (uint16_t) (Value >> 0);
+        Returned[1] = (uint16_t) (Value >> 16);
+        Returned[2] = (uint16_t) (Value >> 32);
+        Returned[3] = (uint16_t) (Value >> 48);
+    }
+
+    void UnpackInteger64To32(uint64_t Value, uint32_t Returned[2]) {
+        Returned[0] = (uint32_t) (Value >> 0);
+        Returned[1] = (uint32_t) (Value >> 32);
+    }
+
+    uint16_t PackIntegers8To16(uint8_t Values[2]) {
+        return Values[0] | (uint16_t) (Values[1] << 8);
+    }
+
+    uint32_t PackIntegers8To32(uint8_t Values[4]) {
+        return Values[0] | (uint32_t) (Values[1] << 8) | (uint32_t) (Values[2] << 16) | (uint32_t) (Values[3] << 24);
+    }
+
+    uint64_t PackIntegers8To64(uint8_t Values[8]) {
+        return Values[0] | (uint64_t) (Values[1] << 8) | (uint64_t) (Values[2] << 16) | (uint64_t) (Values[3] << 24) | \
+        (uint64_t) (Values[4] << 32) | (uint64_t) (Values[5] << 40) | (uint64_t) (Values[6] << 48) | (uint64_t) (Values[7] << 56);
+    }
+
+    uint32_t PackIntegers16To32(uint16_t Values[2]) {
+        return Values[0] | (uint32_t) (Values[1] << 16);
+    }
+
+    uint64_t PackIntegers16To64(uint16_t Values[4]) {
+        return Values[0] | (uint64_t) (Values[1] << 16) | (uint64_t) (Values[2] << 32) | (uint64_t) (Values[3] << 48);
+    }
+
+    uint64_t PackIntegers32To64(uint32_t Values[2]) {
+        return Values[0] | (uint64_t) (Values[1] << 32);
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
