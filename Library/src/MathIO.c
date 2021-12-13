@@ -1,5 +1,6 @@
 #include "../include/MathIO.h"       /* Included for our declarations */
 #include "../include/TextIO/LogIO.h" /* Included for Logging */
+#include <assert.h>
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -477,12 +478,13 @@ extern "C" {
 #if (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
 __attribute__((no_sanitize("undefined")))
 #endif
-    int64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const int64_t Value) {
-        int64_t Rotated = 0ULL;
+    uint64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value) {
+        uint64_t Rotated = 0ULL;
+        static_assert(RotationType != RotationType_Unspecified, "RotationType_Unspecified is invalid");
         if (RotationType == RotationType_Left) {
-            Rotated     = (Value << NumBits2Rotate) | (Value >> (-NumBits2Rotate) & 63);
+            Rotated     = (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
         } else if (RotationType == RotationType_Right) {
-            Rotated     = (Value >> NumBits2Rotate) | (Value << (-NumBits2Rotate) & 63);
+            Rotated     = (Value >> NumBits2Rotate) | (Value << (64 - NumBits2Rotate));
         }
         return Rotated;
     }

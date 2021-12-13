@@ -37,8 +37,9 @@ extern "C" {
     } MathIO_RoundingTypes;
     
     typedef enum MathIO_RotationTypes {
-                   RotationType_Left              = 0,
-                   RotationType_Right             = 1,
+                   RotationType_Unspecified       = 0,
+                   RotationType_Left              = 1,
+                   RotationType_Right             = 2,
     } MathIO_RotationTypes;
     
     /*!
@@ -534,7 +535,7 @@ extern "C" {
      @param      Value                            The value to rotate.
      @return                                      Returns the rotated value.
      */
-    int64_t      Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const int64_t Value);
+    uint64_t      Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
