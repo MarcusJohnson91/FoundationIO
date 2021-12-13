@@ -1,4 +1,5 @@
 #include "../../include/TextIO/StringIO.h"             /* Included for our declarations */
+#include "../../include/BufferIO.h"                    /* Included for BufferIO_MemorySet */
 #include "../../include/FileIO.h"                      /* Included for File operations */
 #include "../../include/MathIO.h"                      /* Included for endian swapping */
 #include "../../include/TextIO/LogIO.h"                /* Included for error logging */
@@ -29,9 +30,7 @@ extern "C" {
             uint64_t StringSize = NumCodeUnits + TextIO_NULLTerminatorSize;
             String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-            for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
-                String[Index]   = 0x38;
-            }
+            BufferIO_MemorySet8(String, 0x38, NumCodeUnits);
 #endif
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF8));
@@ -48,14 +47,12 @@ extern "C" {
             uint64_t StringSize = NumCodeUnits + TextIO_NULLTerminatorSize;
             String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-            for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
-#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
-                String[Index]   = 0x3136;
-#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
-                String[Index]   = 0x3631;
-#endif /* Byte Order */
-            }
-#endif
+#if   PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE
+            BufferIO_MemorySet16(String, 0x3136, StringSize);
+#elif PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE
+            BufferIO_MemorySet16(String, 0x3631, StringSize);
+#endif /* ByteOrder */
+#endif /* Debug */
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF16));
             }
@@ -71,14 +68,12 @@ extern "C" {
             uint64_t StringSize = NumCodePoints + TextIO_NULLTerminatorSize;
             String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-            for (uint64_t Index = 0ULL; Index < NumCodePoints; Index++) {
-#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
-                String[Index]   = 0x3332;
-#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
-                String[Index]   = 0x3233;
-#endif /* Byte Order */
-            }
-#endif
+#if   PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE
+            BufferIO_MemorySet32(String, 0x3136, StringSize);
+#elif PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE
+            BufferIO_MemorySet32(String, 0x3631, StringSize);
+#endif /* ByteOrder */
+#endif /* Debug */
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF32));
             }
@@ -88,34 +83,16 @@ extern "C" {
         return String;
     }
     
-    void UTF8_Set(UTF8 *String, UTF8 Value, uint64_t NumCodeUnits) {
-        if (String != NULL) {
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < NumCodeUnits; CodeUnit++) {
-                String[CodeUnit] = Value;
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
+    void UTF8_Set(UTF8 *String, UTF8 Value, size_t NumCodeUnits) {
+        BufferIO_MemorySet8((uint8_t*) String, (uint8_t) Value, NumCodeUnits);
     }
     
-    void UTF16_Set(UTF16 *String, UTF16 Value, uint64_t NumCodeUnits) {
-        if (String != NULL) {
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < NumCodeUnits; CodeUnit++) {
-                String[CodeUnit] = Value;
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
+    void UTF16_Set(UTF16 *String, UTF16 Value, size_t NumCodeUnits) {
+        BufferIO_MemorySet16((uint16_t*) String, (uint16_t) Value, NumCodeUnits);
     }
     
-    void UTF32_Set(UTF32 *String, UTF32 Value, uint64_t NumCodePoints) {
-        if (String != NULL) {
-            for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
-                String[CodePoint] = Value;
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
+    void UTF32_Set(UTF32 *String, UTF32 Value, size_t NumCodePoints) {
+        BufferIO_MemorySet32((uint32_t*) String, (uint32_t) Value, NumCodePoints);
     }
     
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
@@ -1168,7 +1145,7 @@ extern "C" {
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
-        return StringHasNewLine;
+        return HasNewLine;
     }
     
     bool UTF32_IsUpperCase(UTF32 CodePoint) {

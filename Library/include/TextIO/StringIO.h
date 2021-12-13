@@ -228,7 +228,7 @@ extern "C" {
      @param            Value                             The value to set each CodeUnit to.
      @param            NumCodeUnits                      The size of the string not counting the NULL terminator.
      */
-    void               UTF8_Set(UTF8 *String, UTF8 Value, uint64_t NumCodeUnits);
+    void               UTF8_Set(UTF8 *String, UTF8 Value, size_t NumCodeUnits);
     
     /*!
      @abstract                                           Sets NumCodeUnits to Value.
@@ -236,7 +236,7 @@ extern "C" {
      @param            Value                             The value to set each CodeUnit to.
      @param            NumCodeUnits                      The size of the string not counting the NULL terminator.
      */
-    void               UTF16_Set(UTF16 *String, UTF16 Value, uint64_t NumCodeUnits);
+    void               UTF16_Set(UTF16 *String, UTF16 Value, size_t NumCodeUnits);
     
     /*!
      @abstract                                           Sets NumCodeUnits to Value.
@@ -244,7 +244,7 @@ extern "C" {
      @param            Value                             The value to set each CodePoint to.
      @param            NumCodePoints                     The size of the string not counting the NULL terminator.
      */
-    void               UTF32_Set(UTF32 *String, UTF32 Value, uint64_t NumCodePoints);
+    void               UTF32_Set(UTF32 *String, UTF32 Value, size_t NumCodePoints);
     
     /*!
      @abstract                                           Returns the number of CodeUnits in the CodePoint.
