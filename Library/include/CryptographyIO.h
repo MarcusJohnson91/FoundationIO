@@ -18,16 +18,6 @@
 extern "C" {
 #endif
 
-    /*
-     Blake3 Modes: Hashing, Keyed Hashing, Key Derivitation
-
-     Tree, each blocck 1024 bytes, last block may be shorter
-
-     Blake3 IV: 0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL
-
-     
-     */
-
     /*!
      @abstract                              Forward declare BitBuffer
      */
@@ -42,8 +32,6 @@ extern "C" {
      @abstract                              Own algorithm; Uses InsecurePRNG and AES tables as a starting point to generate (UNTESTED) secure random numbers.
      */
     typedef struct    SecureRNG             SecureRNG;
-
-    typedef struct    MD5                   MD5;
 
     /*!
      @abstract                              Creates an InsecurePRNG structure with random-ish data.
@@ -117,32 +105,6 @@ extern "C" {
      @param           Random                The SecureRNG pointer.
      */
     void              SecureRNG_Deinit(SecureRNG *Random);
-
-    /*!
-     @abstract                              Runs Adler32 hash over the Buffer starting at Offset
-     @param           BitB                  The BitBuffer pointer.
-     @param           OffsetInBits          The Offset into the BitBuffer
-     @param           NumBytes              The number of bytes to read
-     */
-    uint32_t          Adler32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes);
-
-    /*!
-     @abstract                              Runs CRC32 hash over the Buffer starting at Offset
-     @param           BitB                  The BitBuffer pointer.
-     @param           OffsetInBits          The Offset into the BitBuffer
-     @param           NumBytes              The number of bytes to read
-     */
-    uint32_t          CRC32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes);
-
-    MD5              *MD5_Init(void);
-
-    void              MD5_Process(uint32_t *State, uint32_t *Block);
-
-    UTF8             *MD5_Finalize(MD5 *MD5);
-
-    bool              MD5_Compare(uint8_t *Hash1, uint8_t *Hash2);
-
-    void              MD5_Deinit(MD5 *MD5);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
