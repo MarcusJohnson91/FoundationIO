@@ -7,16 +7,21 @@
 extern "C" {
 #endif
 
-    void *BitBuffer_Fixture_Init(PlatformIO_Unused(TestIO_Enviroment *Enviroment)) {
-        BitBuffer *Buffer = BitBuffer_Init(64);
-        uint8_t   *Array  = BitBuffer_GetArray(Buffer);
-        for (uint8_t Byte = 0; Byte < 64; Byte++) {
-            Array[Byte]   = 0xFE;
-        }
-        return Buffer;
+    void BitBuffer_Fixture_Init(TestIO_Suite *Suite) { // , PlatformIO_Unused(TestIO_Enviroment *Enviroment)
+        Suite->FixtureStruct = BitBuffer_Init(64);
+        uint8_t   *Array     = BitBuffer_GetArray(Suite->FixtureStruct);
+        BufferIO_MemorySet8(Array, 0xFE, 64);
     }
 
-     Write 3 fields, all with a leading and trailing one, and a variable number of 0's in between.
+    void BitBuffer_Fixture_Deinit(TestIO_Suite *Suite) { // , PlatformIO_Unused(TestIO_Enviroment)
+        BitBuffer_Deinit(Suite->FixtureStruct);
+        Suite->FixtureStruct = NULL;
+    }
+
+    TestIO_RegisterSuiteWithFixtures(BufferIOTests, BitBuffer_Fixture_Init, BitBuffer_Fixture_Deinit);
+
+     /*
+      Write 3 fields, all with a leading and trailing one, and a variable number of 0's in between.
 
      0b101
      0b110011

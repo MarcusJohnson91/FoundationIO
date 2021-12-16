@@ -1100,7 +1100,7 @@ extern "C" {
 #pragma omp simd
         for (size_t Byte = 0; Byte < NumElements2Copy; Byte++) {
             Destination[Byte]   = Source[Byte];
-            BytesCopied        += 1;
+            ElementsCopied     += 1;
         }
         return ElementsCopied;
     }
