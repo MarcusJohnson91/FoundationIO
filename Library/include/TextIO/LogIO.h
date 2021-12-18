@@ -6,7 +6,6 @@
  @brief           This header contains code for logging errors and testingR information.
  */
 
-#include "../PlatformIO.h"  /* Included for Platform Independence macros */
 #include "TextIOTypes.h"    /* Included for Text types */
 
 #pragma once

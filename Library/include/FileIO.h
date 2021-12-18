@@ -6,9 +6,8 @@
  @brief           This header contains code for reading and writing files, and utilities to manage them.
  */
 
-#include "PlatformIO.h"         /* Included for Platform Independence macros */
-#include "TextIO/TextIOTypes.h" /* Included for Text types */
 #include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
+#include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #pragma once
 

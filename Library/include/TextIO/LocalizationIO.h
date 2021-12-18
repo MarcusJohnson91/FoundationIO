@@ -6,7 +6,6 @@
  @brief           This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include "../PlatformIO.h"  /* Included for Platform Independence macros */
 #include "TextIOTypes.h"    /* Included for Text types */
 
 #pragma once

@@ -1,6 +1,7 @@
 #include "../include/NetworkIO.h"          /* Included for our declarations */
-#include "../include/TextIO/TextIOTypes.h" /* Included for Unicode types */
+
 #include "../include/TextIO/LogIO.h"       /* Included for Logging */
+#include "../include/TextIO/TextIOTypes.h" /* Included for Text types */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <WinSock2.h>                      /* Included for Windows Socket support */

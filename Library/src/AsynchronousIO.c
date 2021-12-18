@@ -1,31 +1,31 @@
 #include "../include/AsynchronousIO.h"    /* Included for our declarations */
+
 #include "../include/TextIO/LogIO.h"      /* Included for Logging */
 #include "../include/TextIO/StringIO.h"   /* Included for UTF-X operations */
 
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsBSD) || PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
+#if defined(__has_include)
+#if __has_include(<sys/types.h>)
 #include <sys/types.h>
+#endif /* <sys/types.h> */
+#if __has_include(<sys/event.h>)
 #include <sys/event.h>
+#endif /* <sys/event.h> */
+#if __has_include(<sys/time.h>)
 #include <sys/time.h>
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
+#endif /* <sys/time.h> */
+#if __has_include(<aiocb.h>)
+#include <aiocb.h>
+#endif /* <aiocb.h> */
+#if __has_include(<fcntl.h>)
+#include <fcntl.h>
+#endif /* <fcntl.h> */
+#endif /* __has_include */
+
+#if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
 #include <sys/epoll.h>
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 // use IO Completion Ports
-#endif
-
-/* Old Headers, cleanup after refactoring */
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-#include <aio.h>                          /* Included for aio_read and aio_write */
-#include <fcntl.h>                        /* Included for open */
-#include <sys/types.h>                    /* Included for Socket API */
-#include <sys/socket.h>                   /* Included for Socket API */
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
-#include <sys/socket.h>                   /* Included for Socket API */
-#include <netinet/in.h>                   /* Included for Socket API */
-#include <netinet/ip.h>                   /* Included for Socket API */
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-#include <process.h>
-#endif /* TargetOS */
-/* Old Headers, cleanup after refactoring */
+#endif /* Linux/Windows */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -148,7 +148,7 @@ extern "C" {
                 .sigev_value             = 0,
                 .sigev_notify_function   = 0,
                 .sigev_notify_attributes = 0,
-            };
+            } SignalEvent;
 
             struct aiocb Async = {
                 .aio_fildes     = Stream->StreamID,
@@ -158,7 +158,7 @@ extern "C" {
                 /* aio_reqprio  = Request Priority */
                 .aio_sigevent   = SignalEvent,
                 .aio_lio_opcode = 0, // What operation are we doing?
-            };
+            } Async;
             aio_read(&Async);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             

@@ -7,7 +7,6 @@
  @todo            Maybe BufferIO should be renamed ArrayIO?
  */
 
-#include "PlatformIO.h"         /* Included for Platform Independence macros */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #pragma once

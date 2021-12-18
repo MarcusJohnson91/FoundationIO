@@ -7,7 +7,6 @@
  @overview        IPv6, IMCPv6, TCPv6, and UDPv6 are the primary focus of NetworkIO and building it all on top of Raw Sockets.
  */
 
-#include "PlatformIO.h"         /* Included for Platform Independence macros */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #pragma once

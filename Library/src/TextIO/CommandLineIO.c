@@ -1,8 +1,9 @@
 #include "../../include/TextIO/CommandLineIO.h" /* Included for our declarations */
+
 #include "../../include/MathIO.h"               /* Included for Logarithm */
 #include "../../include/TextIO/FormatIO.h"      /* Included for Formatter */
 #include "../../include/TextIO/LogIO.h"         /* Included for Logging */
-#include "../../include/TextIO/StringIO.h"      /* Included for StringIO's declarations */
+#include "../../include/TextIO/StringIO.h"      /* Included for string handling */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <signal.h>                             /* Included for SIGWINCH handling */

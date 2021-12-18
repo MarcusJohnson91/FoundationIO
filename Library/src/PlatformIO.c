@@ -1,6 +1,6 @@
 #include "../include/PlatformIO.h"      /* Included for our declarations */
-#include "../include/TextIO/LogIO.h"    /* Included for logging errors */
-#include "../include/TextIO/StringIO.h" /* Included for Path functions */
+
+//#include "../include/TextIO/StringIO.h" /* Included for Path functions */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
 #include <sys/sysctl.h>

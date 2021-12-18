@@ -1,14 +1,16 @@
 #include "../include/TestIO.h"          /* Included for our declarations */
+
 #include "../include/CryptographyIO.h"  /* Included for SecureRNG */
+#include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
 #include "../include/TextIO/LogIO.h"    /* Included for error reporting */
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
-#include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
+
+#if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
+#include <time.h>                       /* Included for timespec_get */
+#endif
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
-#include <time.h>                       /* Included for timespec_get */
 #include <mach/mach_time.h>             /* Included for mach_continuous_time */
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-#include <time.h>                       /* Included for timespec_get */
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <WinBase.h>                    /* Included for QueryPerformanceCounter */
 #endif

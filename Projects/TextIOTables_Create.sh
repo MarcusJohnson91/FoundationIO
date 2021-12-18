@@ -33,7 +33,6 @@ CreateHeaderFile() {
         printf ' @brief           This header contains table declarations used across FoundationIO for Unicode and character set conversion.\n'
         printf ' @remark          ScriptHash is to know if the script has changed since the tables were last generated.\n'
         printf ' */\n\n'
-        printf '#include "../../PlatformIO.h"  /* Included for Platform Independence macros */\n'
         printf '#include "../TextIOTypes.h"    /* Included for the Text types */\n\n'
         printf '#pragma once\n\n'
         printf '#ifndef FoundationIO_TextIO_TextIOTables_H\n'

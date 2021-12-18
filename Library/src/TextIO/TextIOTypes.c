@@ -1,4 +1,5 @@
 #include "../../include/TextIO/TextIOTypes.h"          /* Included for our declarations */
+
 #include "../../include/TextIO/Private/TextIOTables.h" /* Included for the tables */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -19,6 +20,7 @@ extern "C" {
     size_t TextIO_Slice_GetEndInCodeUnits(TextIO_Slice Slice) {
         return Slice.EndInCodeUnits;
     }
+  
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

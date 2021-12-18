@@ -1,4 +1,5 @@
 #include "../include/MathIO.h"       /* Included for our declarations */
+
 #include "../include/TextIO/LogIO.h" /* Included for Logging */
 #include <assert.h>
 

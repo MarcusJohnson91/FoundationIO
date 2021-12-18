@@ -1,11 +1,12 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
+
 #include "../include/AsynchronousIO.h"    /* Included for AsyncIOStream_Init */
 #include "../include/BufferIO.h"          /* Included for BitBuffer for CRC32 and Adler32 */
 #include "../include/FileIO.h"            /* Included for File operations */
-#include "../include/AsynchronousIO.h"    /* Included for raw AsyncIO operations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
-#include "../include/TextIO/StringIO.h"   /* Included for UTF8_GetStringSizeInCodeUnits */
 #include "../include/TextIO/LogIO.h"      /* Included for error logging */
+#include "../include/TextIO/StringIO.h"   /* Included for UTF8_GetStringSizeInCodeUnits */
+
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <BCrypt.h>

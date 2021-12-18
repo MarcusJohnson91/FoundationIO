@@ -7,7 +7,6 @@
  @remark          ScriptHash is to know if the script has changed since the tables were last generated.
  */
 
-#include "../../PlatformIO.h"  /* Included for Platform Independence macros */
 #include "../TextIOTypes.h"    /* Included for the Text types */
 
 #pragma once
@@ -19,7 +18,7 @@
 extern "C" {
 #endif
 
-#define ScriptHash 5b775742f124fcbf6840ea87a9f745623dc4ce50
+#define ScriptHash d70e6a5e1fef4745a0815a012784e0871f5b0c4c
 
 #define UnicodeVersion 14.0.0
 

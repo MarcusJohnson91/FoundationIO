@@ -1,9 +1,10 @@
 #include "../../include/TextIO/StringIO.h"             /* Included for our declarations */
+
 #include "../../include/BufferIO.h"                    /* Included for BufferIO_MemorySet */
 #include "../../include/FileIO.h"                      /* Included for File operations */
 #include "../../include/MathIO.h"                      /* Included for endian swapping */
 #include "../../include/TextIO/LogIO.h"                /* Included for error logging */
-#include "../../include/TextIO/Private/TextIOTables.h" /* Included for the Unicode tables */
+#include "../../include/TextIO/Private/TextIOTables.h" /* Included for the Text tables */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

@@ -6,7 +6,6 @@
  @brief           This header contains code for Asynchronous IO, and utilities to manage it.
  */
 
-#include "PlatformIO.h"         /* Included for Platform Independence macros */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #pragma once

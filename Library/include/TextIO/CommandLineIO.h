@@ -12,7 +12,6 @@
   Option:         User selected switches to direct the program to do something.
  */
 
-#include "../PlatformIO.h"  /* Included for Platform Independence macros */
 #include "TextIOTypes.h"    /* Included for Text types */
 
 #pragma once
