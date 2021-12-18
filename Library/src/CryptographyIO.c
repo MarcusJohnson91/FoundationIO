@@ -410,8 +410,6 @@ extern "C" {
             free(Random);
         }
     }
-
-    
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

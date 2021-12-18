@@ -179,6 +179,18 @@
 #define             PlatformIO_BuildTypeIsRelease                                       (2)
 #endif
 
+#ifndef             PlatformIO_ExecutableFormatIsMachO
+#define             PlatformIO_ExecutableFormatIsMachO 1
+#endif
+
+#ifndef             PlatformIO_ExecutableFormatIsPE
+#define             PlatformIO_ExecutableFormatIsPE 2
+#endif
+
+#ifndef             PlatformIO_ExecutableFormatIsELF
+#define             PlatformIO_ExecutableFormatIsELF 4
+#endif
+
 #ifndef             PlatformIO_ByteOrderIsUnknown
 #define             PlatformIO_ByteOrderIsUnknown                                        (0)
 #endif
@@ -313,15 +325,15 @@
 #define            PlatformIO_Is(Macro2Check, Value2Check) ((Macro2Check & Value2Check) == Value2Check)
 #endif /* PlatformIO_Is */
 
-#ifndef             PlatformIO_Executable
+#ifndef             PlatformIO_ExecutableFormat
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
-#define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsMachO)
+#define             PlatformIO_ExecutableFormat                                              (PlatformIO_ExecutableFormatIsMachO)
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-#define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsPE)
+#define             PlatformIO_ExecutableFormat                                              (PlatformIO_ExecutableFormatIsPE)
 #else
-#define             PlatformIO_Executable                                              (PlatformIO_ExecutableIsElf)
+#define             PlatformIO_ExecutableFormat                                              (PlatformIO_ExecutableFormatIsELF)
 #endif /* TargetOS */
-#endif /* PlatformIO_Executable */
+#endif /* PlatformIO_ExecutableFormat */
 
 #ifndef             PlatformIO_ArraySet
 #define             PlatformIO_ArraySet(Type)                      (const Type *const *const)
