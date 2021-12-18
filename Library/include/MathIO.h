@@ -26,16 +26,23 @@ extern "C" {
     /*!
      @enum         MathIO_RoundingTypes
      @abstract                                    Defines the type of rounding.
-     @constant     RoundingType_Unspecified       Invalid ImageType, exists solely to tell when it hasn't been set.
-     @constant     RoundingType_Down              Flip the imge vertically, up and down.
-     @constant     RoundingType_Up                Flip the image horizontally, side to side.
+     @constant     RoundingType_Unspecified       Invalid RoundingType, exists solely to tell when it hasn't been set.
+     @constant     RoundingType_Down              Round the number down.
+     @constant     RoundingType_Up                Round the number up.
      */
     typedef enum MathIO_RoundingTypes {
                    RoundingType_Unspecified       = 0,
                    RoundingType_Down              = 1,
                    RoundingType_Up                = 2,
     } MathIO_RoundingTypes;
-    
+
+    /*!
+     @enum         MathIO_RotationTypes
+     @abstract                                    Defines the type of rotation.
+     @constant     RotationType_Unspecified       Invalid RotationType, exists solely to tell when it hasn't been set.
+     @constant     RotationType_Left              Rotate the number left putting the rotated-out bits on the right.
+     @constant     RotationType_Right             Rotate the number right putting the rotated-out bits on the left.
+     */
     typedef enum MathIO_RotationTypes {
                    RotationType_Unspecified       = 0,
                    RotationType_Left              = 1,
@@ -549,30 +556,90 @@ extern "C" {
      @param      Value                            The value to rotate.
      @return                                      Returns the rotated value.
      */
-    uint64_t      Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value);
+    uint64_t     Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value);
 
+    /*!
+     @abstract                                    Packs smaller integers into a single larger one.
+     @param       Values                          The values to pack.
+     @return                                      Returns the packed integer.
+     */
     uint16_t      PackIntegers8To16(uint8_t Values[2]);
 
+    /*!
+     @abstract                                    Packs smaller integers into a single larger one.
+     @param       Values                          The values to pack.
+     @return                                      Returns the packed integer.
+     */
     uint32_t      PackIntegers8To32(uint8_t Values[4]);
 
+    /*!
+     @abstract                                    Packs smaller integers into a single larger one.
+     @param       Values                          The values to pack.
+     @return                                      Returns the packed integer.
+     */
     uint64_t      PackIntegers8To64(uint8_t Values[8]);
 
+    /*!
+     @abstract                                    Packs smaller integers into a single larger one.
+     @param       Values                          The values to pack.
+     @return                                      Returns the packed integer.
+     */
     uint32_t      PackIntegers16To32(uint16_t Values[2]);
 
+    /*!
+     @abstract                                    Packs smaller integers into a single larger one.
+     @param       Values                          The values to pack.
+     @return                                      Returns the packed integer.
+     */
     uint64_t      PackIntegers16To64(uint16_t Values[4]);
 
+    /*!
+     @abstract                                    Packs smaller integers into a single larger one.
+     @param       Values                          The values to pack.
+     @return                                      Returns the packed integer.
+     */
     uint64_t      PackIntegers32To64(uint32_t Values[2]);
 
+    /*!
+     @abstract                                    Unpacks a packed integer into a series of smaller ones.
+     @param       Value                           The value to unpack.
+     @param       Returned                        Where to put the series of unpacked integers.
+     */
     void          UnpackInteger16To8(uint16_t Value, uint8_t Returned[2]);
 
+    /*!
+     @abstract                                    Unpacks a packed integer into a series of smaller ones.
+     @param       Value                           The value to unpack.
+     @param       Returned                        Where to put the series of unpacked integers.
+     */
     void          UnpackInteger32To8(uint32_t Value, uint8_t Returned[4]);
 
+    /*!
+     @abstract                                    Unpacks a packed integer into a series of smaller ones.
+     @param       Value                           The value to unpack.
+     @param       Returned                        Where to put the series of unpacked integers.
+     */
     void          UnpackInteger32To16(uint32_t Value, uint16_t Returned[2]);
 
+    /*!
+     @abstract                                    Unpacks a packed integer into a series of smaller ones.
+     @param       Value                           The value to unpack.
+     @param       Returned                        Where to put the series of unpacked integers.
+     */
     void          UnpackInteger64To8(uint64_t Value, uint8_t Returned[8]);
 
+    /*!
+     @abstract                                    Unpacks a packed integer into a series of smaller ones.
+     @param       Value                           The value to unpack.
+     @param       Returned                        Where to put the series of unpacked integers.
+     */
     void          UnpackInteger64To16(uint64_t Value, uint16_t Returned[4]);
 
+    /*!
+     @abstract                                    Unpacks a packed integer into a series of smaller ones.
+     @param       Value                           The value to unpack.
+     @param       Returned                        Where to put the series of unpacked integers.
+     */
     void          UnpackInteger64To32(uint64_t Value, uint32_t Returned[2]);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

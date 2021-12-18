@@ -502,12 +502,37 @@ __attribute__((no_sanitize("undefined")))
         return Rotated;
     }
 
-    void UnpackInteger16To8(uint16_t Value, uint8_t Returned[2]) { // UnpackInteger16To8
+    uint16_t PackIntegers8To16(uint8_t Values[2]) {
+        return Values[0] | ((uint16_t) Values[1] << 8);
+    }
+
+    uint32_t PackIntegers8To32(uint8_t Values[4]) {
+        return Values[0] | ((uint32_t) Values[1] << 8) | ((uint32_t) Values[2] << 16) | ((uint32_t) Values[3] << 24);
+    }
+
+    uint64_t PackIntegers8To64(uint8_t Values[8]) {
+        return Values[0] | ((uint64_t) Values[1] << 8) | ((uint64_t) Values[2] << 16) | ((uint64_t) Values[3] << 24) | \
+        ((uint64_t) Values[4] << 32) | ((uint64_t) Values[5] << 40) | ((uint64_t) Values[6] << 48) | ((uint64_t) Values[7] << 56);
+    }
+
+    uint32_t PackIntegers16To32(uint16_t Values[2]) {
+        return Values[0] | ((uint32_t) Values[1] << 16);
+    }
+
+    uint64_t PackIntegers16To64(uint16_t Values[4]) {
+        return Values[0] | ((uint64_t) Values[1] << 16) | ((uint64_t) Values[2] << 32) | ((uint64_t) Values[3] << 48);
+    }
+
+    uint64_t PackIntegers32To64(uint32_t Values[2]) {
+        return Values[0] | ((uint64_t) Values[1] << 32);
+    }
+
+    void UnpackInteger16To8(uint16_t Value, uint8_t Returned[2]) {
         Returned[0] = (uint8_t) Value >> 0;
         Returned[1] = (uint8_t) Value >> 8;
     }
 
-    void UnpackInteger32To8(uint32_t Value, uint8_t Returned[4]) { // Store32 = UnpackInteger32To8
+    void UnpackInteger32To8(uint32_t Value, uint8_t Returned[4]) {
         Returned[0] = (uint8_t) Value >> 0;
         Returned[1] = (uint8_t) Value >> 8;
         Returned[2] = (uint8_t) Value >> 16;
@@ -540,31 +565,6 @@ __attribute__((no_sanitize("undefined")))
     void UnpackInteger64To32(uint64_t Value, uint32_t Returned[2]) {
         Returned[0] = (uint32_t) (Value >> 0);
         Returned[1] = (uint32_t) (Value >> 32);
-    }
-
-    uint16_t PackIntegers8To16(uint8_t Values[2]) {
-        return Values[0] | (uint16_t) (Values[1] << 8);
-    }
-
-    uint32_t PackIntegers8To32(uint8_t Values[4]) {
-        return Values[0] | (uint32_t) (Values[1] << 8) | (uint32_t) (Values[2] << 16) | (uint32_t) (Values[3] << 24);
-    }
-
-    uint64_t PackIntegers8To64(uint8_t Values[8]) {
-        return Values[0] | (uint64_t) (Values[1] << 8) | (uint64_t) (Values[2] << 16) | (uint64_t) (Values[3] << 24) | \
-        (uint64_t) (Values[4] << 32) | (uint64_t) (Values[5] << 40) | (uint64_t) (Values[6] << 48) | (uint64_t) (Values[7] << 56);
-    }
-
-    uint32_t PackIntegers16To32(uint16_t Values[2]) {
-        return Values[0] | (uint32_t) (Values[1] << 16);
-    }
-
-    uint64_t PackIntegers16To64(uint16_t Values[4]) {
-        return Values[0] | (uint64_t) (Values[1] << 16) | (uint64_t) (Values[2] << 32) | (uint64_t) (Values[3] << 48);
-    }
-
-    uint64_t PackIntegers32To64(uint32_t Values[2]) {
-        return Values[0] | (uint64_t) (Values[1] << 32);
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
