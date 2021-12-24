@@ -452,6 +452,12 @@
 #include <Windows.h>    /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #endif /* PlatformIO_TargetOSIsPOSIX */
 
+#ifndef             PlatformIO_AnnexK
+#ifdef              __STDC_LIB_EXT1__
+#define             PlatformIO_AnnexK                                                  (1)
+#endif /* __STDC_LIB_EXT1__ */
+#endif /* PlatformIO_AnnexK */
+
 #ifndef             PlatformIO_Public
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
 #define             PlatformIO_Public                                                   __attribute__((visibility("default")))

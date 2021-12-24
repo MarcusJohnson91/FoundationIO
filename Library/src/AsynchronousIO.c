@@ -4,27 +4,37 @@
 #include "../include/TextIO/StringIO.h"   /* Included for UTF-X operations */
 
 #if defined(__has_include)
-#if __has_include(<sys/types.h>)
-#include <sys/types.h>
-#endif /* <sys/types.h> */
-#if __has_include(<sys/event.h>)
-#include <sys/event.h>
-#endif /* <sys/event.h> */
-#if __has_include(<sys/time.h>)
-#include <sys/time.h>
-#endif /* <sys/time.h> */
+
+#if __has_include(<aio.h>)
+#include <aio.h>
+#endif /* <aiocb.h> */
 #if __has_include(<aiocb.h>)
 #include <aiocb.h>
 #endif /* <aiocb.h> */
 #if __has_include(<fcntl.h>)
 #include <fcntl.h>
 #endif /* <fcntl.h> */
+#if __has_include(<sys/event.h>)
+#include <sys/event.h>
+#endif /* <sys/event.h> */
+#if __has_include(<sys/time.h>)
+#include <sys/time.h>
+#endif /* <sys/time.h> */
+#if __has_include(<sys/types.h>)
+#include <sys/types.h>
+#endif /* <sys/types.h> */
+#if __has_include(<sys/epoll.h>)
+#include <sys/epoll.h>
+#endif /* <sys/epoll.h> */
 #endif /* __has_include */
 
-#if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
-#include <sys/epoll.h>
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
+/*
+ MacOS: KQueue for Networking, AIO for DiskIO
+ */
+
+#if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 // use IO Completion Ports
+#include <IOAPI.h>
 #endif /* Linux/Windows */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -92,15 +102,15 @@ extern "C" {
             if (Path8HasBOM) {
                 Path8Offset      = UTF8BOMSizeInCodeUnits;
             }
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-#ifndef __STDC_LIB_EXT1__
-            Stream->StreamID     = open(&Path8[Path8Offset], Mode); // Use O_LARGEFILE
+#if    PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
+#ifdef PlatformIO_AnnexK
+            Stream.StreamID      = open_s(&Path8[Path8Offset], Mode);
 #else
-            Stream->StreamID     = open_s(&Path8[Path8Offset], Mode);
-#endif
+            Stream.StreamID      = open(&Path8[Path8Offset], Mode);
+#endif /* PlatformIO_AnnexK */
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             UTF16 *Path16        = UTF8_Convert(&Path8[Path8Offset]);
-            Stream->StreamID     = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+            Stream.StreamID      = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
             UTF16_Deinit(Path16);
 #endif
         } else if (Path8 == NULL) {
@@ -121,14 +131,14 @@ extern "C" {
             }
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             UTF8 *Path8          = UTF16_Convert(&Path16[Path16Offset]);
-#ifndef __STDC_LIB_EXT1__
-            Stream->StreamID     = open(Path8, Mode);
+#ifdef PlatformIO_AnnexK
+            Stream.StreamID     = open_s(Path8, Mode);
 #else
-            Stream->StreamID     = open_s(Path8, Mode);
+            Stream.StreamID     = open(Path8, Mode);
 #endif
             UTF8_Deinit(Path8);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-            Stream->StreamID     = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+            Stream.StreamID     = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
 #endif
         } else if (Path16 == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Path8 Pointer is NULL"));
@@ -138,28 +148,26 @@ extern "C" {
         return OpenedSucessfully;
     }
 
-    uint64_t AsyncIOStream_Read(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements) {
+    uint64_t AsyncIOStream_Read(AsyncIOStream Stream, void *Array, uint8_t ElementSize, uint8_t NumElements) {
         uint64_t NumBytesRead = 0ULL;
         if (Stream != NULL && Array != NULL) {
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-            struct sigevent SignalEvent = {
-                .sigev_notify            = 0,
-                .sigev_signo             = 0,
-                .sigev_value             = 0,
-                .sigev_notify_function   = 0,
-                .sigev_notify_attributes = 0,
-            } SignalEvent;
-
             struct aiocb Async = {
-                .aio_fildes     = Stream->StreamID,
-                .aio_offset     = Stream->StreamPosition,
-                .aio_buf        = Array,
-                .aio_nbytes     = ElementSize * NumElements,
-                /* aio_reqprio  = Request Priority */
-                .aio_sigevent   = SignalEvent,
-                .aio_lio_opcode = 0, // What operation are we doing?
-            } Async;
-            aio_read(&Async);
+                .aio_fildes                  = Stream.StreamID,
+                .aio_offset                  = Stream.StreamPosition,
+                .aio_buf                     = Array,
+                .aio_nbytes                  = ElementSize * NumElements,
+                .aio_lio_opcode              = 0, // What operation are we doing?
+                /* aio_reqprio = Request Priority */
+                .aio_sigevent                = {
+                    .sigev_notify            = 0,
+                    .sigev_signo             = 0,
+                    .sigev_value             = 0,
+                    .sigev_notify_function   = 0,
+                    .sigev_notify_attributes = 0,
+                },
+            };
+          aio_read(&Async);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             
 #endif
@@ -167,26 +175,24 @@ extern "C" {
         return NumBytesRead;
     }
 
-    uint64_t AsyncIOStream_Write(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements) {
+    uint64_t AsyncIOStream_Write(AsyncIOStream Stream, void *Array, uint8_t ElementSize, uint8_t NumElements) {
         uint64_t NumBytesWritten = 0ULL;
         if (Stream != NULL && Array != NULL) {
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-            struct sigevent SignalEvent = {
-                .sigev_notify            = 0,
-                .sigev_signo             = 0,
-                .sigev_value             = 0,
-                .sigev_notify_function   = 0,
-                .sigev_notify_attributes = 0,
-            };
-
             struct aiocb Async = {
-                .aio_fildes     = Stream->StreamID,
-                .aio_offset     = Stream->StreamPosition,
-                .aio_buf        = Array,
-                .aio_nbytes     = ElementSize * NumElements,
-                /* aio_reqprio  = Request Priority */
-                .aio_sigevent   = SignalEvent,
-                .aio_lio_opcode = 0, // What operation are we doing?
+                .aio_fildes                  = Stream.StreamID,
+                .aio_offset                  = Stream.StreamPosition,
+                .aio_buf                     = Array,
+                .aio_nbytes                  = ElementSize * NumElements,
+                .aio_lio_opcode              = 0, // What operation are we doing?
+                /* aio_reqprio = Request Priority */
+                .aio_sigevent                = {
+                    .sigev_notify            = 0,
+                    .sigev_signo             = 0,
+                    .sigev_value             = 0,
+                    .sigev_notify_function   = 0,
+                    .sigev_notify_attributes = 0,
+                },
             };
             aio_write(&Async);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
