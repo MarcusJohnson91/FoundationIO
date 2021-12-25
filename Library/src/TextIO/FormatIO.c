@@ -1,8 +1,9 @@
-#include "../../include/TextIO/FormatIO.h" /* Included for our declarations */
+#include "../../include/TextIO/FormatIO.h"    /* Included for our declarations */
 
-#include "../../include/MathIO.h"          /* Included for Logarithm */
-#include "../../include/TextIO/LogIO.h"    /* Included for Logging */
-#include "../../include/TextIO/StringIO.h" /* Included for StringIO */
+#include "../../include/MathIO.h"             /* Included for Logarithm */
+#include "../../include/TextIO/LogIO.h"       /* Included for Logging */
+#include "../../include/TextIO/StringIO.h"    /* Included for StringIO */
+#include "../../include/TextIO/StringSetIO.h" /* Included for StringSet support */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

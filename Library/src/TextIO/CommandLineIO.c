@@ -4,6 +4,7 @@
 #include "../../include/TextIO/FormatIO.h"      /* Included for Formatter */
 #include "../../include/TextIO/LogIO.h"         /* Included for Logging */
 #include "../../include/TextIO/StringIO.h"      /* Included for string handling */
+#include "../../include/TextIO/StringSetIO.h"   /* Included for StringSet support */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <signal.h>                             /* Included for SIGWINCH handling */

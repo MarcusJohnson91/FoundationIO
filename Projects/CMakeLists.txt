@@ -69,7 +69,7 @@ set(LIBRARY_SOURCE
 "${LIBRARY_DIRECTORY}/src/TextIO/LocalizationIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/LogIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/StringIO.c"
-"${LIBRARY_DIRECTORY}/src/TextIO/SyntaxIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/StringSetIO.c"
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")

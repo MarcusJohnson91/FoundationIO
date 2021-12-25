@@ -2,6 +2,7 @@
 
 #include "../../include/TextIO/LogIO.h"                /* Included for error logging */
 #include "../../include/TextIO/StringIO.h"             /* Included for UTF8_GetStringSizeInCodeUnits */
+#include "../../include/TextIO/StringSetIO.h"          /* Included for StringSet support */
 #include "../../include/TextIO/Private/TextIOTables.h" /* Included for Currency tables */
 #include <locale.h>
 
