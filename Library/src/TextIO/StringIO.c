@@ -5,6 +5,7 @@
 #include "../../include/MathIO.h"                      /* Included for endian swapping */
 #include "../../include/TextIO/LogIO.h"                /* Included for error logging */
 #include "../../include/TextIO/Private/TextIOTables.h" /* Included for the Text tables */
+#include "../../include/TextIO/StringSetIO.h"          /* Included for StringSet stuff */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
