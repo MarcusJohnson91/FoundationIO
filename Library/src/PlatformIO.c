@@ -14,8 +14,8 @@
 extern "C" {
 #endif
     
-    uint64_t PlatformIO_GetTotalMemoryInBytes(void) {
-        uint64_t TotalMemory = 0ULL;
+    size_t PlatformIO_GetTotalMemoryInBytes(void) {
+        size_t TotalMemory = 0ULL;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
         size_t PageSize      = sysconf(_SC_PAGE_SIZE);
         size_t NumPages;
@@ -33,6 +33,10 @@ extern "C" {
 #endif
         return TotalMemory;
     }
+
+    /*
+     Kinda wonder if I could make Assert handle format args?
+     */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

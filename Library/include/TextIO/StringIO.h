@@ -207,19 +207,19 @@ extern "C" {
      @abstract                                           Creates a UTF8 string plus a NULL terminator.
      @param            NumCodeUnits                      The size of the string not counting the NULL terminator.
      */
-    UTF8              *UTF8_Init(uint64_t NumCodeUnits);
+    UTF8              *UTF8_Init(size_t NumCodeUnits);
     
     /*!
      @abstract                                           Creates a UTF16 string plus a NULL terminator.
      @param            NumCodeUnits                      The size of the string not counting the NULL terminator.
      */
-    UTF16             *UTF16_Init(uint64_t NumCodeUnits);
+    UTF16             *UTF16_Init(size_t NumCodeUnits);
     
     /*!
      @abstract                                           Creates a UTF32 string plus a NULL terminator.
      @param            NumCodePoints                     The size of the string not counting the NULL terminator.
      */
-    UTF32             *UTF32_Init(uint64_t NumCodePoints);
+    UTF32             *UTF32_Init(size_t NumCodePoints);
     
     /*!
      @abstract                                           Sets NumCodeUnits to Value.
@@ -274,54 +274,54 @@ extern "C" {
      @remark                                             This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings.
      @param            String                            The string to get the number of codeunits in.
      */
-    uint64_t           UTF8_GetStringSizeInCodeUnits(ImmutableString_UTF8 String);
+    size_t             UTF8_GetStringSizeInCodeUnits(ImmutableString_UTF8 String);
     
     /*!
      @abstract                                           Gets the number of Unicode codeunits in the UTF8.
      @remark                                             This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings.
      @param            String                            The string to get the number of CodePoints in.
      */
-    uint64_t           UTF16_GetStringSizeInCodeUnits(ImmutableString_UTF16 String);
+    size_t             UTF16_GetStringSizeInCodeUnits(ImmutableString_UTF16 String);
     
     /*!
      @abstract                                           Gets the number of Unicode CodePoints in the string.
      @remark                                             This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings.
      @param            String                            The string to get the number of CodePoints in.
      */
-    uint64_t           UTF8_GetStringSizeInCodePoints(ImmutableString_UTF8 String);
+    size_t             UTF8_GetStringSizeInCodePoints(ImmutableString_UTF8 String);
     
     /*!
      @abstract                                           Gets the number of Unicode CodePoints in the string.
      @remark                                             This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings.
      @param            String                            The string to get the number of CodePoints in.
      */
-    uint64_t           UTF16_GetStringSizeInCodePoints(ImmutableString_UTF16 String);
+    size_t             UTF16_GetStringSizeInCodePoints(ImmutableString_UTF16 String);
     
     /*!
      @abstract                                           Gets the number of Unicode CodePoints in the string.
      @param            String                            The string to get the number of CodePoints in.
      */
-    uint64_t           UTF32_GetStringSizeInCodePoints(ImmutableString_UTF32 String);
+    size_t             UTF32_GetStringSizeInCodePoints(ImmutableString_UTF32 String);
     
     /*!
      @abstract                                           Gets the number of user visible characters in a UTF-8 string.
      @remark                                             This function just decodes the string and sends it off to the UTF32 version.
      @param            String                            The string to get the number of graphemes in.
      */
-    uint64_t           UTF8_GetStringSizeInGraphemes(ImmutableString_UTF8 String);
+    size_t             UTF8_GetStringSizeInGraphemes(ImmutableString_UTF8 String);
     
     /*!
      @abstract                                           Gets the number of user visible characters in a UTF-16 string.
      @remark                                             This function just decodes the string and sends it off to the UTF32 version.
      @param            String                            The string to get the number of graphemes in.
      */
-    uint64_t           UTF16_GetStringSizeInGraphemes(ImmutableString_UTF16 String);
+    size_t             UTF16_GetStringSizeInGraphemes(ImmutableString_UTF16 String);
     
     /*!
      @abstract                                           Gets the number of user visible characters in a UTF-32 string.
      @param            String                            The string to get the number of graphemes in.
      */
-    uint64_t           UTF32_GetStringSizeInGraphemes(ImmutableString_UTF32 String);
+    size_t             UTF32_GetStringSizeInGraphemes(ImmutableString_UTF32 String);
     
     /*!
      @abstract                                           Converts yes/no/true/false/on/off/1/0 to true or false.
@@ -554,7 +554,7 @@ extern "C" {
      @param            TableSize                         The size of the table.
      @param            CodePoint                         The codepoint to check.
      */
-    bool               UTF32_IsCodePointInTable(const UTF32 *Table, uint64_t TableSize, UTF32 CodePoint);
+    bool               UTF32_IsCodePointInTable(const UTF32 *Table, size_t TableSize, UTF32 CodePoint);
 
     /*!
      @abstract                                           Get the CodePoint's CombiningCharacterClass value.
@@ -587,7 +587,7 @@ extern "C" {
      @param            String2Replace                    The codepoint to check.
      @param            String2ReplaceSize                The size of the string2replace, makes lookup way faster.
      */
-    UTF32             *UTF32_GetReplacementStringFromTable(UTF32 *Table, uint64_t TableSize, UTF32 *String2Replace, uint64_t String2ReplaceSize);
+    UTF32             *UTF32_GetReplacementStringFromTable(UTF32 *Table, size_t TableSize, UTF32 *String2Replace, size_t String2ReplaceSize);
     /*!
      @abstract                                           Casefolds string for case insensitive comparison.
      @remark                                             Uppercase CodePoints are connverted to lowercase for the comparison
@@ -644,21 +644,43 @@ extern "C" {
      @param            String                            The string to extract from.
      @param            Grapheme                          The Grapheme Index to start extracting from.
      */
-    UTF8              *UTF8_ExtractGrapheme(ImmutableString_UTF8 String, uint64_t Grapheme);
+    UTF8              *UTF8_ExtractGrapheme(ImmutableString_UTF8 String, size_t Grapheme);
     
     /*!
      @abstract                                           Extracts a Grapheme from String.
      @param            String                            The string to extract from.
      @param            Grapheme                          The Grapheme Index to start extracting from.
      */
-    UTF16             *UTF16_ExtractGrapheme(ImmutableString_UTF16 String, uint64_t Grapheme);
+    UTF16             *UTF16_ExtractGrapheme(ImmutableString_UTF16 String, size_t Grapheme);
     
     /*!
      @abstract                                           Extracts a Grapheme from String.
      @param            String                            The string to extract from.
      @param            Grapheme                          The Grapheme Index to start extracting from.
      */
-    UTF32             *UTF32_ExtractGrapheme(ImmutableString_UTF32 String, uint64_t Grapheme);
+    UTF32             *UTF32_ExtractGrapheme(ImmutableString_UTF32 String, size_t Grapheme);
+
+    /*!
+     @abstract                                           Moves CodePoints to the right
+     @remark                                             Always start at the end of the string and work towards the beginning to reduce workload.
+     @remark                                             This function is low level, do not use with untrusted input.
+     @param            String                            The string to shift.
+     @param            StringSize                        The number of CodePoints usefully occupied.
+     @param            StringCapacity                    The actual allocated size of the string, not counting NULLTerminator.
+     @param            Start                             Where should we start moving the CodePoints from?
+     @param            NumCodePointsToShift              How far should Start (and all following CodePoints) be moved?
+     @eturn                                              Returns true if the shift was sucessful, false otherwise.
+     */
+    bool               UTF32_ShiftCodePoints(UTF32 *String, size_t StringSize, size_t StringCapacity, size_t Start, size_t NumCodePointsToShift);
+
+    /*!
+     @abstract                                           Replaces String[Start] .. String[SizeOf(Replacement)] with replacement.
+     @param            String                            The string to modify.
+     @param            Replacement                       What to be replaced with.
+     @param            Start                             Where should we start replacing the CodePoints?
+     @eturn                                              Returns true if the replacement was sucessful, false otherwise.
+     */
+    bool               UTF32_ReplaceInPlace(UTF32 *String, const UTF32 *const Replacement, size_t Start);
     
     /*!
      @abstract                                           Compares String1 to String2.
@@ -690,7 +712,7 @@ extern "C" {
      @param            Times2Pad                         The number of times for Padding to be duplicated.
      @return                                             Returns a new string containing Padding * Times2Pad.
      */
-    UTF8              *UTF8_Create(ImmutableString_UTF8 Padding, uint64_t Times2Pad);
+    UTF8              *UTF8_Create(ImmutableString_UTF8 Padding, size_t Times2Pad);
     
     /*!
      @abstract                                           Creates a String composed of Padding.
@@ -698,7 +720,7 @@ extern "C" {
      @param            Times2Pad                         The number of times for Padding to be duplicated.
      @return                                             Returns a new string containing Padding * Times2Pad.
      */
-    UTF16             *UTF16_Create(ImmutableString_UTF16 Padding, uint64_t Times2Pad);
+    UTF16             *UTF16_Create(ImmutableString_UTF16 Padding, size_t Times2Pad);
     
     /*!
      @abstract                                           Creates a String composed of Padding.
@@ -706,7 +728,7 @@ extern "C" {
      @param            Times2Pad                         The number of times for Padding to be duplicated.
      @return                                             Returns a new string containing Padding * Times2Pad.
      */
-    UTF32             *UTF32_Create(ImmutableString_UTF32 Padding, uint64_t Times2Pad);
+    UTF32             *UTF32_Create(ImmutableString_UTF32 Padding, size_t Times2Pad);
     
     /*!
      @abstract                                           Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length.
@@ -717,7 +739,7 @@ extern "C" {
      @param            Length                            How many CodePoints should we search for the substring? -1 means all CodePoints.
      @return                                             Returns the offset of the start of the substring in String, or -1 if a match wasn't found..
      */
-    int64_t            UTF8_FindSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString, uint64_t Offset, int64_t Length);
+    size_t             UTF8_FindSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length.
@@ -728,7 +750,7 @@ extern "C" {
      @param            Length                            How many CodePoints should we search for the substring? -1 means all CodePoints.
      @return                                             Returns the offset of the start of the substring in String, or -1 if a match wasn't found..
      */
-    int64_t            UTF16_FindSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString, uint64_t Offset, int64_t Length);
+    size_t             UTF16_FindSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length.
@@ -739,7 +761,7 @@ extern "C" {
      @param            Length                            How many CodePoints should we search for the substring? -1 means all CodePoints.
      @return                                             Returns the offset of the start of the substring in String, or -1 if a match wasn't found..
      */
-    int64_t            UTF32_FindSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString, uint64_t Offset, int64_t Length);
+    size_t             UTF32_FindSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Extracts a SubString from String.
@@ -747,7 +769,7 @@ extern "C" {
      @param            Offset                            The CodePoint to start extracting from.
      @param            NumCodeUnits                      The number of CodePoints to extract.
      */
-    UTF8              *UTF8_ExtractSubString(ImmutableString_UTF8 String, uint64_t Offset, uint64_t NumCodeUnits);
+    UTF8              *UTF8_ExtractSubString(ImmutableString_UTF8 String, size_t Offset, size_t NumCodeUnits);
     
     /*!
      @abstract                                           Extracts a SubString from String.
@@ -755,7 +777,7 @@ extern "C" {
      @param            Offset                            The CodePoint to start extracting from.
      @param            NumCodeUnits                      The number of CodePoints to extract.
      */
-    UTF16             *UTF16_ExtractSubString(ImmutableString_UTF16 String, uint64_t Offset, uint64_t NumCodeUnits);
+    UTF16             *UTF16_ExtractSubString(ImmutableString_UTF16 String, size_t Offset, size_t NumCodeUnits);
     
     /*!
      @abstract                                           Extracts a SubString from String.
@@ -763,7 +785,7 @@ extern "C" {
      @param            Offset                            The CodePoint to start extracting from.
      @param            NumCodePoints                     The number of CodePoints to extract.
      */
-    UTF32             *UTF32_ExtractSubString(ImmutableString_UTF32 String, uint64_t Offset, uint64_t NumCodePoints);
+    UTF32             *UTF32_ExtractSubString(ImmutableString_UTF32 String, size_t Offset, size_t NumCodePoints);
     
     /*!
      @abstract                                           Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement.
@@ -772,7 +794,7 @@ extern "C" {
      @param            Offset                            Where to start replacing String with Substituion.
      @param            Length                            The number of CodePoints to substitute, can be more or less than Substituion.
      */
-    UTF8              *UTF8_SubstituteSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substitution, uint64_t Offset, uint64_t Length);
+    UTF8              *UTF8_SubstituteSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substitution, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement.
@@ -781,7 +803,7 @@ extern "C" {
      @param            Offset                            Where to start replacing String with Substituion.
      @param            Length                            The number of CodePoints to substitute, can be more or less than Substituion.
      */
-    UTF16             *UTF16_SubstituteSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substitution, uint64_t Offset, uint64_t Length);
+    UTF16             *UTF16_SubstituteSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substitution, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement.
@@ -790,7 +812,7 @@ extern "C" {
      @param            Offset                            Where to start replacing String with Substituion.
      @param            Length                            The number of CodePoints to substitute, can be more or less than Substituion.
      */
-    UTF32             *UTF32_SubstituteSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substitution, uint64_t Offset, uint64_t Length);
+    UTF32             *UTF32_SubstituteSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substitution, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive).
@@ -798,7 +820,7 @@ extern "C" {
      @param            Offset                            The first CodePoint to remove.
      @param            Length                            The last CodePoint to remove minus Offset.
      */
-    UTF8              *UTF8_StitchSubString(ImmutableString_UTF8 String, uint64_t Offset, uint64_t Length);
+    UTF8              *UTF8_StitchSubString(ImmutableString_UTF8 String, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive).
@@ -806,7 +828,7 @@ extern "C" {
      @param            Offset                            The first CodePoint to remove.
      @param            Length                            The last CodePoint to remove minus Offset.
      */
-    UTF16             *UTF16_StitchSubString(ImmutableString_UTF16 String, uint64_t Offset, uint64_t Length);
+    UTF16             *UTF16_StitchSubString(ImmutableString_UTF16 String, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive).
@@ -814,7 +836,7 @@ extern "C" {
      @param            Offset                            The first CodePoint to remove.
      @param            Length                            The last CodePoint to remove minus Offset.
      */
-    UTF32             *UTF32_StitchSubString(ImmutableString_UTF32 String, uint64_t Offset, uint64_t Length);
+    UTF32             *UTF32_StitchSubString(ImmutableString_UTF32 String, size_t Offset, size_t Length);
     
     /*!
      @abstract                                           Reallocates String and copies it except for the instance (-1 for all instances) of the substring.
@@ -822,7 +844,7 @@ extern "C" {
      @param            SubString2Remove                  The substring to remove from the string.
      @param            Instance2Remove                   The instance (0 for all) of the substring in the string to remove.
      */
-    UTF8              *UTF8_RemoveSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString2Remove, uint64_t Instance2Remove);
+    UTF8              *UTF8_RemoveSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString2Remove, size_t Instance2Remove);
     
     /*!
      @abstract                                           Reallocates String and copies it except for the instance (-1 for all instances) of the substring.
@@ -830,7 +852,7 @@ extern "C" {
      @param            SubString2Remove                  The substring to remove from the string.
      @param            Instance2Remove                   The instance (0 for all) of the substring in the string to remove.
      */
-    UTF16             *UTF16_RemoveSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString2Remove, uint64_t Instance2Remove);
+    UTF16             *UTF16_RemoveSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString2Remove, size_t Instance2Remove);
     
     /*!
      @abstract                                           Reallocates String and copies it except for the instance (-1 for all instances) of the substring.
@@ -838,7 +860,7 @@ extern "C" {
      @param            SubString2Remove                  The substring to remove from the string.
      @param            Instance2Remove                   The instance (0 for all) of the substring in the string to remove.
      */
-    UTF32             *UTF32_RemoveSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString2Remove, uint64_t Instance2Remove);
+    UTF32             *UTF32_RemoveSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString2Remove, size_t Instance2Remove);
     
     /*!
      @abstract                                           Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence.
@@ -847,7 +869,7 @@ extern "C" {
      @param            Substring                         The substring to check.
      @return                                             Returns whether Substring matches at the given offsets.
      */
-    bool               UTF8_CompareSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    bool               UTF8_CompareSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substring, size_t StringOffset, size_t SubstringOffset);
     
     /*!
      @abstract                                           Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence.
@@ -856,7 +878,7 @@ extern "C" {
      @param            Substring                         The substring to check.
      @return                                             Returns whether Substring matches at the given offsets.
      */
-    bool               UTF16_CompareSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    bool               UTF16_CompareSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substring, size_t StringOffset, size_t SubstringOffset);
     
     /*!
      @abstract                                           Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence.
@@ -865,7 +887,7 @@ extern "C" {
      @param            Substring                         The substring to check.
      @return                                             Returns whether Substring matches at the given offsets.
      */
-    bool               UTF32_CompareSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    bool               UTF32_CompareSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substring, size_t StringOffset, size_t SubstringOffset);
     
     /*!
      @abstract                                           Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process.
@@ -1075,7 +1097,7 @@ extern "C" {
      @param            NumGraphemes                      The maxiumum amount of CodeUnits in the string, not counting the null terminator.
      @return                                             Returns the truncated, null terminated copy of String.
      */
-    UTF8              *UTF8_Truncate(ImmutableString_UTF8 String, uint64_t NumGraphemes);
+    UTF8              *UTF8_Truncate(ImmutableString_UTF8 String, size_t NumGraphemes);
     
     /*!
      @abstract                                           Cuts a string down to MaxCodeUnits CodeUnits.
@@ -1084,7 +1106,7 @@ extern "C" {
      @param            NumGraphemes                      The maxiumum amount of CodeUnits in the string, not counting the null terminator.
      @return                                             Returns the truncated, null terminated copy of String.
      */
-    UTF16             *UTF16_Truncate(ImmutableString_UTF16 String, uint64_t NumGraphemes);
+    UTF16             *UTF16_Truncate(ImmutableString_UTF16 String, size_t NumGraphemes);
     
     /*!
      @abstract                                           Cuts a string down to MaxCodePoints CodePoints.
@@ -1093,7 +1115,7 @@ extern "C" {
      @param            NumGraphemes                      The maxiumum amount of CodePoints in the string, not counting the null terminator.
      @return                                             Returns the truncated, null terminated copy of String.
      */
-    UTF32             *UTF32_Truncate(ImmutableString_UTF32 String, uint64_t NumGraphemes);
+    UTF32             *UTF32_Truncate(ImmutableString_UTF32 String, size_t NumGraphemes);
     
     /*!
      @abstract                                           Creates a copy of String, with String2Insert starting at Offset.
@@ -1103,7 +1125,7 @@ extern "C" {
      @param            OffsetInCodePoints                Where should String2Insert be inserted?
      @return                                             Returns a pointer to a new string containing the original, and String2Insert at Offset.
      */
-    UTF8              *UTF8_Insert(ImmutableString_UTF8 String, ImmutableString_UTF8 String2Insert, uint64_t OffsetInCodePoints);
+    UTF8              *UTF8_Insert(ImmutableString_UTF8 String, ImmutableString_UTF8 String2Insert, size_t OffsetInCodePoints);
     
     /*!
      @abstract                                           Creates a copy of String, with String2Insert starting at Offset.
@@ -1113,7 +1135,7 @@ extern "C" {
      @param            OffsetInCodePoints                Where should String2Insert be inserted?
      @return                                             Returns a pointer to a new string containing the original, and String2Insert at Offset.
      */
-    UTF16             *UTF16_Insert(ImmutableString_UTF16 String, ImmutableString_UTF16 String2Insert, uint64_t OffsetInCodePoints);
+    UTF16             *UTF16_Insert(ImmutableString_UTF16 String, ImmutableString_UTF16 String2Insert, size_t OffsetInCodePoints);
     
     /*!
      @abstract                                           Creates a copy of String, with String2Insert starting at Offset.
@@ -1123,7 +1145,7 @@ extern "C" {
      @param            OffsetInCodePoints                Where should String2Insert be inserted?
      @return                                             Returns a pointer to a new string containing the original, and String2Insert at Offset.
      */
-    UTF32             *UTF32_Insert(ImmutableString_UTF32 String, ImmutableString_UTF32 String2Insert, uint64_t OffsetInCodePoints);
+    UTF32             *UTF32_Insert(ImmutableString_UTF32 String, ImmutableString_UTF32 String2Insert, size_t OffsetInCodePoints);
     
     /*!
      @abstract                                           Reverses a string Grapheme by Grapheme.
@@ -1260,7 +1282,7 @@ extern "C" {
      @param            String                            The string to check.
      @return                                             Returns the number of format specifiers found.
      */
-    uint64_t           UTF8_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF8 String);
+    size_t             UTF8_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF8 String);
     
     /*!
      @abstract                                           Counts the number of Digits in String starting at Offset (inclusive).
@@ -1268,7 +1290,7 @@ extern "C" {
      @param            String                            The string to check.
      @return                                             Returns the number of format specifiers found.
      */
-    uint64_t           UTF16_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF16 String);
+    size_t             UTF16_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF16 String);
     
     /*!
      @abstract                                           Counts the number of Digits in String starting at Offset (inclusive).
@@ -1276,7 +1298,7 @@ extern "C" {
      @param            String                            The string to check.
      @return                                             Returns the number of format specifiers found.
      */
-    uint64_t           UTF32_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF32 String);
+    size_t             UTF32_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF32 String);
     
     /*!
      @abstract                                           Gets a substring from Offset to where Format and Formatted start matching.
@@ -1285,7 +1307,7 @@ extern "C" {
      @param            Offset                            Where to start looking for digits.
      @return                                             Returns the SubString.
      */
-    uint64_t           UTF32_GetSubStringLength(ImmutableString_UTF32 Format, ImmutableString_UTF32 Formatted, uint64_t Offset);
+    size_t             UTF32_GetSubStringLength(ImmutableString_UTF32 Format, ImmutableString_UTF32 Formatted, size_t Offset);
 
     /* Unicode Conversion */
     /*!

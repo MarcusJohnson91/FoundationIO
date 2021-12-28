@@ -23,13 +23,13 @@ extern "C" {
     typedef struct InsecurePRNG {
         uint64_t State[16];
         uint64_t Output[16];
-        uint64_t Iteration;
+        size_t   Iteration;
     } InsecurePRNG;
 
     typedef struct SecureRNG {
         uint8_t  *EntropyPool;
-        uint64_t  NumBits;
-        uint64_t  BitOffset;
+        size_t    NumBits;
+        size_t    BitOffset;
     } SecureRNG;
 
     InsecurePRNG *InsecurePRNG_Init(uint64_t Seed[4]) {
@@ -68,7 +68,7 @@ extern "C" {
         return Insecure;
     }
 
-    void InsecurePRNG_Generate(InsecurePRNG *Insecure, uint8_t *Buffer, uint64_t BufferSize) {
+    void InsecurePRNG_Generate(InsecurePRNG *Insecure, uint8_t *Buffer, size_t BufferSize) {
         if (Insecure != NULL) {
             uint64_t *Buffer64                         = (uint64_t*) Buffer;
             uint64_t State1                            = Insecure->State[1];
@@ -76,8 +76,8 @@ extern "C" {
             uint64_t Iteration                         = Insecure->Iteration;
             uint64_t Increment[4] = {1, 3, 5, 7};
 
-            for (uint64_t OutputWord = 0; OutputWord < 4; OutputWord++) {
-                for (uint64_t BufferWord = 0; BufferWord < BufferSize; BufferWord += 64) {
+            for (size_t OutputWord = 0; OutputWord < 4; OutputWord++) {
+                for (size_t BufferWord = 0; BufferWord < BufferSize; BufferWord += 64) {
                     Buffer64[BufferWord + OutputWord]  = Insecure->Output[OutputWord];
                     State1                            += Iteration;
                     State3                            += Iteration;
@@ -305,10 +305,10 @@ extern "C" {
         return Bits;
     }
 
-    SecureRNG *SecureRNG_Init(uint64_t EntropyPoolSize) {
+    SecureRNG *SecureRNG_Init(size_t EntropyPoolSize) {
         SecureRNG *Random             = (SecureRNG*) calloc(1, sizeof(SecureRNG));
         if (Random != NULL) {
-            uint64_t PoolSize         = EntropyPoolSize;
+            size_t PoolSize           = EntropyPoolSize;
             if (EntropyPoolSize % 16 != 0) {
                 PoolSize              = EntropyPoolSize + (16 - (EntropyPoolSize % 16));
             }
@@ -329,8 +329,8 @@ extern "C" {
         return Random;
     }
 
-    uint64_t SecureRNG_GetRemainingEntropy(SecureRNG *Random) {
-        uint64_t RemainingBits = 0ULL;
+    size_t SecureRNG_GetRemainingEntropy(SecureRNG *Random) {
+        size_t RemainingBits   = 0;
         if (Random != NULL) {
             RemainingBits      = Random->NumBits - Random->BitOffset;
         } else {
@@ -339,8 +339,8 @@ extern "C" {
         return RemainingBits;
     }
 
-    int64_t SecureRNG_GenerateInteger(SecureRNG *Random, uint8_t NumBits) {
-        int64_t GeneratedInteger = 0LL;
+    uint64_t SecureRNG_GenerateInteger(SecureRNG *Random, uint8_t NumBits) {
+        uint64_t GeneratedInteger = 0;
         if (Random != NULL && NumBits >= 1 && NumBits <= 64) {
             GeneratedInteger     = SecureRNG_ExtractBits(Random, NumBits);
         } else if (Random == NULL) {
@@ -351,8 +351,8 @@ extern "C" {
         return GeneratedInteger;
     }
 
-    int64_t SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue) {
-        int64_t RandomInteger                     = 0ULL;
+    uint64_t SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue) {
+        uint64_t RandomInteger                    = 0;
         if (Random != NULL && MinValue <= MaxValue) {
             uint8_t Bits2Read                     = (uint8_t) Exponentiate(2, Subtract(MinValue, MaxValue));
             RandomInteger                         = SecureRNG_ExtractBits(Random, Bits2Read);
@@ -394,7 +394,7 @@ extern "C" {
     uint8_t SecureRNG_Erase(SecureRNG *Random, uint8_t NewValue) {
         uint8_t Verification = 0xFE;
         if (Random != NULL) {
-            for (uint64_t Byte = 0ULL; Byte < Bits2Bytes(RoundingType_Down, Random->NumBits); Byte++) {
+            for (size_t Byte = 0ULL; Byte < Bits2Bytes(RoundingType_Down, Random->NumBits); Byte++) {
                 Random->EntropyPool[Byte] = NewValue;
             }
             Random->BitOffset             = NewValue;

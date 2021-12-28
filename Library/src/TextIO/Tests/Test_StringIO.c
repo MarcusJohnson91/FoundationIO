@@ -11,7 +11,7 @@ extern "C" {
         ImmutableStringSet_UTF8 StringSet = UTF8StringSet(UTF8String("String1"), UTF8String("String2"), UTF8String("String3"));
         uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet); // 14?!
         if (NumStrings != 3) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings is %llu but should be 3"), NumStrings);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings is %zu but should be 3"), NumStrings);
             TestPassed = No;
         }
         uint64_t *StringSizes = UTF8_StringSet_GetStringSizesInCodeUnits(StringSet);
@@ -94,7 +94,7 @@ extern "C" {
         uint64_t  TestStringSize = UTF32_GetStringSizeInCodePoints(TestString32);
         if (TestStringSize != 7) {
             TestPassed           = No;
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String \"%s\" is supposed to be 7 CodePoints long, but is actually %llu"), TestString8, TestStringSize);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String \"%s\" is supposed to be 7 CodePoints long, but is actually %zu"), TestString8, TestStringSize);
         }
         return TestPassed;
     }

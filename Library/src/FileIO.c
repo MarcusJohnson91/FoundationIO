@@ -31,8 +31,8 @@ extern "C" {
     
     UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
         UTF8 *Base = NULL;
-        uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
-        uint64_t Start                 = Path8SizeInCodeUnits;
+        size_t Path8SizeInCodeUnits    = UTF8_GetStringSizeInCodeUnits(Path8);
+        size_t Start                   = Path8SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0 && Path8[Start] != '\\') {
             Start                     -= 1;
@@ -42,11 +42,11 @@ extern "C" {
             Start                     -= 1;
         }
 #endif
-        uint64_t BaseSize              = Path8SizeInCodeUnits - Start;
+        size_t BaseSize                = Path8SizeInCodeUnits - Start;
         Base                           = UTF8_Init(BaseSize);
         if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path8Index        = Start;
+            size_t BaseIndex           = 0;
+            size_t Path8Index          = Start;
             while (BaseIndex < BaseSize && Path8Index < Path8SizeInCodeUnits) {
                 Base[BaseIndex]        = Path8[Path8Index];
                 BaseIndex             += 1;
@@ -57,8 +57,8 @@ extern "C" {
     
     UTF16 *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16) {
         UTF16 *Base = NULL;
-        uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
-        uint64_t Start                 = Path16SizeInCodeUnits;
+        size_t Path16SizeInCodeUnits   = UTF16_GetStringSizeInCodeUnits(Path16);
+        size_t Start                   = Path16SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0 && Path16[Start] != '\\') {
             Start                     -= 1;
@@ -68,11 +68,11 @@ extern "C" {
             Start                     -= 1;
         }
 #endif
-        uint64_t BaseSize              = Path16SizeInCodeUnits - Start;
+        size_t BaseSize                = Path16SizeInCodeUnits - Start;
         Base                           = UTF16_Init(BaseSize);
         if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path16Index       = Start;
+            size_t BaseIndex           = 0;
+            size_t Path16Index         = Start;
             while (BaseIndex < BaseSize && Path16Index < Path16SizeInCodeUnits) {
                 Base[BaseIndex]        = Path16[Path16Index];
                 BaseIndex             += 1;
@@ -83,8 +83,8 @@ extern "C" {
     
     UTF32 *FileIO_UTF32_GetFileName(ImmutableString_UTF32 Path32) {
         UTF32 *Base = NULL;
-        uint64_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
-        uint64_t Start                 = Path32SizeInCodeUnits;
+        size_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
+        size_t Start                 = Path32SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0 && Path32[Start] != '\\') {
             Start                     -= 1;
@@ -94,11 +94,11 @@ extern "C" {
             Start                     -= 1;
         }
 #endif
-        uint64_t BaseSize              = Path32SizeInCodeUnits - Start;
+        size_t BaseSize                = Path32SizeInCodeUnits - Start;
         Base                           = UTF32_Init(BaseSize);
         if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path32Index       = Start;
+            size_t BaseIndex           = 0;
+            size_t Path32Index         = Start;
             while (BaseIndex < BaseSize && Path32Index < Path32SizeInCodeUnits) {
                 Base[BaseIndex]        = Path32[Path32Index];
                 BaseIndex             += 1;
@@ -113,8 +113,8 @@ extern "C" {
          if you find a '.' before a slash or after the start of the string, it has an extension.
          Start at the end of the string, loop until you find a dot or the start of the string or a slash
          */
-        uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
-        uint64_t Start                 = Path8SizeInCodeUnits;
+        size_t   Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
+        size_t   Start                 = Path8SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0) {
             if (Path8[Start] == '\\') { // Stop the loop because we're now in a folder
@@ -136,11 +136,11 @@ extern "C" {
             Start                     -= 1;
         }
 #endif
-        uint64_t BaseSize              = Path8SizeInCodeUnits - Start;
+        size_t BaseSize                = Path8SizeInCodeUnits - Start;
         Base                           = UTF8_Init(BaseSize);
         if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path8Index        = Start;
+            size_t BaseIndex           = 0;
+            size_t Path8Index          = Start;
             while (BaseIndex < BaseSize && Path8Index < Path8SizeInCodeUnits) {
                 Base[BaseIndex]        = Path8[Path8Index];
                 BaseIndex             += 1;
@@ -151,8 +151,8 @@ extern "C" {
     
     UTF16 *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16) {
         UTF16 *Base = NULL;
-        uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
-        uint64_t Start                 = Path16SizeInCodeUnits;
+        size_t Path16SizeInCodeUnits   = UTF16_GetStringSizeInCodeUnits(Path16);
+        size_t Start                   = Path16SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0) {
             if (Path16[Start] == '\\') { // Stop the loop because we're now in a folder
@@ -174,11 +174,11 @@ extern "C" {
             Start                     -= 1;
         }
 #endif
-        uint64_t BaseSize              = Path16SizeInCodeUnits - Start;
+        size_t BaseSize                = Path16SizeInCodeUnits - Start;
         Base                           = UTF16_Init(BaseSize);
         if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path16Index       = Start;
+            size_t BaseIndex           = 0;
+            size_t Path16Index         = Start;
             while (BaseIndex < BaseSize && Path16Index < Path16SizeInCodeUnits) {
                 Base[BaseIndex]        = Path16[Path16Index];
                 BaseIndex             += 1;
@@ -189,8 +189,8 @@ extern "C" {
     
     UTF32 *FileIO_UTF32_GetFileExtension(ImmutableString_UTF32 Path32) {
         UTF32 *Base = NULL;
-        uint64_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
-        uint64_t Start                 = Path32SizeInCodeUnits;
+        size_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
+        size_t Start                 = Path32SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         while (Start > 0) {
             if (Path32[Start] == '\\') { // Stop the loop because we're now in a folder
@@ -212,11 +212,11 @@ extern "C" {
             Start                     -= 1;
         }
 #endif
-        uint64_t BaseSize              = Path32SizeInCodeUnits - Start;
+        size_t BaseSize                = Path32SizeInCodeUnits - Start;
         Base                           = UTF32_Init(BaseSize);
         if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path32Index       = Start;
+            size_t BaseIndex           = 0;
+            size_t Path32Index         = Start;
             while (BaseIndex < BaseSize && Path32Index < Path32SizeInCodeUnits) {
                 Base[BaseIndex]        = Path32[Path32Index];
                 BaseIndex             += 1;
@@ -242,138 +242,10 @@ extern "C" {
         return StringType;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     uint8_t FileIO_GetEncodingSize(AsyncIOStream *Stream) {
         uint8_t EncodingSize = 0;
         return EncodingSize;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     /* File Operations */
     static UTF8 *UTF8_CreateModeString(AsyncIO_FileModes Mode) {
@@ -531,7 +403,7 @@ extern "C" {
     UTF16 *FileIO_UTF16_GetCurrentWorkingPath(void) {
         UTF16 *CurrentWorkingPath = NULL;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        CurrentWorkingPath        = UTF8_Convert(getcwd(NULL, 0));
+        CurrentWorkingPath        = UTF8_Convert((UTF8 const*) getcwd(NULL, 0));
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         CurrentWorkingPath        = _wgetcwd(PlatformIO_Cast(wchar_t*, &CWP16), _MAX_PATH);
 #endif /* TargetOS */
@@ -555,17 +427,17 @@ extern "C" {
         return DirectoryName;
     }
     
-    uint64_t FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read) {
-        uint64_t BytesRead = 0;
+    size_t FileIO_Read(const FILE *const File2Read, void *Buffer, uint8_t BufferElementSize, size_t Elements2Read) {
+        size_t ElementsRead = 0;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        BytesRead = fread((void*) Buffer, BufferElementSize, Elements2Read, PlatformIO_Mutable(FILE*, File2Read));
+        ElementsRead = fread(Buffer, BufferElementSize, Elements2Read, PlatformIO_Mutable(FILE*, File2Read));
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        ReadFile(File2Read, Buffer, Elements2Read, &BytesRead, NULL);
+        ReadFile(File2Read, Buffer, Elements2Read, &ElementsRead, NULL);
 #endif
-        return BytesRead;
+        return ElementsRead;
     }
     
-    bool FileIO_Seek(PlatformIO_Immutable(FILE *) File2Seek, int64_t SeekSizeInBytes, AsyncIO_SeekTypes SeekType) {
+    bool FileIO_Seek(FILE *File2Seek, ssize_t SeekSizeInBytes, AsyncIO_SeekTypes SeekType) {
         bool SuccessIsZero      = 1;
         if ((SeekType & SeekType_Beginning) == SeekType_Beginning) {
             // TODO: Maybe we should make sure that SeekSize fits within the file
@@ -589,18 +461,18 @@ extern "C" {
         }
         return SuccessIsZero ^ 1;
     }
-    
-    uint64_t FileIO_Write(PlatformIO_Immutable(FILE *) File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write) {
-        uint64_t BytesWritten = 0;
+
+    size_t FileIO_Write(FILE *File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, size_t Elements2Write) {
+        size_t ElementsWritten = 0;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        BytesWritten          = fwrite(Buffer, BufferElementSize, Elements2Write, PlatformIO_Mutable(FILE*, File2Write));
+        ElementsWritten        = fwrite(Buffer, BufferElementSize, Elements2Write, PlatformIO_Mutable(FILE*, File2Write));
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        WriteFile(File2Write, Buffer, Elements2Write, &BytesWritten, NULL);
+        WriteFile(File2Write, Buffer, Elements2Write, &ElementsWritten, NULL);
 #endif
-        if (BytesWritten != Elements2Write) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu Elements but %llu Elements were requested"), BytesWritten, Elements2Write);
+        if (ElementsWritten != Elements2Write) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %zu Elements but %zu Elements were requested"), ElementsWritten, Elements2Write);
         }
-        return BytesWritten;
+        return ElementsWritten;
     }
     
     bool FileIO_Close(FILE *File) {

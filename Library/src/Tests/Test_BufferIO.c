@@ -163,7 +163,7 @@ extern "C" {
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Write);
             if (ReadInteger != RandomInteger) {
                 TestPassed = No;
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %zu does not match WrittenInteger: %zu"), ReadInteger, RandomInteger);
             }
             BitBuffer_Erase(BitB, 0);
         }
@@ -187,7 +187,7 @@ extern "C" {
             BitBuffer_Seek(BitB, -(NumBits2Extract));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract);
             if (ReadInteger != RandomInteger) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %zu does not match WrittenInteger: %zu"), ReadInteger, RandomInteger);
             }
             BitBuffer_Erase(BitB, 0);
         }
@@ -208,7 +208,7 @@ extern "C" {
             BitBuffer_Seek(BitB, -(NumBits2Extract));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract);
             if (ReadInteger != RandomInteger) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %zu does not match WrittenInteger: %zu"), ReadInteger, RandomInteger);
             }
             BitBuffer_Erase(BitB, 0);
         }

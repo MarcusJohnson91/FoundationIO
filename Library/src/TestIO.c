@@ -64,7 +64,7 @@ extern "C" {
 
 
     void TestIO_Run(size_t SecureRNGSize) {
-        uint64_t NumSuites = 0;
+        size_t NumSuites = 0;
         for (TestIO_Suite *Suite = __TestIO_Suites_Start; Suite < __TestIO_Suites_Stop; Suite++) {
             // Ok, so we have the actual test suite.
             /*
@@ -80,9 +80,9 @@ extern "C" {
 
         TestIO_Suite **Suites = calloc(NumSuites, sizeof(TestIO_Suite));
         SecureRNG *Secure                              = SecureRNG_Init(SecureRNGSize);
-        uint64_t NumEnabledTests                       = 0ULL;
-        for (uint64_t Suite = 0; Suite < NumSuites; Suite++) {
-            for (uint64_t Test = 0; Test < Suites[Suite]->NumTests; Test++) {
+        size_t NumEnabledTests                         = 0;
+        for (size_t Suite = 0; Suite < NumSuites; Suite++) {
+            for (size_t Test = 0; Test < Suites[Suite]->NumTests; Test++) {
                 if (Suites[Suite]->Tests[Test].State == TestState_Enabled) {
                     NumEnabledTests                   += 1;
                     Suites[Suite]->Tests[Test].Result  = Suites[Suite]->Tests[Test].Function(Secure);
@@ -94,8 +94,8 @@ extern "C" {
     static ImmutableStringSet_UTF8 UTF8_TestIO_GetFunctionNamesAsStringSet(TestIO_Suite *Suite) {
         ImmutableStringSet_UTF8 StringSet = NULL;
         if (Suite != NULL) {
-            uint64_t NumEnabledTests               = 0ULL;
-            for (uint64_t Test = 0; Test < Suite->NumTests; Test++) {
+            size_t NumEnabledTests               = 0ULL;
+            for (size_t Test = 0; Test < Suite->NumTests; Test++) {
                 if (Suite->Tests[Test].State == TestState_Enabled) {
                     NumEnabledTests               += 1;
                     bool Outcome                   = Suite->Tests[Test].Function;
@@ -113,12 +113,12 @@ extern "C" {
 
              Correct/Incorrect outcome seems good
              */
-            UTF8 *EnabledDisabledTests         = UTF8_Format(UTF8String("Enabled/Disabled Tests: %llu/%llu"), NumEnabledTests, Suite->NumTests - NumEnabledTests);
-            UTF8 *TestResults                  = UTF8_Format(UTF8String("Correct/Incorrect Outcome: %llu/%llu"), Suite->NumCorrectOutcomes, Suite->NumTests - Suite->NumCompleted);
+            UTF8 *EnabledDisabledTests         = UTF8_Format(UTF8String("Enabled/Disabled Tests: %zu/%zu"), NumEnabledTests, Suite->NumTests - NumEnabledTests);
+            UTF8 *TestResults                  = UTF8_Format(UTF8String("Correct/Incorrect Outcome: %zu/%zu"), Suite->NumCorrectOutcomes, Suite->NumTests - Suite->NumCompleted);
             UTF8_File_WriteString(stdout, EnabledDisabledTests);
             UTF8_File_WriteString(stdout, TestResults);
             UTF8_File_WriteString(stdout, UTF8String("Incorrect Tests:\n"));
-            for (uint64_t Test = 0; Test < Suite->NumTests; Test++) {
+            for (size_t Test = 0; Test < Suite->NumTests; Test++) {
                 if (Suite->Tests[Test].State == TestState_Enabled && Suite->Tests[Test].Expectation != Suite->Tests[Test].Outcome) {
                     UTF8_File_WriteString(stdout, Suite->Tests[Test].Name);
                 }
@@ -199,16 +199,16 @@ extern "C" {
         return CodePoint;
     }
 
-    UTF32 *UTF32_GenerateString(SecureRNG *Random, uint64_t NumCodePoints) {
+    UTF32 *UTF32_GenerateString(SecureRNG *Random, size_t NumCodePoints) {
         UTF32 *String                 = 0UL;
         if (Random != NULL) {
             String                    = UTF32_Init(NumCodePoints);
             if (String != NULL) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
+                for (size_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
                     String[CodePoint] = UTF32_GenerateCodePoint(Random);
                 }
             } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate string with %zu CodePoints"), NumCodePoints);
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));

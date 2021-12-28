@@ -55,9 +55,9 @@ extern "C" {
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         /* POSIX uses ISO 639-1 if possible, otherwise ISO 639-2 */
         UTF8    *LocaleAll      = PlatformIO_Cast(UTF8*, setlocale(LC_ALL, NULL));
-        uint64_t EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
+        size_t   EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
         UTF8    *LanguageString = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
-        uint64_t StringSize     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
+        size_t   StringSize     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) {
             if (UTF8_Compare(LanguageString, UTF8String("en"))) {
                 LanguageID = WrittenLanguage_English;
@@ -71,7 +71,7 @@ extern "C" {
                 LanguageID = WrittenLanguage_Icelandic;
             }
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Invalid Language string length %llu"), StringSize);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Invalid Language string length %zu"), StringSize);
         }
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #endif
@@ -83,7 +83,7 @@ extern "C" {
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         UTF8    *LocaleAll  = PlatformIO_Cast(UTF8*, setlocale(LC_ALL, NULL));
         
-        uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(LocaleAll);
+        size_t   StringSize = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) {
             
         } else if (StringSize == 3) {
@@ -99,10 +99,10 @@ extern "C" {
         LocalizationIO_Init();
         UTF8 *LocaleString              = PlatformIO_Cast(UTF8*, getenv("LANG"));
         if (LocaleString != NULL) {
-            uint64_t StringSize         = UTF8_GetStringSizeInCodeUnits(LocaleString);
-            uint64_t Offset             = UTF8_FindSubString(LocaleString, UTF8String("."), 0, 1);
+            size_t   StringSize         = UTF8_GetStringSizeInCodeUnits(LocaleString);
+            size_t   Offset             = UTF8_FindSubString(LocaleString, UTF8String("."), 0, 1);
             UTF8    *EncodingString     = UTF8_ExtractSubString(LocaleString, Offset, StringSize - Offset);
-            uint64_t EncodingStringSize = UTF8_GetStringSizeInCodeUnits(EncodingString);
+            size_t   EncodingStringSize = UTF8_GetStringSizeInCodeUnits(EncodingString);
             if (EncodingStringSize == 4) {
                 if (UTF8_Compare(EncodingString, UTF8String("utf8")) || UTF8_Compare(EncodingString, UTF8String("UTF8"))) {
                     Encoding = StringType_UTF8;
@@ -129,10 +129,10 @@ extern "C" {
         
         UTF16 *LocaleString = getenv((ImmutableString_UTF8) "LANG");
         if (LocaleString != NULL) {
-            uint64_t StringSize         = UTF16_GetStringSizeInCodeUnits(LocaleString);
-            uint64_t Offset             = UTF16_FindSubString(LocaleString, UTF16String("."), 0, 1);
-            UTF8 *   EncodingString     = UTF16_ExtractSubString(LocaleString, Offset, StringSize - Offset);
-            uint64_t EncodingStringSize = UTF16_GetStringSizeInCodeUnits(EncodingString);
+            size_t   StringSize         = UTF16_GetStringSizeInCodeUnits(LocaleString);
+            size_t   Offset             = UTF16_FindSubString(LocaleString, UTF16String("."), 0, 1);
+            UTF8    *EncodingString     = UTF16_ExtractSubString(LocaleString, Offset, StringSize - Offset);
+            size_t   EncodingStringSize = UTF16_GetStringSizeInCodeUnits(EncodingString);
             if (EncodingStringSize == 4) {
                 if (UTF16_Compare(EncodingString, UTF16String("utf8")) || UTF16_Compare(EncodingString, UTF16String("UTF8"))) {
                     Encoding = StringType_UTF8;
@@ -247,9 +247,9 @@ extern "C" {
         ImmutableStringSet_UTF8 Delimiters         = UTF8StringSet(UTF8String("/"), UTF8String("\\"));
         
         UTF8 ** GroupingSize8  = UTF8_Split(GroupingSizeString, Delimiters);
-        UTF32 **GroupingSize32 = UTF8_StringSet_Decode(GroupingSize8);
+        UTF32 **GroupingSize32 = UTF8_StringSet_Decode((const UTF8**) GroupingSize8);
         UTF8_StringSet_Deinit(GroupingSize8);
-        GroupingSize = UTF16_StringSet_Encode(GroupingSize32);
+        GroupingSize = UTF16_StringSet_Encode((const UTF32**) GroupingSize32);
         UTF32_StringSet_Deinit(GroupingSize32);
         return GroupingSize;
     }
@@ -314,9 +314,9 @@ extern "C" {
                 UpperA = 0x41,
                 LowerA = 0x61,
             } ASCIIConstants;
-            uint64_t OGCodePoint = 0ULL;
-            uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(Base, String);
+            size_t   OGCodePoint = 0ULL;
+            size_t   DeCodePoint = 0ULL;
+            size_t   NumDigits   = UTF32_GetNumDigits(Base, String);
             Delocalized          = UTF32_Init(NumDigits);
             if (Delocalized != NULL) {
                 if ((Base & Base_Integer) == Base_Integer) {
@@ -422,8 +422,8 @@ extern "C" {
     static UTF32 UTF32_DiscoverDecimalSeperator(ImmutableString_UTF32 String) {
         UTF32 DiscoveredSeperator = TextIO_NULLTerminator;
         if (String != TextIO_NULLTerminator) {
-            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t CodePoint = StringSize;
+            size_t   StringSize = UTF32_GetStringSizeInCodePoints(String);
+            size_t   CodePoint = StringSize;
             while (CodePoint > 0 && DiscoveredSeperator == TextIO_NULLTerminator) {
                 if (String[CodePoint] == U'.' || String[CodePoint] == U',' || String[CodePoint] == U'\'') {
                     DiscoveredSeperator = String[CodePoint];
@@ -439,9 +439,9 @@ extern "C" {
     UTF32 *UTF32_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF32 String) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
-            uint64_t OGCodePoint = 0ULL;
-            uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(Base, String);
+            size_t   OGCodePoint = 0ULL;
+            size_t   DeCodePoint = 0ULL;
+            size_t   NumDigits   = UTF32_GetNumDigits(Base, String);
             Delocalized          = UTF32_Init(NumDigits);
             UTF32    Seperator   = UTF32_DiscoverDecimalSeperator(String);
             if (Delocalized != NULL) {

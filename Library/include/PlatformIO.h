@@ -505,9 +505,17 @@
 #define             PlatformIO_Expand(...) __VA_ARGS__
 #endif /* PlatformIO_Expand */
 
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+extern "C" {
+#endif
+    
     /*!
      @abstract      Gets the total amount of memory in the system.
      */
-    uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
+    size_t          PlatformIO_GetTotalMemoryInBytes(void);
+
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+}
+#endif /* Extern C */
 
 #endif /* FoundationIO_PlatformIO_H */

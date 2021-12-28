@@ -60,6 +60,7 @@ set(LIBRARY_SOURCE
 "${LIBRARY_DIRECTORY}/src/BufferIO.c"
 "${LIBRARY_DIRECTORY}/src/CryptographyIO.c"
 "${LIBRARY_DIRECTORY}/src/FileIO.c"
+"${LIBRARY_DIRECTORY}/src/GUUID.c"
 "${LIBRARY_DIRECTORY}/src/MathIO.c"
 "${LIBRARY_DIRECTORY}/src/NetworkIO.c"
 "${LIBRARY_DIRECTORY}/src/PlatformIO.c"
@@ -137,6 +138,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     register_test(BufferIO)
     register_test(CryptographyIO)
     register_test(FileIO)
+    register_test(GUUID)
     register_test(MathIO)
     register_test(NetworkIO)
     register_test(PlatformIO)
@@ -145,6 +147,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     register_test(LocalizationIO)
     register_test(LogIO)
     register_test(StringIO)
+    register_test(StringSetIO)
 
     add_custom_target(All_Tests Test DEPENDS ${UNIT_TEST_TARGETS})
     add_custom_command(TARGET All_Tests COMMENT "Run tests" POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

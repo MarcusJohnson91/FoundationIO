@@ -6,8 +6,8 @@
  @brief           This header contains code for reading and writing files, and utilities to manage them.
  */
 
-#include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
+#include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
 
 #pragma once
 
@@ -84,7 +84,7 @@ extern "C" {
      @param             AsyncIOStream                   FileIO_Input or FileIO_Output
      @return                                            Returns the size of the file
      */
-    int64_t             FileIO_GetSize(PlatformIO_Immutable(void *) AsyncIOStream);
+    size_t              FileIO_GetSize(PlatformIO_Immutable(void *) AsyncIOStream);
     
     /*!
      @abstract                                          Gets the size of the elements in the Stream
@@ -100,10 +100,10 @@ extern "C" {
      @param             File2Read                       The File to read the data to.
      @param             Buffer                          Where to put the data to read.
      @param             BufferElementSize               The size of Buffer's elements in bytes.
-     @param             Elements2Read                   The number of bytes to read.
+     @param             Elements2Read                   The number of elements to read.
      @return                                            Returns the amount of data actually read.
      */
-    uint64_t            FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read);
+    size_t              FileIO_Read(const FILE *const File2Read, void *Buffer, uint8_t BufferElementSize, size_t Elements2Read);
 
     /*!
      @abstract                                          Seeks around a file.
@@ -112,7 +112,7 @@ extern "C" {
      @param             SeekType                        The kind of seeking to do.
      @return                                            Returns true if sucessful.
      */
-    bool                FileIO_Seek(PlatformIO_Immutable(FILE *) File2Seek, int64_t SeekSizeInBytes, AsyncIO_SeekTypes SeekType);
+    bool                FileIO_Seek(FILE *File2Seek, ssize_t SeekSizeInBytes, AsyncIO_SeekTypes SeekType);
 
     /*!
      @abstract                                          Writes data to a file.
@@ -122,7 +122,7 @@ extern "C" {
      @param             Elements2Write                  The number of Elements to write.
      @return                                            Returns the amount of data actually written in bytes.
      */
-    uint64_t            FileIO_Write(PlatformIO_Immutable(FILE *) File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write);
+    size_t              FileIO_Write(FILE *File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, size_t Elements2Write);
 
     /*!
      @abstract                                          Flushes the File stream and closes it.

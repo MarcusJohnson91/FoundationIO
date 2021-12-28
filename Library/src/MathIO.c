@@ -436,20 +436,20 @@ extern "C" {
         return Swapped;
     }
     
-    int64_t  Bytes2Bits(const int64_t Bytes) {
-        return Bytes * 8;
+    size_t Bytes2Bits(const size_t NumBytes) {
+        return NumBytes * 8;
     }
     
-    uint64_t Bits2Bytes(const MathIO_RoundingTypes RoundingType, const uint64_t Bits) {
-        uint64_t Bytes        = Bits / 8;
-        if (RoundingType == RoundingType_Up && Bits % 8 != 0) {
-            Bytes            += 1;
+    size_t Bits2Bytes(const MathIO_RoundingTypes RoundingType, const size_t NumBits) {
+        size_t Bytes        = NumBits / 8;
+        if (RoundingType == RoundingType_Up && NumBits % 8 != 0) {
+            Bytes          += 1;
         }
         return Bytes;
     }
     
-    uint8_t BitsAvailableInByte(const uint64_t Offset) {
-        return 8 - (Offset % 8);
+    uint8_t BitsAvailableInByte(const size_t NumBits) {
+        return 8 - (NumBits % 8);
     }
     
     uint8_t CountBitsSet(const uint64_t Value) {
@@ -462,7 +462,7 @@ extern "C" {
         return NumBitsSet;
     }
 
-    uint8_t GetHighestSetBit(uint64_t Value) { // highest_one
+    uint8_t GetHighestSetBit(uint64_t Value) {
         uint8_t HighestBit = 0;
         while (Value >>= 1) {
             HighestBit    += 1;
@@ -470,7 +470,7 @@ extern "C" {
         return HighestBit;
     }
 
-    uint64_t RoundDownToPowerOf2(uint64_t Value) { // round_down_to_power_of_2
+    uint64_t RoundDownToPowerOf2(uint64_t Value) {
         return 1ULL << GetHighestSetBit(Value | 1);
     }
     
@@ -487,10 +487,11 @@ extern "C" {
         }
         return NumDigits;
     }
-
+/*
 #if (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
 __attribute__((no_sanitize("undefined")))
 #endif
+ */
     uint64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value) {
         uint64_t Rotated = 0ULL;
         assert(RotationType != RotationType_Unspecified && "RotationType_Unspecified is invalid");

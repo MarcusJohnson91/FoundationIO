@@ -8,6 +8,7 @@
  */
 
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
+#include "GUUID.h"              /* Included for GUUIDTypes */
 
 #pragma once
 
@@ -67,22 +68,6 @@ extern "C" {
     } BufferIO_BitOrders;
 
     /*!
-     @enum         BufferIO_GUUIDTypes
-     @constant     GUUIDType_Unspecified           The GUUID type is unknown, invalid.
-     @constant     GUUIDType_GUIDString            The GUUID is a GUID string, aka LSByte first UUID with hyphens.
-     @constant     GUUIDType_UUIDString            The GUUID is a UUID string, aka MSByte first UUID with hyphens.
-     @constant     GUUIDType_BinaryGUID            The GUUID is a Binary GUID, aka LSByte first UUID without hyphens.
-     @constant     GUUIDType_BinaryUUID            The GUUID is a Binary UUID, aka MSByte first UUID without hypthns.
-     */
-    typedef enum BufferIO_GUUIDTypes {
-                   GUUIDType_Unspecified           = 0,
-                   GUUIDType_GUIDString            = 1,
-                   GUUIDType_UUIDString            = 2,
-                   GUUIDType_BinaryGUID            = 3,
-                   GUUIDType_BinaryUUID            = 4,
-    } BufferIO_GUUIDTypes;
-
-    /*!
      @enum         BufferIO_StringTerminators
      @constant     StringTerminator_NULL           Write the NULL Terminator.
      @constant     StringTerminator_Sized          Do not write the null terminaotr, there's a size field.
@@ -91,29 +76,12 @@ extern "C" {
                    StringTerminator_NULL           = 1,
                    StringTerminator_Sized          = 2,
     } BufferIO_StringTerminators;
-    
-    typedef enum BufferIO_Constants {
-                   GUUIDString_Size                = 20,
-                   BinaryGUUID_Size                = 16,
-    } BufferIO_Constants;
 
     /*!
      @typedef      BitBuffer
      @abstract                                     Contains variables and a pointer to a buffer for reading and writing bits.
      */
     typedef struct BitBuffer                       BitBuffer;
-    
-    /*!
-     @typedef      BinaryGUUID
-     @abstract                                     A binary GUUID is just the raw data without dashes.
-     */
-    typedef        uint8_t                         BinaryGUUID[BinaryGUUID_Size];
-    
-    /*!
-     @typedef      GUUIDString
-     @abstract                                     A GUUID string is the GUUID with dashes and a NULL terminator
-     */
-    typedef        uint8_t                         GUUIDString[GUUIDString_Size + TextIO_NULLTerminatorSize];
 
     /*!
      @typedef      SecureRNG
@@ -127,42 +95,42 @@ extern "C" {
      @param        BitBufferSize                   The number of bytes to create the BitBuffer with.
      @return                                       Returns a pointer to the BitBuffer.
      */
-    BitBuffer     *BitBuffer_Init(uint64_t BitBufferSize);
+    BitBuffer     *BitBuffer_Init(size_t BitBufferSize);
 
     /*!
      @abstract                                     Gets the size of the BitBuffer in bits.
      @param        BitB                            BitBuffer Pointer.
      @return                                       Returns the number of bits the buffer can hold max.
      */
-    uint64_t       BitBuffer_GetSize(BitBuffer *BitB);
+    size_t         BitBuffer_GetSize(BitBuffer *BitB);
 
     /*!
      @abstract                                     Sets the size of the BitBuffer in bits.
      @param        BitB                            BitBuffer Pointer.
-     @param        Bits                            The size of the BitBuffer in Bits.
+     @param        NumBits                         The size of the BitBuffer in Bits.
      */
-    void           BitBuffer_SetSize(BitBuffer *BitB, uint64_t Bits);
+    void           BitBuffer_SetSize(BitBuffer *BitB, size_t NumBits);
 
     /*!
      @abstract                                     Gets the offset of the BitBuffer in bits.
      @param        BitB                            BitBuffer Pointer.
      @return                                       Returns the offset from the start of the BitBuffer in bits.
      */
-    uint64_t       BitBuffer_GetPosition(BitBuffer *BitB);
+    size_t         BitBuffer_GetPosition(BitBuffer *BitB);
 
     /*!
      @abstract                                     Sets the offset of the BitBuffer in bits.
      @param        BitB                            BitBuffer Pointer.
-     @param        Offset                          The offset of the BitBuffer in Bits.
+     @param        OffsetInBits                    The offset of the BitBuffer in Bits.
      */
-    void           BitBuffer_SetPosition(BitBuffer *BitB, uint64_t Offset);
+    void           BitBuffer_SetPosition(BitBuffer *BitB, size_t OffsetInBits);
 
     /*!
      @abstract                                     Gets the number of free bits in the BitBuffer.
      @param        BitB                            BitBuffer Pointer.
      @return                                       Returns the offset from the start of BitBuffer in bits - the current offset.
      */
-    uint64_t       BitBuffer_GetBitsFree(BitBuffer *BitB);
+    size_t         BitBuffer_GetBitsFree(BitBuffer *BitB);
 
     /*!
      @abstract                                     Gets a pointer to BitBuffer's array.
@@ -179,16 +147,16 @@ extern "C" {
      @param        Buffer                          Pointer to a byte array to set as BitBuffer's internal array.
      @param        BufferSizeInBytes               The size of Buffer in bytes.
      */
-    void           BitBuffer_SetArray(BitBuffer *BitB, uint8_t *Buffer, uint64_t BufferSizeInBytes);
+    void           BitBuffer_SetArray(BitBuffer *BitB, uint8_t *Buffer, size_t BufferSizeInBytes);
 
     /*!
      @abstract                                     Checks if the BitBuffer's offset is aligned to boundary AlignmentSize.
      @remark                                       Alignment means the offset of a BitBuffer is a multiple of AlignmentSize.
      @param        BitB                            BitBuffer Pointer.
-     @param        AlignmentSize                   The number of bytes to check the alignment of.
+     @param        AlignmentSizeInBytes            The number of bytes to check the alignment of.
      @return                                       Returns whether the BitBuffer is aligned to AlignmentSize or not.
      */
-    bool           BitBuffer_IsAligned(BitBuffer *BitB, uint8_t AlignmentSize);
+    bool           BitBuffer_IsAligned(BitBuffer *BitB, size_t AlignmentSizeInBytes);
 
     /*!
      @abstract                                     Aligns BitBuffer.
@@ -197,30 +165,30 @@ extern "C" {
      @param        BitB                            BitBuffer Pointer.
      @param        AlignmentSizeInBytes            The alignment size in bytes.
      */
-    void           BitBuffer_Align(BitBuffer *BitB, uint8_t AlignmentSizeInBytes);
+    void           BitBuffer_Align(BitBuffer *BitB, size_t AlignmentSizeInBytes);
 
     /*!
      @abstract                                     Seeks forwards and backwards in BitBuffer.
      @param        BitB                            BitBuffer Pointer.
      @param        Bits2Seek                       The number of bits to seek.
      */
-    void           BitBuffer_Seek(BitBuffer *BitB, int64_t Bits2Seek);
+    void           BitBuffer_Seek(BitBuffer *BitB, ssize_t Bits2Seek);
 
     /*!
      @abstract                                     Securely erases the BitBuffer.
      @param        BitB                            BitBuffer Pointer.
      @param        NewValue                        The value to set each byte to while erasing.
-     @return                                       Returns the value of the first element of String, or 0xFE if it was unsucessful
+     @return                                       Returns true if the buffe was sucessfully erased, false otherwise
      */
-    uint8_t        BitBuffer_Erase(BitBuffer *BitB, uint8_t NewValue);
+    bool           BitBuffer_Erase(BitBuffer *BitB, uint8_t NewValue);
 
     /*!
      @abstract                                     Changes the size of an already initialized BitBuffer.
      @remark                                       Resizing a BitBuffer IS NOT destructive.
      @param        BitB                            BitBuffer Pointer to resize.
-     @param        NewSize                         The new size of the internal buffer in bytes.
+     @param        NewSizeInBits                   The new size of the internal buffer in bytes.
      */
-    void           BitBuffer_Resize(BitBuffer *BitB, uint64_t NewSize);
+    void           BitBuffer_Resize(BitBuffer *BitB, size_t NewSizeInBits);
 
     /*!
      @abstract                                     Copies BitBuffer Source to Destination.
@@ -230,7 +198,7 @@ extern "C" {
      @param        BitStart                        The bit to start copying from (inclusive).
      @param        BitEnd                          The bit to end copying (inclusive).
      */
-    void           BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd);
+    void           BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, size_t BitStart, size_t BitEnd);
 
     /*!
      @abstract                                     Reads BitBuffer's Input Stream into BitBuffer's array
@@ -278,7 +246,7 @@ extern "C" {
      @remark                                       Does NOT count any potential NULL terminator.
      @param        BitB                            BitBuffer Pointer.
      */
-    uint64_t       BitBuffer_GetUTF8StringSize(BitBuffer *BitB);
+    size_t         BitBuffer_GetUTF8StringSize(BitBuffer *BitB);
 
     /*!
      @abstract                                     Reads a UTF-8 encoded string from the BitBuffer.
@@ -286,14 +254,14 @@ extern "C" {
      @param        BitB                            BitBuffer Pointer.
      @param        StringSize                      Size of the string in CodeUnits, not counting an optional null.
      */
-    UTF8          *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize);
+    UTF8          *BitBuffer_ReadUTF8(BitBuffer *BitB, size_t StringSize);
 
     /*!
      @abstract                                     Reads data from the BitBuffer until it stops matching the UTF-8 format.
      @remark                                       Does NOT count any potential NULL terminator.
      @param        BitB                            BitBuffer Pointer.
      */
-    uint64_t       BitBuffer_GetUTF16StringSize(BitBuffer *BitB);
+    size_t         BitBuffer_GetUTF16StringSize(BitBuffer *BitB);
 
     /*!
      @abstract                                     Reads a UTF-16 encoded string from the BitBuffer.
@@ -301,7 +269,7 @@ extern "C" {
      @param        BitB                            BitBuffer Pointer.
      @param        StringSize                      Size of the string in CodeUnits, not counting an optional null.
      */
-    UTF16         *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize);
+    UTF16         *BitBuffer_ReadUTF16(BitBuffer *BitB, size_t StringSize);
 
     /*!
      @abstract                                     Reads a BinaryGUUID/GUUIDString from the BitBuffer.
@@ -309,16 +277,16 @@ extern "C" {
      @param        GUUIDType                       The type of GUUID to read.
      @return                                       Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes.
      */
-    uint8_t       *BitBuffer_ReadGUUID(BitBuffer *BitB, BufferIO_GUUIDTypes GUUIDType);
+    uint8_t       *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType);
 
     /*!
      @abstract                                     Calculates CRC32 from BitBuffer starting at Offset ending at Offset + NumBytes
      @param        BitB                            BitBuffer Pointer.
-     @param        Start                           Where to start calculating from.
+     @param        OffsetInBits                    The Offset into the BitBuffer.
      @param        NumBytes                        The number of bytes to calculate.
      @return                                       Returns the calculated CRC.
      */
-    uint32_t       BitBuffer_CalculateCRC32(BitBuffer *BitB, uint64_t Start, uint64_t NumBytes);
+    uint32_t       BitBuffer_CalculateCRC32(BitBuffer *BitB, size_t OffsetInBits, size_t NumBytes, uint32_t Polynomial);
 
     /*!
      @abstract                                     Runs Adler32 hash over the BitBuffer starting at Offset
@@ -327,7 +295,7 @@ extern "C" {
      @param        NumBytes                        The number of bytes to read
      @return                                       Returns the calculated Adler32.
      */
-    uint32_t       BitBuffer_CalculateAdler32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes);
+    uint32_t       BitBuffer_CalculateAdler32(BitBuffer *BitB, size_t OffsetInBits, size_t NumBytes);
 
     /*!
      @abstract                                     Writes bits to the BitBuffer.
@@ -372,7 +340,7 @@ extern "C" {
      @param        BitB                            BitBuffer Pointer.
      @param        GUUID2Write                     Pointer to the GUUID you want to write.
      */
-    void           BitBuffer_WriteGUUID(BitBuffer *BitB, BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Write);
+    void           BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, uint8_t *GUUID2Write);
 
     /*!
      @abstract                                     Deletes the BitBuffer.
@@ -381,60 +349,17 @@ extern "C" {
     void           BitBuffer_Deinit(BitBuffer *BitB);
     /* BitBuffer */
 
-    /* GUUID */
-    /*!
-     @abstract                                     Generates a random GUUID.
-     @param        Secure                          Pointer to SecureRNG.
-     @return                                       Returns the generated GUUID.
-     */
-    uint8_t        *GUUID_Generate(SecureRNG *Secure, BufferIO_GUUIDTypes GUUIDType);
-
-    /*!
-     @abstract                                     Compares GUUIDs for equivalence, GUUID1 and 2 HAVE to be the same type.
-     @param        GUUID1                          Pointer to a GUUID to be compared.
-     @param        GUUID2                          Pointer to a GUUID to be compared.
-     @return                                       Returns Yes if GUUID1 and GUUID2 match, No otherwise.
-     */
-    bool           GUUID_Compare(BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID1, uint8_t *GUUID2);
-
-    /*!
-     @abstract                                     Converts a GUUID from one representation to another (String/Binary) || (UUID/GUID).
-     @remark                                       The original GUUID is untouched, the user needs to deinit it.
-     @param        GUUIDType_Input                 What type of GUUID are we converting from?
-     @param        GUUIDType_Output                What type of GUUID are we converting to?
-     @return                                       Returns the converted GUUID.
-     */
-    uint8_t        *GUUID_Convert(BufferIO_GUUIDTypes GUUIDType_Input, BufferIO_GUUIDTypes GUUIDType_Output, uint8_t *GUUID2Convert);
-
-    /*!
-     @abstract                                     Swaps the byte order of a BinaryGUUID or GUUIDString.
-     @remark                                       The original GUUID is untouched, the user needs to deinit it.
-     @param        GUUIDType                       Is this a GUUIDString or BinaryGUUID?
-     @param        GUUID2Swap                      GUUID Pointer to swap.
-     @return                                       Returns a pointer to a swapped GUUID.
-     */
-    uint8_t        *GUUID_Swap(BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap);
-
-    /*!
-     @abstract                                     Frees a GUUID.
-     */
-    void           GUUID_Deinit(uint8_t *GUUID);
-    /* GUUID */
-
     /* Standard Replacements */
     size_t BufferIO_MemoryCopy8(uint8_t *restrict Destination, const uint8_t *restrict Source, const size_t NumElements2Copy);
     size_t BufferIO_MemoryCopy16(uint64_t *restrict Destination, const uint64_t *restrict Source, const size_t NumElements2Copy);
     size_t BufferIO_MemoryCopy32(uint64_t *restrict Destination, const uint64_t *restrict Source, const size_t NumElements2Copy);
     size_t BufferIO_MemoryCopy64(uint64_t *restrict Destination, const uint64_t *restrict Source, const size_t NumElements2Copy);
-    /* Standard Replacements */
 
     size_t BufferIO_MemorySet8(uint8_t *Array, uint8_t Value2Set, size_t NumElements2Set);
-
     size_t BufferIO_MemorySet16(uint16_t *Array, uint16_t Value2Set, size_t NumElements2Set);
-
     size_t BufferIO_MemorySet32(uint32_t *Array, uint16_t Value2Set, size_t NumElements2Set);
-
     size_t BufferIO_MemorySet64(uint64_t *Array, uint16_t Value2Set, size_t NumElements2Set);
+    /* Standard Replacements */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

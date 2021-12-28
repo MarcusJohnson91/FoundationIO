@@ -135,19 +135,19 @@ extern "C" {
      @param        NumSwitches                     The number of CommandLineSwitch structures to initalize.
      @return                                       Returns a pointer to an initialized CommandLineIO instance.
      */
-    CommandLineIO *CommandLineIO_Init(uint64_t NumSwitches);
+    CommandLineIO *CommandLineIO_Init(size_t NumSwitches);
     
     /*!
      @abstract                                     Creating a Text UI.
      @return                                       Returns the width of the terminal in codepoints.
      */
-    uint64_t       CommandLineIO_GetTerminalWidth(void);
+    size_t         CommandLineIO_GetTerminalWidth(void);
     
     /*!
      @abstract                                     Creating a Text UI.
      @return                                       Returns the height of the terminal in codepoints.
      */
-    uint64_t       CommandLineIO_GetTerminalHeight(void);
+    size_t         CommandLineIO_GetTerminalHeight(void);
     
     /*!
      @abstract                                     Creating a Text UI.
@@ -156,10 +156,10 @@ extern "C" {
     bool           CommandLineIO_TerminalWasResized(void);
     
     /*!
-     @abstract                                     Helper function to cast argc to uint64_t and handle Windows' globals.
+     @abstract                                     Helper function to cast argc to size_t and handle Windows' globals.
      @return                                       Returns the number of arguments.
      */
-    uint64_t       CommandLineIO_GetNumArguments(int argc);
+    size_t         CommandLineIO_GetNumArguments(int argc);
     
     /*!
      @abstract                                     Helper function to decode argv/wargv to UTF32 for use with parsing.
@@ -216,14 +216,14 @@ extern "C" {
      @param        CLI                             CommandLineIO Pointer.
      @param        MinOptions                      The minimum number of options.
      */
-    void           CommandLineIO_SetMinOptions(CommandLineIO *CLI, uint64_t MinOptions);
+    void           CommandLineIO_SetMinOptions(CommandLineIO *CLI, size_t MinOptions);
     
     /*!
      @abstract                                     Sets the help switch.
      @param        CLI                             CommandLineIO Pointer.
      @param        HelpOption                      Which option is the one to get help?
      */
-    void           CommandLineIO_SetHelpOption(CommandLineIO *CLI, uint64_t HelpOption);
+    void           CommandLineIO_SetHelpOption(CommandLineIO *CLI, size_t HelpOption);
     
     /*!
      @abstract                                     Displays on the screen the progress of X actions that are taking place
@@ -242,7 +242,7 @@ extern "C" {
      @param        OptionID                        The option to set.
      @param        Name                            The flag to identify an option with.
      */
-    void           CommandLineIO_Switch_SetName(CommandLineIO *CLI, uint64_t OptionID, ImmutableString_UTF32 Name);
+    void           CommandLineIO_Switch_SetName(CommandLineIO *CLI, size_t OptionID, ImmutableString_UTF32 Name);
     
     /*!
      @abstract                                     Sets OptionDescription's flag in the CommandLineIO instance pointed by CLI.
@@ -250,7 +250,7 @@ extern "C" {
      @param        OptionID                        The option to set.
      @param        Description                     Pointer to a UTF-8 encoded string containing the description of what this program does.
      */
-    void           CommandLineIO_Switch_SetDescription(CommandLineIO *CLI, uint64_t OptionID, ImmutableString_UTF32 Description);
+    void           CommandLineIO_Switch_SetDescription(CommandLineIO *CLI, size_t OptionID, ImmutableString_UTF32 Description);
     
     /*!
      @abstract                                     Sets OptionID's flag in the CommandLineIO instance pointed by CLI.
@@ -258,7 +258,7 @@ extern "C" {
      @param        OptionID                        Which option are we talking about?
      @param        SwitchType                      What kind of switch is this?
      */
-    void           CommandLineIO_Switch_SetType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_SwitchTypes SwitchType);
+    void           CommandLineIO_Switch_SetType(CommandLineIO *CLI, size_t OptionID, CommandLineIO_SwitchTypes SwitchType);
     
     /*!
      @abstract                                     Sets OptionID as accepting arguments of only a certain type.
@@ -266,7 +266,7 @@ extern "C" {
      @param        OptionID                        The option to apply the ArgumentType to.
      @param        SwitchArgument                  The argument type from CommandLineIO_SwitchArguments.
      */
-    void           CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_SwitchArguments SwitchArgument);
+    void           CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, size_t OptionID, CommandLineIO_SwitchArguments SwitchArgument);
     
     /*!
      @abstract                                     Sets MetaFlag option as a meta flag for OptionID.
@@ -274,7 +274,7 @@ extern "C" {
      @param        MasterID                        Which option does the child/meta option depend on?
      @param        Slave                           Which option is the child option?
      */
-    void           CommandLineIO_Switch_SetChild(CommandLineIO *CLI, uint64_t MasterID, uint64_t Slave);
+    void           CommandLineIO_Switch_SetChild(CommandLineIO *CLI, size_t MasterID, size_t Slave);
     
     /*!
      @abstract                                     Parses the Command Line Options as UTF-8 encoded strings.
@@ -282,7 +282,7 @@ extern "C" {
      @param        NumArguments                    The number of argument strings present in Arguments; equivalent to argc.
      @param        Arguments                       A StringSet of UTF-8 encoded arguments; equivalent to argv
      */
-    void           CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, ImmutableStringSet_UTF8 Arguments);
+    void           CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, size_t NumArguments, ImmutableStringSet_UTF8 Arguments);
     
     /*!
      @abstract                                     Parses the Command Line Options as UTF-16 encoded strings.
@@ -290,7 +290,7 @@ extern "C" {
      @param        NumArguments                    The number of argument strings present in Arguments; equivalent to __argc.
      @param        Arguments                       A StringSet of UTF-16 encoded arguments; equivalent to __wargv on Windows
      */
-    void           CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, ImmutableStringSet_UTF16 Arguments);
+    void           CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, size_t NumArguments, ImmutableStringSet_UTF16 Arguments);
     
     /*!
      @abstract                                     How many Master options are present in the Options (will also check for slave options if present).
@@ -300,7 +300,7 @@ extern "C" {
      @param        ChildIDs                        Array of the the ChildIDs the option is required or allowed to have to match your search.
      @return                                       Returns the argument number if a match is found, otherwise -1.
      */
-    uint64_t       CommandLineIO_Option_GetOptionID(CommandLineIO *CLI, uint64_t SwitchID, uint64_t NumChildren, uint64_t *ChildIDs);
+    size_t         CommandLineIO_Option_GetOptionID(CommandLineIO *CLI, size_t SwitchID, size_t NumChildren, size_t *ChildIDs);
     
     /*!
      @abstract                                     Gets the data contained in Argument2Option.
@@ -308,7 +308,7 @@ extern "C" {
      @param        OptionID                        The option's result to return.
      @return                                       Returns the data after the option, if the option is resultless it will return 0.
      */
-    UTF8          *CommandLineIO_UTF8_GetOptionResult(CommandLineIO *CLI, uint64_t OptionID);
+    UTF8          *CommandLineIO_UTF8_GetOptionResult(CommandLineIO *CLI, size_t OptionID);
     
     /*!
      @abstract                                     Gets the data contained in Argument2Option.
@@ -316,7 +316,7 @@ extern "C" {
      @param        OptionID                        The option's result to return.
      @return                                       Returns the data after the option, if the option is resultless it will return 0.
      */
-    UTF16         *CommandLineIO_UTF16_GetOptionResult(CommandLineIO *CLI, uint64_t OptionID);
+    UTF16         *CommandLineIO_UTF16_GetOptionResult(CommandLineIO *CLI, size_t OptionID);
     
     /*!
      @abstract                                     Gets a BoolString as a bool.
@@ -324,7 +324,7 @@ extern "C" {
      @param        OptionID                        The Option's BoolString to convert.
      @return                                       Returns 1 for 1/yes/true, 0 for 0/no/false, -1 otherwise.
      */
-    int8_t         CommandLineIO_ConvertBoolString(CommandLineIO *CLI, uint64_t OptionID);
+    int8_t         CommandLineIO_ConvertBoolString(CommandLineIO *CLI, size_t OptionID);
     
     /*!
      @abstract                                     Makes a string colorful.

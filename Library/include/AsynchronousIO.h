@@ -146,14 +146,14 @@ extern "C" {
      @param             Stream                          AsyncIOStream Pointer.
      @return                                            Returns the value in BitI->FileSize if it exists.
      */
-    int64_t             AsyncIOStream_GetSize(AsyncIOStream *Stream);
+    size_t              AsyncIOStream_GetSize(AsyncIOStream *Stream);
 
     /*!
      @abstract                                          Gets the position of the AsyncIOStream file from the start.
      @param             Stream                          AsyncIOStream Pointer.
      @return                                            Returns the position of the file in bytes from the beginning
      */
-    int64_t             AsyncIOStream_GetPosition(AsyncIOStream *Stream);
+    size_t              AsyncIOStream_GetPosition(AsyncIOStream *Stream);
 
     /*!
      @abstract                                          Gets the number of bytes remaining
@@ -161,7 +161,7 @@ extern "C" {
      @param             Stream                          The stream in question
      @return                                            Returns the number of bytes remaining
      */
-    int64_t             AsyncIOStream_GetBytesRemaining(AsyncIOStream *Stream);
+    size_t              AsyncIOStream_GetBytesRemaining(AsyncIOStream *Stream);
     /* AsyncIOStream */
     
     /* BitBuffer */
@@ -190,7 +190,7 @@ extern "C" {
      @param             NumElements                     The number of ElementSize elements to read
      @return                                            Returns the number of bytes actually read
      */
-    uint64_t            AsyncIOStream_Read(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements);
+    size_t              AsyncIOStream_Read(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements);
     
     /*!
      @abstract                                          Writes data from Array to Stream
@@ -201,7 +201,7 @@ extern "C" {
      @param             NumElements                     The number of ElementSize elements to write
      @return                                            Returns the number of bytes actually written
      */
-    uint64_t            AsyncIOStream_Write(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements);
+    size_t              AsyncIOStream_Write(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements);
     
     /*!
      @abstract                                          Closes the Descriptor, after flushing any unwritten data

@@ -64,27 +64,27 @@ extern "C" {
         UTF8 *SecurityName8 = NULL;
         ImmutableString_UTF8 WarnString = Severities[Severity - 1];
         if (Log_ProgramName8 != NULL) {
-            uint64_t Size      = snprintf(NULL, 0, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
+            size_t   Size      = snprintf(NULL, 0, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
-            snprintf(SecurityName8, Size, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
+            snprintf((char*) SecurityName8, Size, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
         } else {
-            uint64_t Size      = snprintf(NULL, 0, "%s in %s: ", WarnString, FunctionName);
+            size_t   Size      = snprintf(NULL, 0, "%s in %s: ", WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
-            snprintf(SecurityName8, Size, "%s in %s: ", WarnString, FunctionName);
+            snprintf((char*) SecurityName8, Size, "%s in %s: ", WarnString, FunctionName);
         }
 
         va_list Arguments;
         va_start(Arguments, Description);
-        int Size2           = vsnprintf(NULL, 0, Description, Arguments);
+        int Size2           = vsnprintf(NULL, 0, (char*) Description, Arguments);
         UTF8 *FormattedArgs = UTF8_Init(Size2);
-        vsnprintf(FormattedArgs, Size2, Description, Arguments);
+        vsnprintf((char*) FormattedArgs, Size2, (char*) Description, Arguments);
         va_end(Arguments);
 
         // Now we need to combine the parts
         UTF8 *Combined   = NULL;
         int SizeCombined = snprintf(NULL, 0, "%s %s", SecurityName8, FormattedArgs);
         Combined         = UTF8_Init(SizeCombined);
-        snprintf(Combined, SizeCombined, "%s %s", SecurityName8, FormattedArgs);
+        snprintf((char*) Combined, SizeCombined, "%s %s", SecurityName8, FormattedArgs);
         
         free(FormattedArgs);
         free(SecurityName8);

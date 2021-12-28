@@ -16,11 +16,11 @@ extern "C" {
         AsyncIOStream *Input;
         AsyncIOStream *Output;
         uint8_t       *Buffer;
-        uint64_t       BitOffset;
-        uint64_t       NumBits;
+        size_t         BitOffset;
+        size_t         NumBits;
     } BitBuffer;
     
-    BitBuffer *BitBuffer_Init(uint64_t BitBufferSize) {
+    BitBuffer *BitBuffer_Init(size_t BitBufferSize) {
         BitBuffer *BitB                  = (BitBuffer*) calloc(1, sizeof(BitBuffer));
         if (BitB != NULL && BitBufferSize > 0) {
             BitB->Buffer                 = (uint8_t*) calloc(BitBufferSize, sizeof(uint8_t));
@@ -29,7 +29,7 @@ extern "C" {
             } else {
                 BitBuffer_Deinit(BitB);
                 BitB                     = NULL;
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate %lld bits for BitBuffer's buffer"), BitBufferSize);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate %zu bits for BitBuffer's buffer"), BitBufferSize);
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate BitBuffer"));
@@ -57,26 +57,26 @@ extern "C" {
         }
     }
     
-    uint64_t BitBuffer_GetSize(BitBuffer *BitB) {
-        uint64_t BitBufferSize = 0ULL;
+    size_t BitBuffer_GetSize(BitBuffer *BitB) {
+        size_t BitBufferSize = 0;
         if (BitB != NULL) {
-            BitBufferSize      = BitB->NumBits;
+            BitBufferSize    = BitB->NumBits;
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return BitBufferSize;
     }
     
-    void BitBuffer_SetSize(BitBuffer *BitB, uint64_t Bits) {
+    void BitBuffer_SetSize(BitBuffer *BitB, size_t NumBits) {
         if (BitB != NULL) {
-            BitB->NumBits = Bits;
+            BitB->NumBits = NumBits;
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
-    uint64_t BitBuffer_GetPosition(BitBuffer *BitB) {
-        uint64_t Position = 0ULL;
+    size_t BitBuffer_GetPosition(BitBuffer *BitB) {
+        size_t Position = 0ULL;
         if (BitB != NULL) {
             Position = BitB->BitOffset;
         } else {
@@ -85,16 +85,16 @@ extern "C" {
         return Position;
     }
     
-    void BitBuffer_SetPosition(BitBuffer *BitB, uint64_t Offset) {
+    void BitBuffer_SetPosition(BitBuffer *BitB, size_t OffsetInBits) {
         if (BitB != NULL) {
-            BitB->BitOffset = Offset;
+            BitB->BitOffset = OffsetInBits;
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
-    uint64_t BitBuffer_GetBitsFree(BitBuffer *BitB) {
-        uint64_t BitsFree = 0ULL;
+    size_t BitBuffer_GetBitsFree(BitBuffer *BitB) {
+        size_t BitsFree = 0ULL;
         if (BitB != NULL) {
             BitsFree      = BitB->NumBits - BitB->BitOffset;
         } else {
@@ -113,10 +113,10 @@ extern "C" {
         return Buffer;
     }
 
-    void BitBuffer_SetArray(BitBuffer *BitB, uint8_t *Buffer, uint64_t BufferSizeInBytes) {
+    void BitBuffer_SetArray(BitBuffer *BitB, uint8_t *Buffer, size_t BufferSizeInBytes) {
         if (BitB != NULL && Buffer != NULL && BufferSizeInBytes > 0) {
             BitB->Buffer  = Buffer;
-            BitB->NumBits = (BufferSizeInBytes * 8);
+            BitB->NumBits = Bytes2Bits(BufferSizeInBytes);
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Buffer == NULL) {
@@ -126,24 +126,24 @@ extern "C" {
         }
     }
     
-    bool BitBuffer_IsAligned(BitBuffer *BitB, uint8_t AlignmentSize) {
+    bool BitBuffer_IsAligned(BitBuffer *BitB, size_t AlignmentSizeInBytes) {
         bool AlignmentStatus    = No;
-        if (BitB != NULL && AlignmentSize >= 1 && AlignmentSize % 2 == 0) {
-            if (BitB->BitOffset % ((uint64_t) AlignmentSize * 8) == 0) {
+        if (BitB != NULL && AlignmentSizeInBytes >= 1 && AlignmentSizeInBytes % 2 == 0) {
+            if (BitB->BitOffset % AlignmentSizeInBytes == 0) {
                 AlignmentStatus = Yes;
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (AlignmentSize != 1 || AlignmentSize % 2 != 0) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("AlignmentSize: %d isn't 1 or an integer power of 2"), AlignmentSize);
+        } else if (AlignmentSizeInBytes != 1 && AlignmentSizeInBytes % 2 != 0) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("AlignmentSizeInBytes: %zu isn't 1 or an integer power of 2"), AlignmentSizeInBytes);
         }
         return AlignmentStatus;
     }
     
-    void BitBuffer_Align(BitBuffer *BitB, uint8_t AlignmentSize) {
-        if (BitB != NULL && (AlignmentSize == 1 || AlignmentSize % 2 == 0)) {
-            int64_t  AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
-            int64_t  Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
+    void BitBuffer_Align(BitBuffer *BitB, size_t AlignmentSizeInBytes) {
+        if (BitB != NULL && (AlignmentSizeInBytes == 1 || AlignmentSizeInBytes % 2 == 0)) {
+            size_t AlignmentSizeInBits   = Bytes2Bits(AlignmentSizeInBytes);
+            size_t Bits2Align            = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
                 BitB->Buffer             = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(RoundingType_Up, BitB->NumBits + Bits2Align));
                 BitB->NumBits           += Bits2Align;
@@ -151,17 +151,17 @@ extern "C" {
             BitB->BitOffset             += Bits2Align;
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("AlignmentSize: %d isn't a multiple of 2"), AlignmentSize);
+        } else if (AlignmentSizeInBytes != 1 && AlignmentSizeInBytes % 2 != 0) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("AlignmentSizeInBytes: %zu isn't a multiple of 2"), AlignmentSizeInBytes);
         }
     }
     
-    void BitBuffer_Seek(BitBuffer *BitB, int64_t Bits2Seek) {
+    void BitBuffer_Seek(BitBuffer *BitB, ssize_t Bits2Seek) {
         if (BitB != NULL) {
             if (Bits2Seek > 0) {
                 BitB->BitOffset += Bits2Seek;
             } else {
-                BitB->BitOffset  -= AbsoluteI(Bits2Seek);
+                BitB->BitOffset -= AbsoluteI(Bits2Seek);
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
@@ -172,12 +172,12 @@ extern "C" {
         if (BitB != NULL) {
             // save up to 1 byte
             if (BitB->BitOffset != 0) {
-                uint64_t BitOffset  = BitB->BitOffset; // Saved for restoration
-                uint64_t NumBits    = BitB->NumBits;
-                uint64_t Bytes2Save = Bits2Bytes(RoundingType_Up, BitOffset);
-                uint64_t BufferSize = Bits2Bytes(RoundingType_Up, NumBits);
+                size_t BitOffset  = BitB->BitOffset; // Saved for restoration
+                size_t NumBits    = BitB->NumBits;
+                size_t Bytes2Save = Bits2Bytes(RoundingType_Up, BitOffset);
+                size_t BufferSize = Bits2Bytes(RoundingType_Up, NumBits);
 
-                for (uint64_t Byte2Keep = BufferSize - Bytes2Save; Byte2Keep < BufferSize; Byte2Keep++) {
+                for (size_t Byte2Keep = BufferSize - Bytes2Save; Byte2Keep < BufferSize; Byte2Keep++) {
                     BitB->Buffer[BufferSize - (Bytes2Save + Byte2Keep)] = BitB->Buffer[Byte2Keep];
                 }
 
@@ -236,40 +236,37 @@ extern "C" {
         }
     }
     
-    uint8_t BitBuffer_Erase(BitBuffer *BitB, uint8_t NewValue) {
-        uint8_t Verification = 0xFE;
+    bool BitBuffer_Erase(BitBuffer *BitB, uint8_t NewValue) {
+        bool ErasedBitBufferCompletely = false;
         if (BitB != NULL) {
-            uint64_t BufferSize = Bits2Bytes(RoundingType_Up, BitB->NumBits);
-            for (uint64_t Byte = 0ULL; Byte < BufferSize; Byte++) {
-                BitB->Buffer[Byte] = NewValue;
-            }
-            Verification = BitB->Buffer[0];
+            size_t NumBytesToErase  = Bits2Bytes(RoundingType_Up, BitB->NumBits);
+            size_t NumBytesErased   = BufferIO_MemorySet8(BitB->Buffer, 0, NumBytesToErase);
+            ErasedBitBufferCompletely = NumBytesErased == NumBytesToErase ? true : false;
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
-        return Verification;
+        return ErasedBitBufferCompletely;
     }
     
-    void BitBuffer_Resize(BitBuffer *BitB, uint64_t NewSize) {
-        if (BitB != NULL && NewSize * 8 >= BitB->BitOffset) {
-            BitB->Buffer    = (uint8_t*) realloc(BitB->Buffer, NewSize);
-            BitB->BitOffset = 0;
-            BitB->NumBits   = NewSize * 8;
+    void BitBuffer_Resize(BitBuffer *BitB, size_t NewSizeInBits) {
+        if (BitB != NULL && Bytes2Bits(NewSizeInBits) >= BitB->BitOffset) {
+            BitB->Buffer  = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(RoundingType_Up, NewSizeInBits));
+            BitB->NumBits = Bytes2Bits(NewSizeInBits);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
-    void BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd) {
-        if (Source != NULL && Destination != NULL && BitStart < BitEnd && BitStart <= Source->NumBits && BitEnd <= Source->NumBits) {
-            uint64_t NumBits2Copy = BitEnd - BitStart;
-            if (BitStart % 8 == 0 && BitEnd % 8 == 0 && NumBits2Copy % 8 == 0) {
+    void BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, size_t StartInBits, size_t EndInBits) {
+        if (Source != NULL && Destination != NULL && StartInBits < EndInBits && StartInBits <= Source->NumBits && EndInBits <= Source->NumBits) {
+            size_t NumBits2Copy = EndInBits - StartInBits;
+            if (StartInBits % 8 == 0 && EndInBits % 8 == 0 && NumBits2Copy % 8 == 0) {
                 Destination->NumBits = NumBits2Copy;
-                for (uint64_t Byte = BitStart / 8; Byte < BitEnd / 8; Byte++) {
-                    Destination->Buffer[Byte - (BitStart / 8)] = Source->Buffer[Byte];
+                for (size_t Byte = StartInBits / 8; Byte < EndInBits / 8; Byte++) {
+                    Destination->Buffer[Byte - (StartInBits / 8)] = Source->Buffer[Byte];
                 }
             } else {
-                for (uint64_t Bit = BitStart; Bit < BitEnd / 8; Bit++) {
+                for (size_t Bit = StartInBits; Bit < EndInBits / 8; Bit++) {
                     Destination->Buffer[Bit / 8] = Source->Buffer[Bit / 8];
                 }
             }
@@ -277,35 +274,34 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Source Pointer is NULL"));
         } else if (Destination == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Destination Pointer is NULL"));
-        } else if (BitStart >= BitEnd) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitStart %lld is greater than or equal to BitEnd %lld"), BitStart, BitEnd);
-        } else if (BitStart >= Source->NumBits || BitEnd >= Source->NumBits) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitStart %lld or BitEnd %lld is greater than there are bits in Source %lld"), BitStart, BitEnd, Source->NumBits);
+        } else if (StartInBits >= EndInBits) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StartInBits %zu is greater than or equal to EndInBits %zu"), StartInBits, EndInBits);
+        } else if (StartInBits >= Source->NumBits || EndInBits >= Source->NumBits) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StartInBits %zu or EndInBits %zu is greater than there are bits in Source %zu"), StartInBits, EndInBits, Source->NumBits);
         }
     }
 
     void BitBuffer_ReadStream(BitBuffer *BitB) {
         if (BitB != NULL) {
-            uint64_t ArraySizeInBits = BitBuffer_GetSize(BitB);
-            uint64_t ArrayOffset     = BitBuffer_GetPosition(BitB);
+            size_t ArraySizeInBits   = BitBuffer_GetSize(BitB);
+            size_t ArrayOffset       = BitBuffer_GetPosition(BitB);
             uint8_t *Array           = BitBuffer_GetArray(BitB);
-            uint64_t Bytes2Read      = Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset);
-            uint8_t  Bits2Save       = ArrayOffset % 8;
+            size_t Bytes2Read        = Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset);
+            size_t  Bits2Save        = ArrayOffset % 8;
             if (Bits2Save > 0) {
                 Array[0]             = 0;
                 uint8_t Saved        = Array[Bytes2Read + 1] & (Exponentiate(2, Bits2Save) - 1); // Todo: Add shift
                 Array[0]             = Saved;
                 BitBuffer_SetPosition(BitB, Bits2Save);
-                for (uint64_t Byte   = (uint64_t) Bits2Bytes(RoundingType_Down, ArrayOffset); Byte < (uint64_t) Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset); Byte++) {
+                for (size_t Byte = Bits2Bytes(RoundingType_Down, ArrayOffset); Byte < Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset); Byte++) {
                     Array[Byte]      = 0;
                 }
             }
-            uint64_t BytesRead       = Bytes2Read;
-            //BytesRead                = FileIO_Read(Input->FileID, Array, sizeof(Array[0]), Bytes2Read);
+            size_t BytesRead         = AsyncIOStream_Read(BitB->Input, Array, sizeof(Array[0]), Bytes2Read);
             if (BytesRead == Bytes2Read) {
                 BitBuffer_SetSize(BitB, BytesRead + ArrayOffset);
             } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BytesRead %zu does not match num bytes requested %zu"), BytesRead, Bytes2Read);
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
@@ -314,22 +310,21 @@ extern "C" {
 
     void BitBuffer_WriteStream(BitBuffer *BitB) {
         if (BitB != NULL) {
-            uint64_t ArraySizeInBits = BitBuffer_GetSize(BitB);
-            uint64_t ArrayOffset     = BitBuffer_GetPosition(BitB);
+            size_t ArraySizeInBits   = BitBuffer_GetSize(BitB);
+            size_t ArrayOffset       = BitBuffer_GetPosition(BitB);
             uint8_t *Array           = BitBuffer_GetArray(BitB);
-            uint64_t Bytes2Write     = Bits2Bytes(RoundingType_Down, BitBuffer_GetPosition(BitB));
-            uint64_t Bits2Keep       = ArrayOffset % 8;
-            uint64_t   BytesWritten    = Bytes2Write; // Just to get it to compile to test core dumps
-                                                      //uint64_t BytesWritten    = FileIO_Write(Output->FileID, Array, sizeof(uint8_t), Bytes2Write);
+            size_t Bytes2Write       = Bits2Bytes(RoundingType_Down, BitBuffer_GetPosition(BitB));
+            size_t Bits2Keep         = ArrayOffset % 8;
+            size_t BytesWritten      = AsyncIOStream_Write(BitB->Output, Array, sizeof(Array[0]), Bytes2Write);
             if (BytesWritten == Bytes2Write) {
                 Array[0]             = 0;
                 Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
                 BitBuffer_SetPosition(BitB, Bits2Keep + 1);
-                for (uint64_t Byte = (uint64_t) Bits2Bytes(RoundingType_Up, ArrayOffset); Byte < (uint64_t) Bits2Bytes(RoundingType_Down, ArraySizeInBits); Byte++) {
+                for (size_t Byte = Bits2Bytes(RoundingType_Up, ArrayOffset); Byte < Bits2Bytes(RoundingType_Down, ArraySizeInBits); Byte++) {
                     Array[Byte]      = 0;
                 }
             } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %zu of %zu bits"), Bytes2Bits(BytesWritten), Bytes2Bits(Bytes2Write));
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
@@ -384,7 +379,6 @@ extern "C" {
             uint8_t  BufferShift        = 8 - Bits2Get;
             uint8_t  BufferMask         = (Exponentiate(2, Bits2Get) - 1) << BufferShift;
             uint8_t  ApplyBits          = BitB->Buffer[Bits2Bytes(RoundingType_Down, BitB->BitOffset)] & BufferMask;
-            uint8_t  ValueShift         = NumBits - NumBits;
 
             Extracted                 <<= Bits2Get;
             Extracted                  |= ApplyBits;
@@ -495,8 +489,8 @@ extern "C" {
         UTF32 *BitBufferString = NULL;
         if (BitB != NULL && Length >= 1 && Length <= 64) {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
-            uint64_t Data    = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, Length);
-            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %X, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, Data);
+            size_t Data      = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, Length);
+            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %X, NumBits: %zu, BitOffset: %zu, Buffer: %zu"), &BitB, BitB->NumBits, BitB->BitOffset, Data);
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {
@@ -527,7 +521,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (NumBits > 64 || (NumBits > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_PeekBits can satisfy 0-64"), NumBits, BitB->BitOffset);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Bits2Peek %d is greater than BitBuffer can provide %zu, or greater than BitBuffer_PeekBits can satisfy 0-64"), NumBits, BitB->BitOffset);
         }
         return Extracted;
     }
@@ -551,7 +545,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (NumBits > 64 || NumBits <= (BitB->NumBits - BitB->BitOffset)) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 0-64"), NumBits, BitB->BitOffset);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %d is greater than BitBuffer can provide %zu, or greater than can be satisfied 0-64"), NumBits, BitB->BitOffset);
         }
         return Extracted;
     }
@@ -586,15 +580,14 @@ extern "C" {
         return Extracted;
     }
     
-    uint64_t BitBuffer_GetUTF8StringSize(BitBuffer *BitB) {
-        uint64_t StringSize               = 0ULL;
+    size_t BitBuffer_GetUTF8StringSize(BitBuffer *BitB) {
+        size_t StringSize               = 0ULL;
         if (BitB != NULL) {
-            int64_t  OriginalOffset       = BitBuffer_GetPosition(BitB);
-            uint64_t Extracted            = 1;
+            size_t OriginalOffset       = BitBuffer_GetPosition(BitB);
+            size_t Extracted            = 1;
             while (Extracted != TextIO_NULLTerminator) {
                 Extracted                 = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
-                uint8_t  CodeUnitSize     = UTF8_GetCodePointSizeInCodeUnits((UTF8) Extracted);
-                StringSize               += CodeUnitSize;
+                StringSize               += UTF8_GetCodePointSizeInCodeUnits((UTF8) Extracted);;
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
@@ -603,27 +596,24 @@ extern "C" {
         return StringSize;
     }
     
-    UTF8 *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
+    UTF8 *BitBuffer_ReadUTF8(BitBuffer *BitB, size_t StringSize) {
         UTF8 *ExtractedString                 = UTF8_Init(StringSize);
-        UTF8 Extracted                        = 0;
         if (BitB != NULL && ExtractedString != NULL) {
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                Extracted                     = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
-                ExtractedString[CodeUnit]     = (UTF8) Extracted;
+            for (size_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                ExtractedString[CodeUnit]     = (UTF8) BitBuffer_Extract_FarByte_FarBit(BitB, 8);
             }
         }
         return ExtractedString;
     }
     
-    uint64_t BitBuffer_GetUTF16StringSize(BitBuffer *BitB) {
-        uint64_t StringSize               = 0ULL;
+    size_t BitBuffer_GetUTF16StringSize(BitBuffer *BitB) {
+        size_t StringSize               = 0ULL;
         if (BitB != NULL) {
-            int64_t  OriginalOffset       = BitBuffer_GetPosition(BitB);
-            uint64_t Extracted            = 1;
+            size_t OriginalOffset       = BitBuffer_GetPosition(BitB);
+            size_t Extracted            = 1;
             while (Extracted != TextIO_NULLTerminator) {
-                Extracted                 = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
-                uint8_t  CodeUnitSize     = UTF8_GetCodePointSizeInCodeUnits((UTF16) Extracted);
-                StringSize               += CodeUnitSize;
+                Extracted               = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
+                StringSize             += UTF16_GetCodePointSizeInCodeUnits(Extracted);
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
@@ -632,19 +622,17 @@ extern "C" {
         return StringSize;
     }
     
-    UTF16 *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
-        UTF16 *ExtractedString                = UTF16_Init(StringSize);
-        UTF16 Extracted;
+    UTF16 *BitBuffer_ReadUTF16(BitBuffer *BitB, size_t StringSize) {
+        UTF16 *ExtractedString            = UTF16_Init(StringSize);
         if (BitB != NULL && ExtractedString != NULL) {
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                Extracted                     = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
-                ExtractedString[CodeUnit]     = (UTF16) Extracted;
+            for (size_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                ExtractedString[CodeUnit] = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
             }
         }
         return ExtractedString;
     }
     
-    uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, BufferIO_GUUIDTypes GUUID2Read) {
+    uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUID2Read) {
         uint8_t *GUUID = NULL;
         if (GUUID2Read != GUUIDType_Unspecified && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUID_Size) {
             if (GUUID2Read == GUUIDType_BinaryUUID || GUUID2Read == GUUIDType_BinaryGUID) {
@@ -690,11 +678,10 @@ extern "C" {
         return GUUID;
     }
 
-    uint32_t BitBuffer_CalculateCRC32(BitBuffer *BitB, uint64_t Start, uint64_t NumBytes) {
+    uint32_t BitBuffer_CalculateCRC32(BitBuffer *BitB, size_t OffsetInBits, size_t NumBytes, uint32_t Polynomial) {
         uint32_t Output = -1;
-        if (BitB != NULL && Start * 8 < BitBuffer_GetSize(BitB) && (Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
-            for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
-                uint32_t Polynomial = 0x82608EDB;
+        if (BitB != NULL && OffsetInBits * 8 < BitBuffer_GetSize(BitB) && (OffsetInBits + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
+            for (size_t Byte = OffsetInBits; Byte < NumBytes - 1; Byte++) {
                 uint8_t  Data       = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, 8);
                 Output             ^= Data;
                 for (uint8_t Bit = 0; Bit < 8; Bit++) {
@@ -707,21 +694,21 @@ extern "C" {
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
-        } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+        } else if (OffsetInBits * 8 < BitBuffer_GetSize(BitB)) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %zu is larger than the BitBuffer %zu"), OffsetInBits * 8, BitBuffer_GetSize(BitB));
+        } else if ((OffsetInBits + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %zu is larger than the BitBuffer %zu"), (OffsetInBits + NumBytes) * 8, BitBuffer_GetSize(BitB));
         }
         return ~Output;
     }
 
-    uint32_t BitBuffer_CalculateAdler32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes) {
+    uint32_t BitBuffer_CalculateAdler32(BitBuffer *BitB, size_t OffsetInBits, size_t NumBytes) {
         uint32_t Output = 0;
         if (BitB != NULL && OffsetInBits * 8 < BitBuffer_GetSize(BitB) && (OffsetInBits + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
             uint16_t A = 1;
             uint16_t B = 0;
 
-            for (uint64_t Byte = OffsetInBits; Byte < NumBytes - 1; Byte++) {
+            for (size_t Byte = OffsetInBits; Byte < NumBytes - 1; Byte++) {
                 uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, 8);
                 A = (A + Value) % 65521;
                 B = (B + A)     % 65521;
@@ -731,9 +718,9 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (OffsetInBits < BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), OffsetInBits, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %zu is larger than the BitBuffer %zu"), OffsetInBits, BitBuffer_GetSize(BitB));
         } else if (OffsetInBits + NumBytes <= BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (OffsetInBits + NumBytes), BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %zu is larger than the BitBuffer %zu"), (OffsetInBits + NumBytes), BitBuffer_GetSize(BitB));
         }
         return Output;
     }
@@ -756,69 +743,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
-        }
-    }
-
-    void BitBuffer_WriteBits2(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write) {
-        if (BitB != NULL) {
-            uint8_t NumBits                          = NumBits2Write;
-            if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitOrder_LSBitIsNearest) {
-                    while (NumBits > 0) {
-                        uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
-                        uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-                        uint8_t  MaskShift           = NumBits2Append - NumBits2Append;
-                        uint64_t Mask                = (Exponentiate(2, NumBits2Append) - 1) << MaskShift;
-                        uint8_t  ExtractedBits       = (Bits2Write & Mask) >> MaskShift;
-                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset);
-                        BitB->Buffer[Byte]          |= ExtractedBits;
-                        NumBits                     -= NumBits2Append;
-                        BitB->BitOffset             += NumBits2Append;
-                    }
-                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                    while (NumBits > 0) {
-                        uint8_t  BitsByteCanContain   = BitsAvailableInByte(BitB->BitOffset);
-                        uint8_t  Bits2Write          = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-                        uint8_t  Mask                = Exponentiate(2, Bits2Write) - 1;
-                        uint8_t  Shift               = NumBits2Write - NumBits;
-                        uint8_t  ExtractedBits       = (Bits2Write & Mask) >> Shift;
-                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset);
-                        BitB->Buffer[Byte]          |= ExtractedBits;
-                        NumBits                     -= Bits2Write;
-                        BitB->BitOffset             += NumBits;
-                    }
-                }
-            } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitOrder_LSBitIsNearest) {
-                    while (NumBits > 0) {
-                        uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
-                        uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-                        uint8_t  Shift               = BitsByteCanContain - NumBits2Append;
-                        uint8_t  ExtractBitMask      = (uint8_t) (Exponentiate(2, NumBits2Append) - 1) << Shift;
-                        uint8_t  ExtractedBits       = (Bits2Write & ExtractBitMask) >> (NumBits - NumBits2Append);
-                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
-                        BitB->Buffer[Byte]          |= ExtractedBits;
-                        NumBits                     -= NumBits2Append;
-                        BitB->BitOffset             += NumBits2Append;
-                    }
-                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                    while (NumBits > 0) {
-                        uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
-                        uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-                        uint8_t  ExtractBitMask      = (uint8_t) (Exponentiate(2, NumBits2Append) - 1);
-                        uint8_t  ExtractedBits       = (Bits2Write & ExtractBitMask);
-                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
-                        BitB->Buffer[Byte]          |= ExtractedBits;
-                        NumBits                     -= NumBits2Append;
-                        BitB->BitOffset             += NumBits2Append;
-                    }
-                }
-            }
-        } else if (BitB == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits2Write %d is greater than BitBuffer can provide %zu, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
         }
     }
     
@@ -854,7 +779,7 @@ extern "C" {
     
     void BitBuffer_WriteUTF8(BitBuffer *BitB, ImmutableString_UTF8 String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
-            uint64_t CodeUnit      = 0ULL;
+            size_t CodeUnit        = 0ULL;
             while (String2Write[CodeUnit] != TextIO_NULLTerminator) {
                 BitBuffer_Append_NearByte_FarBit(BitB, UTF8CodeUnitSizeInBits, String2Write[CodeUnit]);
                 CodeUnit          += 1;
@@ -871,7 +796,7 @@ extern "C" {
     
     void BitBuffer_WriteUTF16(BitBuffer *BitB, ImmutableString_UTF16 String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
-            uint64_t CodeUnit = 0ULL;
+            size_t CodeUnit        = 0ULL;
             while (String2Write[CodeUnit] != TextIO_NULLTerminator) {
                 BitBuffer_Append_NearByte_FarBit(BitB, UTF16CodeUnitSizeInBits, String2Write[CodeUnit]);
                 CodeUnit          += 1;
@@ -886,7 +811,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteGUUID(BitBuffer *BitB, BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
+    void BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
         if (BitB != NULL && GUUID2Write != NULL) {
             static const uint8_t GUUIDSizeInBits[4] = {168, 168, 128, 128};
             if (BitB->BitOffset + GUUIDSizeInBits[GUUIDType] <= BitB->NumBits) {
@@ -912,188 +837,6 @@ extern "C" {
     }
     /* BitBuffer Resource Management */
     /* End BitBuffer section */
-    
-    /* GUUID */
-    uint8_t *GUUID_Generate(SecureRNG *Random, BufferIO_GUUIDTypes GUUIDType) {
-        uint8_t *GUUID                   = 0;
-        if (Random != NULL && GUUIDType != GUUIDType_Unspecified) {
-            uint64_t LowBits             = SecureRNG_GenerateInteger(Random, 64);
-            uint64_t HighBits            = SecureRNG_GenerateInteger(Random, 64);
-            if (GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) {
-                GUUID                    = (uint8_t*) calloc(GUUIDString_Size, sizeof(uint8_t));
-            } else if (GUUIDType == GUUIDType_BinaryGUID || GUUIDType == GUUIDType_BinaryUUID) {
-                GUUID                    = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
-            }
-            if (GUUID != NULL) {
-                if (GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) { // String
-                    for (uint8_t GUUIDByte = 0; GUUIDByte < GUUIDString_Size; GUUIDByte++) {
-                        if (GUUIDByte != 4 && GUUIDByte != 7 && GUUIDByte != 10) {
-                            if (GUUIDByte < 8) {
-                                uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
-                                GUUID[GUUIDByte] = Byte;
-                            } else {
-                                uint8_t Byte     = (HighBits & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
-                                GUUID[GUUIDByte] = Byte;
-                            }
-                        }
-                    }
-                } else if (GUUIDType == GUUIDType_BinaryGUID || GUUIDType == GUUIDType_BinaryUUID) { // Binary
-                    for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUID_Size; GUUIDByte++) {
-                        if (GUUIDByte < 8) {
-                            uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
-                            GUUID[GUUIDByte] = Byte;
-                        } else {
-                            uint8_t Byte     = (HighBits & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
-                            GUUID[GUUIDByte] = Byte;
-                        }
-                    }
-                }
-            } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate GUUID"));
-            }
-        } else if (Random == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        } else if (GUUIDType == GUUIDType_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUIDType"));
-        }
-        return GUUID;
-    }
-    
-    bool GUUID_Compare(BufferIO_GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
-        uint8_t GUUIDSize       = ((Type2Compare == GUUIDType_GUIDString || Type2Compare == GUUIDType_UUIDString) ? BinaryGUUID_Size : BinaryGUUID_Size);
-        bool GUUIDsMatch        = Yes;
-        if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != GUUIDType_Unspecified) {
-            for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
-                if (GUUID1[BinaryGUUIDByte] != GUUID2[BinaryGUUIDByte]) {
-                    GUUIDsMatch = No;
-                }
-            }
-        } else if (GUUID1 == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUID1 Pointer is NULL"));
-        } else if (GUUID2 == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUID2 Pointer is NULL"));
-        } else if (Type2Compare == GUUIDType_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUID type"));
-        }
-        return GUUIDsMatch;
-    }
-    
-    uint8_t *GUUID_Convert(BufferIO_GUUIDTypes InputType, BufferIO_GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
-        uint8_t  Dash = '-';
-        uint8_t  OutputGUUIDSize = ((OutputType == GUUIDType_GUIDString || OutputType == GUUIDType_UUIDString) ? GUUIDString_Size : BinaryGUUID_Size);
-        uint8_t *ConvertedGUUID  = (uint8_t*) calloc(OutputGUUIDSize, sizeof(uint8_t));
-        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputType != GUUIDType_Unspecified && OutputType != GUUIDType_Unspecified) {
-            bool ByteOrderDiffers = (((InputType == GUUIDType_GUIDString && OutputType == GUUIDType_UUIDString) || (InputType == GUUIDType_UUIDString && OutputType == GUUIDType_GUIDString) || (InputType == GUUIDType_BinaryUUID && OutputType == GUUIDType_BinaryGUID) || (InputType == GUUIDType_BinaryGUID && OutputType == GUUIDType_BinaryUUID)) ? Yes : No);
-            
-            bool TypeDiffers      = (((InputType == GUUIDType_GUIDString && OutputType == GUUIDType_BinaryGUID) || (InputType == GUUIDType_BinaryGUID && OutputType == GUUIDType_GUIDString) || (InputType == GUUIDType_UUIDString && OutputType == GUUIDType_BinaryUUID) || (InputType == GUUIDType_BinaryUUID && OutputType == GUUIDType_UUIDString)) ? Yes : No);
-            
-            if (ByteOrderDiffers == Yes) {
-                GUUID_Swap(InputType, GUUID2Convert);
-            }
-            
-            if (TypeDiffers == Yes) {
-                if ((InputType == GUUIDType_UUIDString || InputType == GUUIDType_GUIDString) && (OutputType == GUUIDType_BinaryUUID || OutputType == GUUIDType_BinaryGUID)) {
-                    for (uint8_t StringByte = 0; StringByte < BinaryGUUID_Size; StringByte++) {
-                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUID_Size; BinaryByte++) {
-                            if (GUUID2Convert[StringByte] != Dash) {
-                                ConvertedGUUID[BinaryByte] = GUUID2Convert[StringByte];
-                            }
-                        }
-                    }
-                } else if ((InputType == GUUIDType_BinaryUUID || InputType == GUUIDType_BinaryGUID) || (OutputType == GUUIDType_UUIDString || OutputType == GUUIDType_GUIDString)) {
-                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUID_Size; BinaryByte++) {
-                        for (uint8_t StringByte = 0; StringByte < BinaryGUUID_Size; StringByte++) {
-                            if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
-                                ConvertedGUUID[StringByte]  = GUUID2Convert[BinaryByte];
-                            } else {
-                                ConvertedGUUID[StringByte]  = Dash;
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (ConvertedGUUID == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate ConvertedGUUID"));
-        } else if (GUUID2Convert == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUID Pointer is NULL"));
-        } else if (InputType == GUUIDType_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InputType is invalid"));
-        } else if (OutputType == GUUIDType_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("OutputType is invalid"));
-        }
-        return ConvertedGUUID;
-    }
-    
-    uint8_t *GUUID_Swap(BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
-        uint8_t *SwappedGUUID = NULL;
-        if (GUUIDType != GUUIDType_Unspecified && GUUIDType <= 4) {
-            uint8_t Dash              = '-';
-            if (GUUIDType == GUUIDType_UUIDString || GUUIDType == GUUIDType_GUIDString) {
-                SwappedGUUID          = (uint8_t*) calloc(GUUIDString_Size, sizeof(uint8_t));
-                if (SwappedGUUID != NULL) {
-                    SwappedGUUID[0]   = GUUID2Swap[3];
-                    SwappedGUUID[1]   = GUUID2Swap[2];
-                    SwappedGUUID[2]   = GUUID2Swap[1];
-                    SwappedGUUID[3]   = GUUID2Swap[0];
-                    
-                    SwappedGUUID[4]   = Dash;
-                    
-                    SwappedGUUID[5]   = GUUID2Swap[6];
-                    SwappedGUUID[6]   = GUUID2Swap[5];
-                    
-                    SwappedGUUID[7]   = Dash;
-                    
-                    SwappedGUUID[8]   = GUUID2Swap[9];
-                    SwappedGUUID[9]   = GUUID2Swap[8];
-                    
-                    SwappedGUUID[10]  = Dash;
-                    
-                    SwappedGUUID[11]  = GUUID2Swap[12];
-                    SwappedGUUID[12]  = GUUID2Swap[11];
-                    
-                    SwappedGUUID[13]  = Dash;
-                    
-                    for (uint8_t EndBytes = 13; EndBytes < GUUIDString_Size; EndBytes++) {
-                        SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
-                    }
-                } else {
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
-                }
-            } else if (GUUIDType == GUUIDType_BinaryUUID || GUUIDType == GUUIDType_BinaryGUID) {
-                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
-                if (SwappedGUUID != NULL) {
-                    SwappedGUUID[0]   = GUUID2Swap[3];
-                    SwappedGUUID[1]   = GUUID2Swap[2];
-                    SwappedGUUID[2]   = GUUID2Swap[1];
-                    SwappedGUUID[3]   = GUUID2Swap[0];
-                    
-                    SwappedGUUID[4]   = GUUID2Swap[5];
-                    SwappedGUUID[5]   = GUUID2Swap[4];
-                    
-                    SwappedGUUID[6]   = GUUID2Swap[7];
-                    SwappedGUUID[7]   = GUUID2Swap[6];
-                    
-                    SwappedGUUID[8]   = GUUID2Swap[9];
-                    SwappedGUUID[9]   = GUUID2Swap[8];
-                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUID_Size; EndBytes++) {
-                        SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
-                    }
-                } else {
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
-                }
-            }
-        } else if (GUUIDType == GUUIDType_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUID type"));
-        } else if (GUUIDType > 4) {
-            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("GUUIDTypes are not ORable"));
-        }
-        return SwappedGUUID;
-    }
-    
-    void GUUID_Deinit(uint8_t *GUUID) {
-        free(GUUID);
-    }
-    /* GUUID */
 
     /* Standard Functions */
     size_t BufferIO_MemoryCopy8(uint8_t *restrict Destination, const uint8_t *restrict Source, const size_t NumElements2Copy) { // memcpy

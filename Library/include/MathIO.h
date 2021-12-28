@@ -481,36 +481,22 @@ extern "C" {
      @param      Bytes                            The number of bytes you want to interpret as bits.
      @return                                      Returns the number of bits.
      */
-    int64_t      Bytes2Bits(const int64_t Bytes);
+    size_t       Bytes2Bits(const size_t Bytes);
     
     /*!
      @abstract                                    Computes the number of bytes from the number of bits.
      @param      RoundingType                     The type of rounding to do.
-     @param      Bits                             The bits to convert to bytes.
+     @param      NumBits                          The bits to convert to bytes.
      @return                                      Returns the number of bytes.
      */
-    uint64_t     Bits2Bytes(const MathIO_RoundingTypes RoundingType, const uint64_t Bits);
+    size_t       Bits2Bytes(const MathIO_RoundingTypes RoundingType, const size_t NumBits);
     
     /*!
      @abstract                                    Calculates the number of bits of slack mod 8.
      @param      Offset                           The offset to calculate the number of bits unaccounted for in the byte.
      @return                                      Returns the number of unaccounted for bits.
      */
-    uint8_t      BitsAvailableInByte(const uint64_t Offset);
-    
-    /*!
-     @abstract                                    Creates a bitmask.
-     @param      NumBits2Select                   The number of bits to select.
-     @return                                      Returns the mask.
-     */
-    uint8_t      CreateBitMaskLSBit(const uint8_t NumBits2Select);
-    
-    /*!
-     @abstract                                    Creates a bitmask.
-     @param      NumBits2Select                   The number of bits to select.
-     @return                                      Returns the mask.
-     */
-    uint8_t      CreateBitMaskMSBit(const uint8_t NumBits2Select);
+    uint8_t      BitsAvailableInByte(const size_t Offset);
     
     /*!
      @abstract                                    Counts the number of bits set to 1 in Value.

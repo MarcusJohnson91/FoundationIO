@@ -46,7 +46,7 @@ extern "C" {
      @param           Buffer                Pointer to a byte array to fill with insecure random data.
      @param           BufferSize            The size of Buffer in bytes.
      */
-    void              InsecurePRNG_Generate(InsecurePRNG *Insecure, uint8_t *Buffer, uint64_t BufferSize);
+    void              InsecurePRNG_Generate(InsecurePRNG *Insecure, uint8_t *Buffer, size_t BufferSize);
 
     /*!
      @abstract                              Zeros and deinitializes InsecurePRNG instance.
@@ -58,14 +58,14 @@ extern "C" {
      @param           EntropyPoolSize       The amount of random data to contain in bytes.
      @return                                Returns the newly created SecureRNG.
      */
-    SecureRNG        *SecureRNG_Init(uint64_t EntropyPoolSize);
+    SecureRNG        *SecureRNG_Init(size_t EntropyPoolSize);
     
     /*!
      @abstract                              The number of bits of SecureRNG available.
      @param           Random                The SecureRNG pointer.
      @return                                Returns the the amount of SecureRNG in bits.
      */
-    uint64_t          SecureRNG_GetRemainingEntropy(SecureRNG *Random);
+    size_t            SecureRNG_GetRemainingEntropy(SecureRNG *Random);
     
     /*!
      @abstract                              Generates an integer occupying NumBits.
@@ -73,7 +73,7 @@ extern "C" {
      @param           NumBits               The number of bits for the integer to take up, between 1 and 64.
      @return                                Returns an integer matching those characteristics.
      */
-    int64_t           SecureRNG_GenerateInteger(SecureRNG *Random, uint8_t NumBits);
+    uint64_t          SecureRNG_GenerateInteger(SecureRNG *Random, uint8_t NumBits);
     
     /*!
      @abstract                              Generates an integer between MinValue and MaxValue, inclusive.
@@ -82,7 +82,7 @@ extern "C" {
      @param           MaxValue              The maximum valud value in the range, inclusive.
      @return                                Returns an integer matching those characteristics.
      */
-    int64_t           SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue);
+    uint64_t          SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue);
     
     /*!
      @abstract                              Generates a Decimal.

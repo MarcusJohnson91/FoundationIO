@@ -11,7 +11,7 @@ extern "C" {
 
     bool Test_UTF8_Deformat(SecureRNG *Secure) {
         bool TestPassed      = No;
-        UTF8 **DeformatTest1 = UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
+        UTF8 **DeformatTest1 = UTF8_Deformat(UTF8String("NumArgs: %1$zu, Equal: %zu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
         bool  SubString2     = UTF8_Compare(DeformatTest1[1], UTF8String("1234"));
         bool  SubString3     = UTF8_Compare(DeformatTest1[2], UTF8String("Positional"));
@@ -84,7 +84,7 @@ extern "C" {
             printf("%s\n", UTF8String("Test2 Passed"));
         }
 
-        ImmutableString_UTF32 Test3 = UTF32_SubstituteSubString(UTF32String("surr %llu ound"), UTF32String("1,234,567"), 5, 4);
+        ImmutableString_UTF32 Test3 = UTF32_SubstituteSubString(UTF32String("surr %zu ound"), UTF32String("1,234,567"), 5, 4);
         printf("%ls\n", (wchar_t*) Test3);
         bool  Test3Match = UTF32_Compare(Test3, UTF32String("surr 1,234,567 ound"));
         if (Test3Match == No) {
