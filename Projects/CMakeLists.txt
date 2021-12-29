@@ -159,15 +159,19 @@ set(CMAKE_EXE_LINKER_FLAGS_INIT "-fsanitize=address,undefined -fno-omit-frame-po
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
--ferror-limit=1024 \
--fPIC \
--fshort-enums \
--funsigned-char \
 -std=c2x \
--Weverything \
+-fPIC \
 -Wall \
 -Wextra \
--Wpedantic \
+-Weverything \
+-Bsymbolic \
+-Bsymbolic-functions \
+-ferror-limit=1024 \
+-foptimize-sibling-calls \
+-fshort-enums \
+-funsigned-char \
+-fvisibility-inlines-hidden \
+-Wenum-conversion \
 -Wno-assign-enum \
 -Wno-c99-compat \
 -Wno-ignored-attributes \
@@ -176,13 +180,9 @@ ${CMAKE_C_FLAGS} \
 -Wno-pointer-sign \
 -Wno-reserved-id-macro \
 -Wno-sign-conversion \
+-Wpedantic \
 -Wreserved-identifier \
--Wenum-conversion \
 -Wswitch-enum \
--Bsymbolic \
--fno-semantic-interposition \
--fvisibility-inlines-hidden \
--foptimize-sibling-calls \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
