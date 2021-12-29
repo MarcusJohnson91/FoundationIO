@@ -44,9 +44,15 @@ extern "C" {
      @return                                      Returns the formatted string encoded using the UTF-16 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
     UTF16            *UTF16_Format(ImmutableString_UTF16 Format, ...) __attribute__((format(wprintf, 1, 2)));
+#pragma clang diagnostic pop
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF16            *UTF16_Format(ImmutableString_UTF16 Format, ...);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+    UTF16            *UTF16_Format(ImmutableString_UTF16 Format, ...) __attribute__((format(wprintf, 1, 2)));
+#pragma GCC diagnostic pop
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF16            *UTF16_Format(__format_string ImmutableString_UTF16 Format, ...);
@@ -61,9 +67,15 @@ extern "C" {
      @return                                      Returns the formatted string encoded using the UTF-32 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
     UTF32            *UTF32_Format(ImmutableString_UTF32 Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#pragma clang diagnostic pop
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF32            *UTF32_Format(ImmutableString_UTF32 Format, ...);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+    UTF32            *UTF32_Format(ImmutableString_UTF32 Format, ...) __attribute__((format(wprintf, 1, 2)));
+#pragma GCC diagnostic pop
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF32            *UTF32_Format(__format_string ImmutableString_UTF32 Format, ...);
