@@ -29,7 +29,7 @@ extern "C" {
     bool VerifyMD5(void) {
         bool TestPassed = No;
         MD5Context MD5;
-        MD5Initialize(MD5);
+        MD5Context_Init(MD5);
         for (uint8_t TestString = 0; TestString < NumMD5TestStrings; TestString++) {
             MD5Update(MD5, MD5TestStrings[TestString], UTF8_GetStringSizeInCodeUnits(MD5TestStrings[TestString]));
             MD5Hash Hash;

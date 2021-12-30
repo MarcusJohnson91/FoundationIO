@@ -71,6 +71,32 @@ extern "C" {
      @abstract                              Zeros and deinitializes InsecurePRNG instance.
      */
     void              InsecurePRNG_Deinit(InsecurePRNG *Insecure);
+
+    /*!
+     @remark                                MD5 is EXTREMELY INSECURE, IT'S ONLY HERE FOR OVIA
+     */
+    typedef struct    MD5Context            MD5Context;
+    typedef struct    MD5Hash               MD5Hash;
+
+    /*!
+     @abstract                              Creates an MD5 hasher instance.
+     */
+    MD5Context       *MD5Context_Init(void);
+
+    /*!
+     @abstract                              Updates an MD5 instance.
+     */
+    void              MD5Update(MD5Context *Context, void const *Buffer, size_t BufferSize);
+
+    /*!
+     @abstract                              Finalizes an MD5 instance.
+     */
+    void              MD5Finalize(MD5Context *Context, MD5Hash *Digest);
+
+    /*!
+     @abstract                              Converts a binary MD5 hash to a string.
+     */
+    char             *MD5ToString(MD5Hash *Digest);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
