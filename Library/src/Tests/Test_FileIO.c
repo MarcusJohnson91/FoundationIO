@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-    bool Test_FileOpenWriteReadClose8(SecureRNG *Secure) {
+    bool Test_FileOpenWriteReadClose8(InsecurePRNG *Insecure) {
         bool TestPassed      = No;
         AsyncIOStream *Write = AsyncIOStream_Init();
         AsyncIOStream_OpenPathUTF8(Write, UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Write | FileMode_Binary);

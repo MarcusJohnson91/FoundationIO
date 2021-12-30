@@ -76,6 +76,7 @@ extern "C" {
      @return                                      Returns if @b Integer is negative or not
      */
     bool         IsNegative64(const int64_t Integer);
+  
 #ifdef           IsNegative
 #undef           IsNegative
 #define          IsNegative(Value)                _Generic((Value), int8_t:IsNegative8, uint8_t:IsNegative8, int16_t:IsNegative16, uint16_t:IsNegative16, int32_t:IsNegative32, uint32_t:IsNegative32, int64_t:IsNegative64, uint64_t:IsNegative64)(Value)
@@ -87,20 +88,6 @@ extern "C" {
      @return                                      True for odd, false for even.
      */
     bool         IsOdd(const int64_t Integer);
-    
-    /*!
-     @abstract                                    Converts an integer to an array of bytes.
-     @param      Integer                          The integer to convert.
-     @param      Bytes                            Allocated array of bytes to contain the output bytes.
-     */
-    void         GetBytesFromInteger(const uint64_t Integer, uint8_t *Bytes);
-    
-    /*!
-     @abstract                                    Converts an array of bytes to an integer.
-     @param      Bytes                            The array of bytes to convert.
-     @return                                      Integer.
-     */
-    uint64_t     GetIntegerFromBytes(uint64_t *Bytes);
     
     /*!
      @abstract                                    Converts a Float to an integer.
@@ -239,11 +226,11 @@ extern "C" {
 
     /*!
      @abstract                                    Takes the top bit and copies it to all higher bits.
-     @param      HighestSetBit                    The highest set bit's index, starting at 1.
      @param      Integer                          The Integer to extend.
+     @param      IntegerSizeInBits                The number of bits that are actually being used.
      @return                                      Returns the extended integger
      */
-    int64_t       SignExtend(const uint8_t HighestSetBit, const int64_t Integer);
+    int64_t      SignExtend(const int64_t Integer, const uint8_t IntegerSizeInBits);
     
     /*!
      @abstract                                    Is the decimal normal?

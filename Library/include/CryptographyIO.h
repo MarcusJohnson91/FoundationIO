@@ -4,9 +4,10 @@
  @copyright       2019+
  @version         1.0.0
  @brief           This header contains types, functions, and tables for cryptography and hashing.
+ @TODO:           Look into replacing Xoshiro256** with Shishua
  */
 
-#include "TextIO/TextIOTypes.h" /* Included for Text types */
+#include "PlatformIO.h"
 
 #pragma once
 
@@ -23,87 +24,53 @@ extern "C" {
     typedef struct    BitBuffer             BitBuffer;
 
     /*!
-     @abstract                              Algorithm inspired by public domain Shishua; Nothing was copied.
+     @abstract                              Algorithm inspired by public domain Xoshiro256**
      */
     typedef struct    InsecurePRNG          InsecurePRNG;
 
     /*!
-     @abstract                              Own algorithm; Uses InsecurePRNG and AES tables as a starting point to generate (UNTESTED) secure random numbers.
-     */
-    typedef struct    SecureRNG             SecureRNG;
-
-    /*!
      @abstract                              Creates an InsecurePRNG structure with random-ish data.
      @remark                                InsecurePRNG is for fast random-ish numbers that are NOT to be used for cryptographic purposes.
-     @param           Seed                  Seed needs to be an array of 4 64-bit variables.
+     @param           Seed                  Seed is a 64 bit signed integer, there is a default seed.
      @return                                Returns an initialized instance of InsecurePRNG.
      */
-    InsecurePRNG     *InsecurePRNG_Init(uint64_t Seed[4]);
+    InsecurePRNG     *InsecurePRNG_Init(uint64_t Seed);
 
     /*!
-     @abstract                              Fills the Entropy pool with insecure random data.
-     @param           Insecure              Instance of InsecurePRNG to use in creating the random data.
-     @param           Buffer                Pointer to a byte array to fill with insecure random data.
-     @param           BufferSize            The size of Buffer in bytes.
+     @abstract                              Generates an integer occupying NumBits.
+     @param           Insecure              The InsecurePRNG pointer.
+     @param           IntegerSizeInBits     The number of bits for the integer to take up, between 1 and 64.
+     @return                                Returns an integer matching those characteristics.
      */
-    void              InsecurePRNG_Generate(InsecurePRNG *Insecure, uint8_t *Buffer, size_t BufferSize);
+    int64_t           InsecurePRNG_CreateInteger(InsecurePRNG *Insecure, uint8_t IntegerSizeInBits);
+
+    /*!
+     @abstract                              Generates an integer between MinValue and MaxValue, inclusive.
+     @param           Insecure              The InsecurePRNG pointer.
+     @param           MinValue              The minimum valid value in the range, inclusive.
+     @param           MaxValue              The maximum valud value in the range, inclusive.
+     @return                                Returns an integer matching those characteristics.
+     */
+    int64_t           InsecurePRNG_CreateIntegerInRange(InsecurePRNG *Insecure, int64_t MinValue, int64_t MaxValue);
+
+    /*!
+     @abstract                              Generates a Decimal.
+     @param           Insecure              The InsecurePRNG pointer.
+     @return                                Returns the generated decimal.
+     */
+    double            InsecurePRNG_CreateDecimal(InsecurePRNG *Insecure);
+
+    /*!
+     @abstract                              Erases InsecurePRNG for sexurity reasons.
+     @param           Insecure              The InsecurePRNG pointer.
+     @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful
+     */
+    bool              InsecurePRNG_Erase(InsecurePRNG *Insecure);
 
     /*!
      @abstract                              Zeros and deinitializes InsecurePRNG instance.
      */
     void              InsecurePRNG_Deinit(InsecurePRNG *Insecure);
-    
-    /*!
-     @abstract                              Creates an SecureRNG container for generating random numbers.
-     @param           EntropyPoolSize       The amount of random data to contain in bytes.
-     @return                                Returns the newly created SecureRNG.
-     */
-    SecureRNG        *SecureRNG_Init(size_t EntropyPoolSize);
-    
-    /*!
-     @abstract                              The number of bits of SecureRNG available.
-     @param           Random                The SecureRNG pointer.
-     @return                                Returns the the amount of SecureRNG in bits.
-     */
-    size_t            SecureRNG_GetRemainingEntropy(SecureRNG *Random);
-    
-    /*!
-     @abstract                              Generates an integer occupying NumBits.
-     @param           Random                The SecureRNG pointer.
-     @param           NumBits               The number of bits for the integer to take up, between 1 and 64.
-     @return                                Returns an integer matching those characteristics.
-     */
-    uint64_t          SecureRNG_GenerateInteger(SecureRNG *Random, uint8_t NumBits);
-    
-    /*!
-     @abstract                              Generates an integer between MinValue and MaxValue, inclusive.
-     @param           Random                The SecureRNG pointer.
-     @param           MinValue              The minimum valid value in the range, inclusive.
-     @param           MaxValue              The maximum valud value in the range, inclusive.
-     @return                                Returns an integer matching those characteristics.
-     */
-    uint64_t          SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue);
-    
-    /*!
-     @abstract                              Generates a Decimal.
-     @param           Random                The SecureRNG pointer.
-     @return                                Returns the generated decimal.
-     */
-    double            SecureRNG_GenerateDecimal(SecureRNG *Random);
-    
-    /*!
-     @abstract                              Erases the SecureRNG pool for sexurity reasons.
-     @param           Random                The SecureRNG pointer.
-     @param           NewValue              The value to set each codeunit to while erasing.
-     @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful
-     */
-    uint8_t           SecureRNG_Erase(SecureRNG *Random, uint8_t NewValue);
-    
-    /*!
-     @abstract                              The number of bits of SecureRNG available.
-     @param           Random                The SecureRNG pointer.
-     */
-    void              SecureRNG_Deinit(SecureRNG *Random);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

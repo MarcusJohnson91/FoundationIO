@@ -1,7 +1,7 @@
 #include "../include/GUUID.h"             /* Included for our declarations */
 
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
-#include "../include/CryptographyIO.h"    /* Included for SecureRNG_GenerateInteger */
+#include "../include/CryptographyIO.h"    /* Included for InsecurePRNG_CreateInteger */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
 #include "../include/TextIO/LogIO.h"      /* Included for Logging */
@@ -18,11 +18,11 @@
 extern "C" {
 #endif
     
-    uint8_t *GUUID_Generate(SecureRNG *Random, GUUIDTypes GUUIDType) {
+    uint8_t *GUUID_Generate(InsecurePRNG *Insecure, GUUIDTypes GUUIDType) {
         uint8_t *GUUID                   = 0;
-        if (Random != NULL && GUUIDType != GUUIDType_Unspecified) {
-            uint64_t LowBits             = SecureRNG_GenerateInteger(Random, 64);
-            uint64_t HighBits            = SecureRNG_GenerateInteger(Random, 64);
+        if (Insecure != NULL && GUUIDType != GUUIDType_Unspecified) {
+            uint64_t LowBits             = InsecurePRNG_CreateInteger(Insecure, 64);
+            uint64_t HighBits            = InsecurePRNG_CreateInteger(Insecure, 64);
             if (GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) {
                 GUUID                    = (uint8_t*) calloc(GUUIDString_Size, sizeof(uint8_t));
             } else if (GUUIDType == GUUIDType_BinaryGUID || GUUIDType == GUUIDType_BinaryUUID) {
@@ -55,8 +55,8 @@ extern "C" {
             } else {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate GUUID"));
             }
-        } else if (Random == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+        } else if (Insecure == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
         } else if (GUUIDType == GUUIDType_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUIDType"));
         }

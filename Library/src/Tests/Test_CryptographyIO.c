@@ -44,8 +44,8 @@ extern "C" {
     }
     
     int main(void) {
-        // First lets test InsecureRNG
-        SecureRNG *Random = SecureRNG_Init(12288);
+        // First lets test InsecurePRNG
+        InsecurePRNG *Insecure = InsecurePRNG_Init(0);
 
         return EXIT_SUCCESS;
     }

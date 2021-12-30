@@ -84,10 +84,10 @@ extern "C" {
     typedef struct BitBuffer                       BitBuffer;
 
     /*!
-     @typedef      SecureRNG
+     @typedef      InsecurePRNG
      @abstract                                     Forward declaration from CryptographyIO.
      */
-    typedef struct SecureRNG                       SecureRNG;
+    typedef struct InsecurePRNG                    InsecurePRNG;
 
     /* BitBuffer */
     /*!

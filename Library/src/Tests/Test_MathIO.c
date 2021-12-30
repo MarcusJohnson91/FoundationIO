@@ -28,7 +28,7 @@ extern "C" {
     
     
     
-    bool Test_Exponentiate(SecureRNG *Secure) { // Even, Odd, Positive, Negative
+    bool Test_Exponentiate(InsecurePRNG *Insecure) { // Even, Odd, Positive, Negative
         TestIO_Register(MathIO, Test_Exponentiate, TestState_Enabled, Outcome_Passed);
         bool Passed = No;
         int64_t Even = Exponentiate(2, 2); // 4
@@ -41,9 +41,9 @@ extern "C" {
         return Passed;
     }
     
-    void Test_CountDigits(SecureRNG *Secure) {
-        uint8_t  NumBits   = SecureRNG_GenerateInteger(Secure, 6);
-        int64_t  Value     = SecureRNG_GenerateInteger(Secure, NumBits);
+    void Test_CountDigits(InsecurePRNG *Insecure) {
+        uint8_t  NumBits   = InsecurePRNG_CreateInteger(Insecure, 6);
+        int64_t  Value     = InsecurePRNG_CreateInteger(Insecure, NumBits);
         uint8_t  LogCeil   = Logarithm(10, -Value) - 1;
         uint8_t  NumDigits = NumDigitsInInteger(10, -Value);
         
@@ -52,19 +52,19 @@ extern "C" {
         }
     }
     
-    void Test_Logarithm(SecureRNG *Secure) {
-        uint8_t  NumBits = SecureRNG_GenerateInteger(Secure, 6);
-        int64_t  Value   = SecureRNG_GenerateInteger(Secure, NumBits);
+    void Test_Logarithm(InsecurePRNG *Insecure) {
+        uint8_t  NumBits = InsecurePRNG_CreateInteger(Insecure, 6);
+        int64_t  Value   = InsecurePRNG_CreateInteger(Insecure, NumBits);
         uint8_t  LogCeil = Logarithm(2, Value);
         if (LogCeil != NumBits) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %hhu is incorrect"), NumBits);
         }
     }
     
-    void Test_MinMax(SecureRNG *Secure) {
-        uint8_t NumBits  = SecureRNG_GenerateInteger(Secure, 8);
-        int64_t Integer1 = SecureRNG_GenerateInteger(Secure, NumBits);
-        int64_t Integer2 = SecureRNG_GenerateInteger(Secure, NumBits);
+    void Test_MinMax(InsecurePRNG *Insecure) {
+        uint8_t NumBits  = InsecurePRNG_CreateInteger(Insecure, 8);
+        int64_t Integer1 = InsecurePRNG_CreateInteger(Insecure, NumBits);
+        int64_t Integer2 = InsecurePRNG_CreateInteger(Insecure, NumBits);
         
         int64_t Minimum1 = Minimum(Integer1, Integer2);
         int64_t Maximum1 = Maximum(Integer1, Integer2);
@@ -74,17 +74,17 @@ extern "C" {
         }
     }
     
-    void Test_Decimals(SecureRNG *Secure) {
-        double  Decimal    = SecureRNG_GenerateDecimal(Secure);
+    void Test_Decimals(InsecurePRNG *Insecure) {
+        double  Decimal    = InsecurePRNG_CreateDecimal(Insecure);
         int32_t Ceiled     = CeilD(Decimal);
         int32_t Floored    = FloorD(Decimal);
     }
     
     int main(void) {
-        SecureRNG *Secure = SecureRNG_Init(67108864);
+        InsecurePRNG *Insecure = InsecurePRNG_Init(0);
         TestIO_RunTests(MathIO);
-        //Test_Exponentiate(Secure);
-        //Test_CountDigits(Secure);
+        //Test_Exponentiate(Insecure);
+        //Test_CountDigits(Insecure);
         //Test_Decimals();
         //Test_MinMax();
         return EXIT_SUCCESS;

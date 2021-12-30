@@ -9,7 +9,7 @@ extern "C" {
 
     TestSuite FormatTests;
 
-    bool Test_UTF8_Deformat(SecureRNG *Secure) {
+    bool Test_UTF8_Deformat(InsecurePRNG *Insecure) {
         bool TestPassed      = No;
         UTF8 **DeformatTest1 = UTF8_Deformat(UTF8String("NumArgs: %1$zu, Equal: %zu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
@@ -31,7 +31,7 @@ extern "C" {
 
 
 
-    bool Test_UTF8_Format(SecureRNG *Secure) {
+    bool Test_UTF8_Format(InsecurePRNG *Insecure) {
         /*
          TestIO Notes:
 
@@ -246,7 +246,7 @@ extern "C" {
         return TestPassed;
 
         TestCase TestCase_Format8 = {
-            .Function    = Test_UTF8_Format(Secure),
+            .Function    = Test_UTF8_Format,
             .State       = TestState_Enabled,
             .Expectation = Outcome_Passed, // TestOutcome?
         };
@@ -254,8 +254,8 @@ extern "C" {
 
     int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = false;
-        SecureRNG *Secure         = SecureRNG_Init(4096);
-        TestSuitePassed           = Test_UTF8_Format(Secure);
+        InsecurePRNG *Insecure    = InsecurePRNG_Init(0);
+        TestSuitePassed           = Test_UTF8_Format(Insecure);
         return TestSuitePassed;
     }
 

@@ -6,7 +6,7 @@
 extern "C" {
 #endif
     
-    bool Test_StringSet(SecureRNG *Secure) {
+    bool Test_StringSet(InsecurePRNG *Insecure) {
         bool TestPassed = Yes;
         ImmutableStringSet_UTF8 StringSet = UTF8StringSet(UTF8String("String1"), UTF8String("String2"), UTF8String("String3"));
         uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet); // 14?!
@@ -28,7 +28,7 @@ extern "C" {
         return TestPassed;
     }
 
-    bool Test_UTF8_Graphemes(SecureRNG *Secure) {
+    bool Test_UTF8_Graphemes(InsecurePRNG *Insecure) {
         bool TestPassed = No;
         UTF8 *Grapheme1 = UTF8String("🇺🇸");
         UTF8 *Grapheme2 = UTF8String("NumGraphemes = 16");
@@ -40,16 +40,16 @@ extern "C" {
         return TestPassed;
     }
     
-    bool Test_UTF8_EncodeDecode(SecureRNG *Secure) {
+    bool Test_UTF8_EncodeDecode(InsecurePRNG *Insecure) {
         bool TestPassed                = No;
-        if (Secure != NULL) {
-            uint64_t  NumCodePoints    = SecureRNG_GenerateInteger(Secure, 16);
-            ImmutableString_UTF32 GeneratedString  = UTF32_GenerateString(Secure, NumCodePoints);
+        if (Insecure != NULL) {
+            uint64_t  NumCodePoints    = InsecurePRNG_CreateInteger(Insecure, 16);
+            ImmutableString_UTF32 GeneratedString  = UTF32_GenerateString(Insecure, NumCodePoints);
             UTF8     *Generated8       = UTF8_Encode(GeneratedString);
             ImmutableString_UTF32 Decoded8         = UTF8_Decode(Generated8);
             TestPassed                 = UTF32_Compare(GeneratedString, Decoded8);
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
         }
         return TestPassed;
     }
@@ -60,11 +60,11 @@ extern "C" {
         .Expectation = Outcome_Passed,
     };
     
-    bool Test_UTF16_EncodeDecode(SecureRNG *Secure) {
+    bool Test_UTF16_EncodeDecode(InsecurePRNG *Insecure) {
         bool TestPassed = Yes;
-        if (Secure != NULL) {
-            uint64_t  NumCodePoints               = SecureRNG_GenerateInteger(Secure, 16);
-            ImmutableString_UTF32 GeneratedString = UTF32_GenerateString(Secure, NumCodePoints);
+        if (Insecure != NULL) {
+            uint64_t  NumCodePoints               = InsecurePRNG_CreateInteger(Insecure, 16);
+            ImmutableString_UTF32 GeneratedString = UTF32_GenerateString(Insecure, NumCodePoints);
             ImmutableString_UTF16 Generated16     = UTF16_Encode(GeneratedString);
             ImmutableString_UTF32 Decoded16       = UTF16_Decode(Generated16);
             TestPassed                            = UTF32_Compare(GeneratedString, Decoded16);
@@ -72,12 +72,12 @@ extern "C" {
             UTF16_Deinit(Generated16);
             UTF32_Deinit(Decoded16);
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
         }
         return TestPassed;
     }
     
-    bool Test_UTF8_Insert(SecureRNG *Secure) {
+    bool Test_UTF8_Insert(InsecurePRNG *Insecure) {
         bool TestPassed = No;
         ImmutableString_UTF8 Original = UTF8String("Original");
         ImmutableString_UTF8 Insertee = UTF8String("Insert");
@@ -87,7 +87,7 @@ extern "C" {
         return TestPassed;
     }
     
-    bool Test_UTF8_Properties(SecureRNG *Secure) {
+    bool Test_UTF8_Properties(InsecurePRNG *Insecure) {
         bool      TestPassed     = Yes;
         ImmutableString_UTF8 TestString8    = UTF8String("Size: 7");
         ImmutableString_UTF32 TestString32   = UTF8_Decode(TestString8);
@@ -99,7 +99,7 @@ extern "C" {
         return TestPassed;
     }
     
-    bool Test_SubstituteSubString(SecureRNG *Secure) {
+    bool Test_SubstituteSubString(InsecurePRNG *Insecure) {
         bool TestPassed = No;
         
         ImmutableString_UTF32 Replacement = UTF32String("987654321");
@@ -109,91 +109,91 @@ extern "C" {
         return TestPassed;
     }
     
-    bool Test_UTF8_StitchSubString(SecureRNG *Secure) {
+    bool Test_UTF8_StitchSubString(InsecurePRNG *Insecure) {
         bool TestPassed                         = No;
         ImmutableString_UTF8 BananaBread        = UTF8_StitchSubString(UTF8String("Banana NUT Bread"), 8, 4);
         TestPassed                              = UTF8_Compare(BananaBread, UTF8String("Banana Bread"));
         return TestPassed;
     }
 
-    bool Test_UTF8_StringSet(SecureRNG *Secure) {
+    bool Test_UTF8_StringSet(InsecurePRNG *Insecure) {
         bool TestPassed                    = No;
         ImmutableStringSet_UTF8 StringSet  = UTF8StringSet(UTF8String("One"), UTF8String("Two"), UTF8String("Three"), UTF8String("Four"));
         return TestPassed;
     }
     
-    bool Test_UTF8_Reverse(SecureRNG *Secure) {
+    bool Test_UTF8_Reverse(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_Clone(SecureRNG *Secure) {
+    bool Test_UTF8_Clone(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_Trim(SecureRNG *Secure) {
+    bool Test_UTF8_Trim(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_Strip(SecureRNG *Secure) {
+    bool Test_UTF8_Strip(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_String2Decimal(SecureRNG *Secure) {
+    bool Test_UTF8_String2Decimal(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_Decimal2String(SecureRNG *Secure) {
+    bool Test_UTF8_Decimal2String(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_String2Integer(SecureRNG *Secure) {
+    bool Test_UTF8_String2Integer(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_Integer2String(SecureRNG *Secure) {
+    bool Test_UTF8_Integer2String(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_Split(SecureRNG *Secure) {
+    bool Test_UTF8_Split(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_CompareSubString(SecureRNG *Secure) {
+    bool Test_UTF8_CompareSubString(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_FindSubString(SecureRNG *Secure) {
+    bool Test_UTF8_FindSubString(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_ExtractSubString(SecureRNG *Secure) {
+    bool Test_UTF8_ExtractSubString(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
-    bool Test_UTF8_RemoveSubString(SecureRNG *Secure) {
+    bool Test_UTF8_RemoveSubString(InsecurePRNG *Insecure) {
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
     int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = No;
-        SecureRNG *Random         = SecureRNG_Init(16 * 1024);
-        //TestSuitePassed           = Test_StringSet(Random);
-        TestSuitePassed           = Test_UTF8_Graphemes(Random);
-        //TestSuitePassed           = Test_UTF8_StringSet(Random);
-        //TestSuitePassed           = Test_UTF16_EncodeDecode(Random);
+        InsecurePRNG *Insecure    = InsecurePRNG_Init(0);
+        //TestSuitePassed           = Test_StringSet(Insecure);
+        TestSuitePassed           = Test_UTF8_Graphemes(Insecure);
+        //TestSuitePassed           = Test_UTF8_StringSet(Insecure);
+        //TestSuitePassed           = Test_UTF16_EncodeDecode(Insecure);
         return TestSuitePassed;
     }
     

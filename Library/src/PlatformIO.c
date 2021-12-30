@@ -1,6 +1,7 @@
-#include "../include/PlatformIO.h"      /* Included for our declarations */
-
-//#include "../include/TextIO/StringIO.h" /* Included for Path functions */
+#include "../include/PlatformIO.h"         /* Included for our declarations */
+#include "../include/TextIO/TextIOTypes.h" /* Included for NewLine8 */
+#include "../include/TextIO/FormatIO.h"    /* Included for UTF8_Format */
+#include "../include/TextIO/StringIO.h"    /* Included for WriteLine8 */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
 #include <sys/sysctl.h>
@@ -34,9 +35,13 @@ extern "C" {
         return TotalMemory;
     }
 
-    /*
-     Kinda wonder if I could make Assert handle format args?
-     */
+    void PlatformIO_AssertFail(const char *FileName, const char *FunctionName, const char *Expression) {
+        UTF8 *Formatted = UTF8_Format(UTF8String("Assertion '%s' in %s::%s Failed%s"), Expression, FileName, FunctionName, TextIO_NewLine8);
+        UTF8_File_WriteString(stderr, Formatted);
+        UTF8_Deinit(Formatted);
+        exit(EXIT_FAILURE);
+		/* Wonder if I could make Assert handle format args? */
+    }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

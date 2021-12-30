@@ -39,7 +39,11 @@ extern "C" {
         BinaryGUUID_Size                = 16,
     } GUUIDConstants;
 
-    typedef struct SecureRNG                       SecureRNG;
+    /*!
+     @typedef      InsecurePRNG
+     @abstract                                     Forward declaration from CryptographyIO.
+     */
+    typedef struct InsecurePRNG                    InsecurePRNG;
 
     /*!
      @typedef      BinaryGUUID
@@ -55,10 +59,10 @@ extern "C" {
 
     /*!
      @abstract                                     Generates a random GUUID.
-     @param        Secure                          Pointer to SecureRNG.
+     @param        Insecure                        Pointer to InsecurePRNG.
      @return                                       Returns the generated GUUID.
      */
-    uint8_t        *GUUID_Generate(SecureRNG *Secure, GUUIDTypes GUUIDType);
+    uint8_t        *GUUID_Generate(InsecurePRNG *Insecure, GUUIDTypes GUUIDType);
 
     /*!
      @abstract                                     Compares GUUIDs for equivalence, GUUID1 and 2 HAVE to be the same type.

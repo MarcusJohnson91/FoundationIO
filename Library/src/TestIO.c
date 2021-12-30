@@ -1,6 +1,6 @@
 #include "../include/TestIO.h"          /* Included for our declarations */
 
-#include "../include/CryptographyIO.h"  /* Included for SecureRNG */
+#include "../include/CryptographyIO.h"  /* Included for InsecurePRNG */
 #include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
 #include "../include/TextIO/LogIO.h"    /* Included for error reporting */
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
@@ -34,11 +34,57 @@ extern "C" {
         .Tests    = &NULLCase,
     };
 
+    /*
+     Memory Layout of TestIO Section:
+
+     --------------------------------
+     TestIOSectionMarker
+     ?NumSuites?
+     Suite[0] = {
+        .Name     = SuiteName,
+        .Init     = <FunctionPointer>,
+        .Deinit   = <FunctionPointer>,
+        .NumTests = <size_t> 3,
+        .Tests[]  = {
+            [0] = {
+                .Name       = TestName,
+                .Function   = <FunctionPointer>,
+                .State      = <TestState>,
+                .Expetation = <TestOutcome>,
+                .Result     = <TestOutcome>,
+            },
+            [1] = {
+                .Name       = TestName,
+                .Function   = <FunctionPointer>,
+                .State      = <TestState>,
+                .Expetation = <TestOutcome>,
+                .Result     = <TestOutcome>,
+            },
+            [2] = {
+                .Name       = TestName,
+                .Function   = <FunctionPointer>,
+                .State      = <TestState>,
+                .Expetation = <TestOutcome>,
+                .Result     = <TestOutcome>,
+            },
+        },
+     }
+     Suite[1] = {
+
+     }
+     Suite[...] = {
+
+     }
+     TestIOSectionMarker
+     --------------------------------
+     */
+
     extern const int *__start_foo;
 
     extern PlatformIO_ArraySet(TestIO_Suite) __TestIO_Suites_Start = NULLSuite;
     extern PlatformIO_ArraySet(TestIO_Suite) __TestIO_Suites_Stop  = NULLSuite;
 
+    /*
      Instrument the functions to see when and where branching occurs and to refine the randomly generated data
      */
 
@@ -63,7 +109,7 @@ extern "C" {
      */
 
 
-    void TestIO_Run(size_t SecureRNGSize) {
+    void TestIO_Run(void) {
         size_t NumSuites = 0;
         for (TestIO_Suite *Suite = __TestIO_Suites_Start; Suite < __TestIO_Suites_Stop; Suite++) {
             // Ok, so we have the actual test suite.
@@ -79,13 +125,13 @@ extern "C" {
         //}
 
         TestIO_Suite **Suites = calloc(NumSuites, sizeof(TestIO_Suite));
-        SecureRNG *Secure                              = SecureRNG_Init(SecureRNGSize);
+        InsecurePRNG *Insecure                         = InsecurePRNG_Init(0);
         size_t NumEnabledTests                         = 0;
         for (size_t Suite = 0; Suite < NumSuites; Suite++) {
             for (size_t Test = 0; Test < Suites[Suite]->NumTests; Test++) {
                 if (Suites[Suite]->Tests[Test].State == TestState_Enabled) {
                     NumEnabledTests                   += 1;
-                    Suites[Suite]->Tests[Test].Result  = Suites[Suite]->Tests[Test].Function(Secure);
+                    Suites[Suite]->Tests[Test].Result  = Suites[Suite]->Tests[Test].Function(Insecure);
                 }
             }
         }
@@ -184,34 +230,34 @@ extern "C" {
         return Time;
     }
 
-    static UTF32 UTF32_GenerateCodePoint(SecureRNG *Random) {
+    static UTF32 UTF32_GenerateCodePoint(InsecurePRNG *Insecure) {
         UTF32 CodePoint          = 0UL;
-        if (Random != NULL) {
-            CodePoint            = (UTF32) SecureRNG_GenerateInteger(Random, UTF16HighSurrogateStart - 1);
+        if (Insecure != NULL) {
+            CodePoint            = (UTF32) InsecurePRNG_CreateInteger(Insecure, UTF16HighSurrogateStart - 1);
             /*
-            UTF32  CodePointHigh = (UTF32) SecureRNG_GenerateIntegerInRange(Random, 1, 0xD7FF);
-            UTF32  CodePointLow  = (UTF32) SecureRNG_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
+            UTF32  CodePointHigh = (UTF32) InsecurePRNG_CreateIntegerInRange(Insecure, 1, 0xD7FF);
+            UTF32  CodePointLow  = (UTF32) InsecurePRNG_CreateIntegerInRange(Insecure, 0xE000, 0x10FFFF);
             CodePoint            = CodePointLow | CodePointHigh;
              */
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Insecure Pointer is NULL"));
         }
         return CodePoint;
     }
 
-    UTF32 *UTF32_GenerateString(SecureRNG *Random, size_t NumCodePoints) {
+    UTF32 *UTF32_GenerateString(InsecurePRNG *Insecure, size_t NumCodePoints) {
         UTF32 *String                 = 0UL;
-        if (Random != NULL) {
+        if (Insecure != NULL) {
             String                    = UTF32_Init(NumCodePoints);
             if (String != NULL) {
                 for (size_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
-                    String[CodePoint] = UTF32_GenerateCodePoint(Random);
+                    String[CodePoint] = UTF32_GenerateCodePoint(Insecure);
                 }
             } else {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate string with %zu CodePoints"), NumCodePoints);
             }
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Insecure Pointer is NULL"));
         }
         return String;
     }

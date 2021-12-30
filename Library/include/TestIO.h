@@ -10,9 +10,10 @@
  Suite:       Group of similar test cases.
  */
 
-#include "PlatformIO.h"         /* Included for Platform Independence macros */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
 #include "TextIO/LogIO.h"       /* Included for Logging, tests need to log errors */
+#include "RegistrationIO.h"
+
 #include <setjmp.h>
 
 #pragma once
@@ -22,6 +23,33 @@
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
+#endif
+
+#ifndef TestIO_Internal_SectionAttibute
+#if (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#else
+#define TestIO_Internal_SectionAttibute __attribute__(section("TestIO"), used)
+#endif /* Compiler */
+
+#ifndef TestIO_Internal_Section_Create
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define TestIO_Internal_Section_Create                                                \
+    __pragma(section(".TestIO$a", read));                                             \
+    __declspec(allocate(".TestIO$a")) extern UTF8 *__start_TestIO = u8"TestIO_Start"; \
+    __pragma(section(".TestIO$b", read));                                             \
+    __declspec(allocate(".TestIO$b")) size_t __TestIO_NumSuites = TestIO_NumSuites;   \
+    __pragma(section(".TestIO$z", read));                                             \
+    __declspec(allocate(".TestIO$z")) UTF8 *__stop_TestIO = u8"TestIO_Stop";
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#if   (PlatformIO_ExecutableFormat == PlatformIO_ExecutableFormatIsMachO)
+#define TestIO_Internal_Section_Create                                                \
+    __attribute__((section("__DATA,TestIO"), used)) extern UTF8 *__start_TestIO = u8"TestIO_Start"; \
+    __attribute__((section("__DATA,TestIO"), used)) extern UTF8 *__stop_TestIO  = u8"TestIO_Stop";
+#else
+    // Elf, PE regardless of compiler
+    __attribute__((section("TestIO"), used)) extern UTF8 *__start_TestIO = u8"TestIO_Start"; \
+    __attribute__((section("TestIO"), used)) extern UTF8 *__stop_TestIO  = u8"TestIO_Stop";
+#endif /* Executable format */
 #endif
 
     /* Disable warnings about redefining the Suite macro */
@@ -63,10 +91,12 @@ extern "C" {
     } TestIO_TestOutcomes;
 
     /*!
-     @abstract                                    Forward Declaration of CryptographyIO's SecureRNG.
+     @typedef      InsecurePRNG
+     @abstract                                     Forward declaration from CryptographyIO.
      */
-    typedef struct SecureRNG                      SecureRNG;
-    typedef        TestIO_TestOutcomes          (*TestIO_TestFunction)(SecureRNG *Secure);
+    typedef struct InsecurePRNG                    InsecurePRNG;
+    
+    typedef        TestIO_TestOutcomes          (*TestIO_TestFunction)(InsecurePRNG *Insecure);
 
     typedef struct TestIO_Enviroment {
         jmp_buf Enviroment;
@@ -85,21 +115,20 @@ extern "C" {
      @variable     Result                         The actual observed value of the test after running.
      */
     typedef struct TestIO_Case {
-        TestIO_TestFunction            Function;
         const UTF8                    *Name;
-        uint64_t                       TimeElapsed;
+        TestIO_TestFunction            Function;
         TestIO_TestStates              State;
         TestIO_TestOutcomes            Expectation;
         TestIO_TestOutcomes            Result;
     } TestIO_Case;
 
     typedef struct TestIO_Suite {
-        void                          *FixtureState;
+        const UTF8                    *Name;
+        void                          *FixtureStruct;
+        const TestIO_Case             *Tests;
         TestIO_FixtureInit             Init;
         TestIO_FixtureDeinit           Deinit;
-        const TestIO_Case             *Tests;
         size_t                         NumTests;
-        const UTF8                    *Name;
     } TestIO_Suite;
 
     extern const TestIO_Suite NULLSuite;
@@ -127,10 +156,18 @@ extern "C" {
 #define          TestIO_Internal_Suite_RestoreNames _Pragma("pop_macro(\"TestIO_Internal_SuiteNames\")")
 #endif /* TestIO_Internal_Suite_RestoreNames */
 
-#ifndef TestIO_Internal_List_AddSuite
-#define TestIO_Internal_List_AddSuite(TestSuite_Name) TestIO_Internal_Suite_SaveNames
-#define TestIO_Internal_SuiteNames TestSuite_Name
-#endif /* TestIO_Internal_List_AddSuite */
+#ifndef TestIO_RegisterTest
+#define TestIO_RegisterTest(Suite_TestCount, Suite_TestList, Suite, Function2Test, TestState, Outcome) \
+__redefine_macro(Suite_TestCount, Suite_TestCount + 1)                   \
+_Pragma("push_macro("\""Suite_TestList"\"")"")                           \
+__redefine_macro(Suite_TestList, TestIOCase_##Function2Test)             \
+const TestIO_Case TestIOCase_##Function2Test TestIO_Internal_Section = { \
+.Name        = PlatformIO_Stringify(Function2Test),                      \
+.Function    = Function2Test,                                            \
+.State       = TestState,                                                \
+.Expectation = Outcome,                                                  \
+};
+#endif /* TestIO_RegisterTest */
 
     /* We also need to create a counter variable to store the number of cases */
 #ifndef TestIO_ReserveCasesForSuite
@@ -152,69 +189,42 @@ extern "C" {
 
 #ifndef TestIO_Internal_IncrementNumTests
 #define TestIO_Internal_IncrementNumTests(TestSuite_Name)
-    __increment(TestIOSuite_##TestSuite_Name##_NumTests)
+    __redefine_macro(TestIOSuite_##TestSuite_Name##_NumTests)
 #endif /* TestIO_Internal_IncrementNumTests */
 
-#ifndef TestIO_Internal_RegisterTestWithSuite
-#define TestIO_Internal_RegisterTestWithSuite(TestSuite_Name, TestCase_Name)
-    _Pragma("push_macro(\"TestIOSuite_CasesFor_##TestSuite_Name\")")
-#undef PlatformIO_Expand(TestIOSuite_CasesFor_##TestSuite_Name)
-#define PlatformIO_Expand(TestIOSuite_CasesFor_##TestSuite_Name) TestCase_Name
-#endif /* TestIO_Internal_RegisterTestWithSuite */
+    /*
+     When registering a test we need the function pointer of the test, the state, the expected outcome, the suitename, and the list macro
+     */
 
 #ifndef TestIO_RegisterSuite
-#define TestIO_RegisterSuite(TestSuite_Name)                                                                 \
-TestIO_ReserveCasesForSuite(TestSuite_Name)                                                                  \
-TestIO_CreateTestCounterForSuite(TestSuite_Name)                                                             \
-static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) = {         \
-.Init   = NULL,                                                                                      \
-.Deinit = NULL,                                                                                      \
-.Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))), \
+#define TestIO_RegisterSuite(TestSuite_Name)                                                                                        \
+TestIO_ReserveCasesForSuite(TestSuite_Name)                                                                                         \
+TestIO_CreateTestCounterForSuite(TestSuite_Name)                                                                                    \
+static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) TestIO_Internal_Section = {            \
+.Init   = NULL,                                                                                                                     \
+.Deinit = NULL,                                                                                                                     \
+.Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))),                                \
 };
-    __increment(TestIO_Internal_NumSuites) /* Increment the count of TestIO_Suites each time RegisterSuite* macros are called */
+    __redefine_macro(TestIO_Internal_NumSuites, TestIO_Internal_NumSuites + 1) /* Increment the count of TestIO_Suites each time RegisterSuite* macros are called */
 #define TestIO_Internal_SuiteNames PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))
     _Pragma("push_macro(\"TestIO_Internal_SuiteNames\")")
 #undef TestIO_Internal_SuiteNames
 #endif /* TestIO_RegisterSuite */
 
 #ifndef TestIO_RegisterSuiteWithFixtures
-#define TestIO_RegisterSuiteWithFixtures(TestSuite_Name, Fixture_Init, Fixture_Deinit)                      \
-TestIO_ReserveCasesForSuite(TestSuite_Name)                                                                 \
-TestIO_CreateTestCounterForSuite(TestSuite_Name)                                                            \
-const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) = {        \
-.Init   = Fixture_Init,                                                                             \
-.Deinit = Fixture_Deinit,                                                                           \
-.Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))),\
+#define TestIO_RegisterSuiteWithFixtures(TestSuite_Name, Fixture_Init, Fixture_Deinit)                                              \
+TestIO_ReserveCasesForSuite(TestSuite_Name)                                                                                         \
+TestIO_CreateTestCounterForSuite(TestSuite_Name)                                                                                    \
+const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name)) TestIO_Internal_Section = {                   \
+.Init   = Fixture_Init,                                                                                                             \
+.Deinit = Fixture_Deinit,                                                                                                           \
+.Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))),                                \
 };
-    __increment(TestIO_Internal_NumSuites)
+    __redefine_macro(TestIO_Internal_NumSuites, TestIO_Internal_NumSuites + 1)
 #define TestIO_Internal_SuiteNames PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))
     _Pragma("push_macro(\"TestIO_Internal_SuiteNames\")")
 #undef TestIO_Internal_SuiteNames
 #endif /* TestIO_RegisterSuiteWithFixtures */
-
-#ifndef            TestIO_RegisterTest
-#define            TestIO_RegisterTest(TestSuite_Name, Function2Test, TestState, Outcome) \
-TestIO_Internal_IncrementNumTests(TestSuite_Name)                                         \
-const TestIO_Case TestIOCase_##Function2Test = {                                   \
-.Function    = Function2Test,                                                             \
-.State       = TestState,                                                                 \
-.Expectation = Outcome,                                                                   \
-.Name        = PlatformIO_Stringify(Function2Test),                                       \
-};
-#endif /* TestIO_RegisterTest */
-
-    /*
-     I need an ArraySet of SuiteNames
-
-     #define TestIO_GetSuiteName _Pragma(pop_macro("TestIO_Internal_SuiteName"))
-     static const TestIO_Suite **SuiteArraySet = {
-     [__COUNTER__] = &TestIO_GetSuiteName;
-     ];
-
-     that's all fine and dandy; the problem is, how do I wrap the index to the address-of part into a damn loop at compile time?
-
-     As for push_macro/pop_macro, each time the name macro is set, we could set a count variable
-     */
 
     /*
      Register each suite:
@@ -242,10 +252,10 @@ const TestIO_Case TestIOCase_##Function2Test = {                                
 
     /*!
      @abstract                                    Generates a valid UTF-32 string, containing up to 8192 CodePoints.
-     @param        Random                         Pointer to an instance of SecureRNG, from CryptographyIO.
+     @param        Insecure                       Pointer to an instance of Insecure, from CryptographyIO.
      @param        NumCodePoints                  The number of CodePoints, for the String's size.
      */
-    UTF32         *TestIO_Random_GetString(SecureRNG *Random, uint64_t NumCodePoints);
+    UTF32         *TestIO_Random_GetString(InsecurePRNG *Insecure, uint64_t NumCodePoints);
 
     /* Re-enable warnings about redefining macros */
 #if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang)

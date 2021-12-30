@@ -5,13 +5,13 @@
 #include "../../include/MathIO.h"                      /* Included for endian swapping */
 #include "../../include/TextIO/LogIO.h"                /* Included for error logging */
 #include "../../include/TextIO/Private/TextIOTables.h" /* Included for the Text tables */
-#include "../../include/TextIO/StringSetIO.h"          /* Included for StringSet stuff */
+#include "../../include/TextIO/StringSetIO.h"          /* Included for StringSet support */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
-    typedef enum UTF8Constants {
+    typedef enum StringIOConstants {
         UTF8Header_2CodeUnits   = 0xC0,
         UTF8Header_3CodeUnits   = 0xE0,
         UTF8Header_4CodeUnits   = 0xF0,
@@ -21,7 +21,12 @@ extern "C" {
         UTF8Mask5Bit            = 0x1F,
         UTF8Mask4Bit            = 0xF,
         UTF8Mask3Bit            = 0x7,
-    } UTF8Constants;
+        UTF8_Debug_Text_8       = 0x38,
+        UTF16_Debug_Text_16BE   = 0x3136,
+        UTF16_Debug_Text_16LE   = 0x3631,
+        UTF32_Debug_Text_32BE   = 0x3332,
+        UTF32_Debug_Text_32LE   = 0x3233,
+    } StringIOConstants;
     
     static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + TextIO_NULLTerminatorSize] = {0, 0, 0, 0, 0};
     static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + TextIO_NULLTerminatorSize] = {0, 0, 0};
@@ -32,7 +37,7 @@ extern "C" {
             size_t StringSize   = NumCodeUnits + TextIO_NULLTerminatorSize;
             String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-            BufferIO_MemorySet8(String, 0x38, NumCodeUnits);
+            BufferIO_MemorySet8(String, UTF8_Debug_Text_8, NumCodeUnits);
 #endif
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %zu bytes"), StringSize * sizeof(UTF8));
@@ -49,10 +54,10 @@ extern "C" {
             size_t StringSize   = NumCodeUnits + TextIO_NULLTerminatorSize;
             String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-#if   PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE
-            BufferIO_MemorySet16(String, 0x3136, StringSize);
-#elif PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE
-            BufferIO_MemorySet16(String, 0x3631, StringSize);
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            BufferIO_MemorySet16(String, UTF16_Debug_Text_16BE, StringSize);
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            BufferIO_MemorySet16(String, UTF16_Debug_Text_16LE, StringSize);
 #endif /* ByteOrder */
 #endif /* Debug */
             if (String == NULL) {
@@ -70,10 +75,10 @@ extern "C" {
             size_t StringSize   = NumCodePoints + TextIO_NULLTerminatorSize;
             String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-#if   PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE
-            BufferIO_MemorySet32(String, 0x3136, StringSize);
-#elif PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE
-            BufferIO_MemorySet32(String, 0x3631, StringSize);
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            BufferIO_MemorySet32(String, UTF32_Debug_Text_32BE, StringSize);
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            BufferIO_MemorySet32(String, UTF32_Debug_Text_32LE, StringSize);
 #endif /* ByteOrder */
 #endif /* Debug */
             if (String == NULL) {

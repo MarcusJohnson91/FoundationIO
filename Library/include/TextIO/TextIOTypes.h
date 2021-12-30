@@ -17,77 +17,120 @@
 extern "C" {
 #endif
 
+  /*!
+   @enum                TextIO_StringTypes
+   @constant            StringType_Unspecified                 Invalid/Default value
+   @constant            StringType_UTF8                        UTF-8
+   @constant            StringType_UTF16                       UTF-16
+   @constant            StringType_UTF32                       UTF-32
+   */
+  typedef enum TextIO_StringTypes {
+                        StringType_Unspecified                 = 0,
+                        StringType_UTF8                        = 1,
+                        StringType_UTF16                       = 2,
+                        StringType_UTF32                       = 4,
+  } TextIO_StringTypes;
+
+  /*!
+   @enum                TextIO_Bases
+   @abstract                                                   Defines the type of option.
+   @constant            Base_Integer                           ORable mask for Integers.
+   @constant            Base_Radix2                            Integer only, base-2/binary.
+   @constant            Base_Radix8                            Integer only, base-8/octal.
+   @constant            Base_Decimal                           ORable mask for floating point numbers.
+   @constant            Base_Radix10                           Integer or Decimal, base-10.
+   @constant            Base_Radix16                           Integer or Decimal, base-16/hexadecimal.
+   @constant            Base_Uppercase                         Base-16 only.
+   @constant            Base_Lowercase                         Base-16 only.
+   @constant            Base_Scientific                        Decimal only.
+   @constant            Base_Shortest                          Decimal only.
+   */
+  typedef enum TextIO_Bases {
+                        Base_Unspecified                       = 0,
+                        Base_Integer                           = 1,
+                        Base_Radix2                            = 2,
+                        Base_Radix8                            = 4,
+                        Base_Decimal                           = 8,
+                        Base_Radix10                           = 16,
+                        Base_Radix16                           = 32,
+                        Base_Uppercase                         = 64,
+                        Base_Lowercase                         = 128,
+                        Base_Scientific                        = 256,
+                        Base_Shortest                          = 512,
+  } TextIO_Bases;
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
+  extern "C++" {
+    constexpr inline  TextIO_Bases operator | (TextIO_Bases A, TextIO_Bases B) {
+      return static_cast<TextIO_Bases>(static_cast<int>(A) | static_cast<int>(B));
+    }
+
+    constexpr inline  TextIO_Bases operator & (TextIO_Bases A, TextIO_Bases B) {
+      return static_cast<TextIO_Bases>(static_cast<int>(A) & static_cast<int>(B));
+    }
+
+    constexpr inline  TextIO_Bases operator |= (TextIO_Bases A, TextIO_Bases B) {
+      uint16_t A1 = static_cast<int>(A);
+      uint16_t B1 = static_cast<int>(B);
+      return static_cast<TextIO_Bases>(A1 | B1);
+    }
+
+    constexpr inline  TextIO_Bases operator &= (TextIO_Bases A, TextIO_Bases B) {
+      uint16_t A1 = static_cast<int>(A);
+      uint16_t B1 = static_cast<int>(B);
+      return static_cast<TextIO_Bases>(A1 & B1);
+    }
+  }
+#endif /* PlatformIO_Language */
+
 #ifndef TextIO_NULLTerminator
-#define TextIO_NULLTerminator                                           (0)
+#define                   TextIO_NULLTerminator                                           (0)
 #endif
 
 #ifndef TextIO_NULLTerminatorSize
-#define TextIO_NULLTerminatorSize                                       (1)
+#define                   TextIO_NULLTerminatorSize                                       (1)
 #endif
 
 #ifndef TextIO_UNCPathPrefix8
-#define TextIO_UNCPathPrefix8                                           UTF8String("//?/")
+#define                   TextIO_UNCPathPrefix8                                           UTF8String("//?/")
 #endif
 
 #ifndef TextIO_InvisibleString32
-#define TextIO_InvisibleString32                                        UTF32String("\u00A0")
+#define                   TextIO_InvisibleString32                                        UTF32String("\u00A0")
 #endif
 
-#ifndef TextIO_WideCharTypeIsUTF32
-#define TextIO_WideCharTypeIsUTF32                                      (1)
-#endif
-
-#ifndef TextIO_WideCharTypeIsUTF16
-#define TextIO_WideCharTypeIsUTF16                                      (2)
-#endif
-
-#ifndef TextIO_WideCharType
+#ifndef TextIO_WCharType
 #if   (WCHAR_MAX == 0x7FFFFFFF || WCHAR_MAX == 0xFFFFFFFF)
-#define TextIO_WideCharType                                             TextIO_WideCharTypeIsUTF32
+#define                   TextIO_WCharType                                                StringType_UTF32
 #elif (WCHAR_MAX == 0x7FFF || WCGAR_MAX == 0xFFFF)
-#define TextIO_WideCharType                                             TextIO_WideCharTypeIsUTF16
+#define                   TextIO_WCharType                                                StringType_UTF16
 #endif /* WCHAR_MAX */
-#endif /* TextIO_WideCharType */
+#endif /* TextIO_WCharType */
 
-#ifndef             TextIO_NewLine8
+#ifndef                   TextIO_NewLineTypes
+#define                   TextIO_NewLineTypes                                             (1)
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-#define             TextIO_NewLine8                                                 UTF8String("\n")
-#define             TextIO_NewLine8Size                                             (1)
+#define                   TextIO_NewLine8                                                 UTF8String("\n")
+#define                   TextIO_NewLine8Size                                             (1)
+#define                   TextIO_NewLine16                                                UTF16String("\n")
+#define                   TextIO_NewLine16Size                                            (1)
+#define                   TextIO_NewLine32                                                UTF32String("\n")
+#define                   TextIO_NewLine32Size                                            (1)
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-#define             TextIO_NewLine8                                                 UTF8String("\r\n")
-#define             TextIO_NewLine8Size                                             (2)
+#define                   TextIO_NewLine8                                                 UTF8String("\r\n")
+#define                   TextIO_NewLine8Size                                             (2)
+#define                   TextIO_NewLine16                                                UTF16String("\r\n")
+#define                   TextIO_NewLine16Size                                            (2)
+#define                   TextIO_NewLine32                                                UTF32String("\r\n")
+#define                   TextIO_NewLine32Size                                            (2)
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsClassicMac)
-#define             TextIO_NewLine8                                                 UTF8String("\r")
-#define             TextIO_NewLine8Size                                             (1)
+#define                   TextIO_NewLine8                                                 UTF8String("\r")
+#define                   TextIO_NewLine8Size                                             (1)
+#define                   TextIO_NewLine16                                                UTF16String("\r")
+#define                   TextIO_NewLine16Size                                            (1)
+#define                   TextIO_NewLine32                                                UTF32String("\r")
+#define                   TextIO_NewLine32Size                                            (1)
 #endif /* PlatformIO_TargetOS */
-#endif /* TextIO_NewLine8 */
-
-#ifndef             TextIO_NewLine16
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-#define             TextIO_NewLine16                                                UTF16String("\n")
-#define             TextIO_NewLine16Size                                            (1)
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-#define             TextIO_NewLine16                                                UTF16String("\r\n")
-#define             TextIO_NewLine16Size                                            (2)
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsClassicMac)
-#define             TextIO_NewLine16                                                UTF16String("\r")
-#define             TextIO_NewLine16Size                                            (1)
-#endif /* PlatformIO_TargetOS */
-#endif /* TextIO_NewLine16 */
-
-
-#ifndef             TextIO_NewLine32
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-#define             TextIO_NewLine32                                                UTF32String("\n")
-#define             TextIO_NewLine32Size                                            (1)
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-#define             TextIO_NewLine32                                                UTF32String("\r\n")
-#define             TextIO_NewLine32Size                                            (2)
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsClassicMac)
-#define             TextIO_NewLine32                                                UTF32String("\r")
-#define             TextIO_NewLine32Size                                            (1)
-#endif /* PlatformIO_TargetOS */
-#endif /* TextIO_NewLine32 */
+#endif /* TextIO_NewLineTypes */
 
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #if defined(__has_include) && __has_include(<uchar.h>)
@@ -163,7 +206,7 @@ extern "C" {
 #endif /* __CHAR32_TYPE__ */
   
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC23)
-  typedef __CHAR8_TYPE__  char8_t;
+  typedef __CHAR8_TYPE__   char8_t;
 #endif
   
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC11)
@@ -190,6 +233,11 @@ typedef                   char8_t                              UTF8;
 @abstract                 CharSet8                             is for non-Unicode character sets.
 */
 typedef                   char8_t                              CharSet8;
+typedef const             UTF8                                 ImmutableChar_UTF8;
+typedef const             UTF8                                 *const ImmutableString_UTF8;
+typedef const             UTF8                                 *StringSet_UTF8;
+typedef const             UTF8                                 *const ImmutableStringSet_UTF8[]; // const Type *const *
+typedef const             UTF8                                 *MutableStringSet_UTF8[]; // const Type *
 #endif /* TextIO_StringTypes8 */
 
 #ifndef                   TextIO_StringTypes16
@@ -208,6 +256,13 @@ typedef                   char16_t                             UTF16;
 @abstract                 CharSet16                            is for non-Unicode character sets.
 */
 typedef                   char16_t                             CharSet16;
+
+
+  typedef const UTF16    ImmutableChar_UTF16;
+  typedef const UTF16    *const ImmutableString_UTF16;
+  typedef const UTF16    *StringSet_UTF16;
+  typedef const UTF16 *const ImmutableStringSet_UTF16[];
+  typedef const UTF16      *MutableStringSet_UTF16[];
 #endif /* TextIO_StringTypes16 */
 
 #ifndef                   TextIO_StringTypes32
@@ -226,6 +281,13 @@ typedef                   char32_t                             UTF32;
 @abstract                 CharSet32                            is for non-Unicode character sets.
  */
 typedef                   char32_t                             CharSet32;
+
+  typedef                 const char32_t                       ImmutableChar32;
+typedef const UTF32    ImmutableChar_UTF32;
+typedef const UTF32    *const ImmutableString_UTF32;
+typedef const UTF32    *StringSet_UTF32;
+typedef const UTF32 *const *const ImmutableStringSet_UTF32;
+typedef const UTF32      *MutableStringSet_UTF32[];
 #endif /* TextIO_StringTypes32 */
 
 #ifndef                   TextIOTypes_PropertyConversion8
@@ -460,26 +522,6 @@ typedef                   char32_t                             CharSet32;
 #endif /* UTF32_MakeStringImmutable */
 
 #endif /* TextIOTypes_PropertyConversion32 */
-  
-typedef const UTF8     ImmutableChar_UTF8;
-typedef const UTF16    ImmutableChar_UTF16;
-typedef const UTF32    ImmutableChar_UTF32;
-
-typedef const UTF8     *const ImmutableString_UTF8;
-typedef const UTF16    *const ImmutableString_UTF16;
-typedef const UTF32    *const ImmutableString_UTF32;
-
-typedef const UTF8     *StringSet_UTF8;
-typedef const UTF16    *StringSet_UTF16;
-typedef const UTF32    *StringSet_UTF32;
-
-typedef const UTF8     *const ImmutableStringSet_UTF8[];
-typedef const UTF16    *const ImmutableStringSet_UTF16[];
-typedef const UTF32    *const ImmutableStringSet_UTF32[];
-
-typedef const UTF8     *MutableStringSet_UTF8[];
-typedef const UTF16    *MutableStringSet_UTF16[];
-typedef const UTF32    *MutableStringSet_UTF32[];
 
 #ifndef                   TextIO_Unicodize8
 #define                   TextIO_Unicodize8               (1)
@@ -593,25 +635,25 @@ typedef const UTF32    *MutableStringSet_UTF32[];
 
     /* TextIO_Slice Functions */
     /*!
-     @abstract                                           Creates an instance of a TextIO_Slice.
-     @param            StartInCodeUnits                  Where should the string start?
-     @param            EndInCodeUnits                    Where should the string end?
+     @abstract                                              Creates an instance of a TextIO_Slice.
+     @param               StartInCodeUnits                  Where should the string start?
+     @param               EndInCodeUnits                    Where should the string end?
      */
-    TextIO_Slice       TextIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits);
+    TextIO_Slice          TextIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits);
 
     /*!
-     @abstract                                           Where does this slice start?
-     @param            Slice                             The instance of the TextIO_Slice.
-     @return                                             The Start of the TextIO_Slice in CodeUnits.
+     @abstract                                              Where does this slice start?
+     @param               Slice                             The instance of the TextIO_Slice.
+     @return                                                The Start of the TextIO_Slice in CodeUnits.
      */
-    size_t             TextIO_Slice_GetStartInCodeUnits(TextIO_Slice Slice);
+    size_t                TextIO_Slice_GetStartInCodeUnits(TextIO_Slice Slice);
 
     /*!
-     @abstract                                           Where does this slice end?
-     @param            Slice                             The instance of the TextIO_Slice.
-     @return                                             The End of the TextIO_Slice in CodeUnits.
+     @abstract                                              Where does this slice end?
+     @param               Slice                             The instance of the TextIO_Slice.
+     @return                                                The End of the TextIO_Slice in CodeUnits.
      */
-    size_t             TextIO_Slice_GetEndInCodeUnits(TextIO_Slice Slice);
+    size_t                TextIO_Slice_GetEndInCodeUnits(TextIO_Slice Slice);
     /* TextIO_Slice Functions */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

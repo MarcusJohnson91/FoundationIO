@@ -7,408 +7,179 @@
 #include "../include/TextIO/LogIO.h"      /* Included for error logging */
 #include "../include/TextIO/StringIO.h"   /* Included for UTF8_GetStringSizeInCodeUnits */
 
-
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-#include <BCrypt.h>
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
-#include <linux/random.h>
-#include <sys/syscall.h>
-#include <sys/random.h>
-#endif /* TargetOS */
+#if defined(__has_include)
+#if __has_include(<assert.h>)
+#include <assert.h>
+#endif /* __has_include */
+#else
+#define assert(X) _Assert(X)
+#endif
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
     typedef struct InsecurePRNG {
-        uint64_t State[16];
-        uint64_t Output[16];
-        size_t   Iteration;
+        uint64_t State[4];
+        uint16_t NumBitsRemaining;
     } InsecurePRNG;
 
-    typedef struct SecureRNG {
-        uint8_t  *EntropyPool;
-        size_t    NumBits;
-        size_t    BitOffset;
-    } SecureRNG;
+    /*!
+     @abstract Generated with WolframAlpha query "RandomInteger[{0, 18446744073709551615}]"
+     @date     Dec 29, 2021
+     @remark   Feel free to change these default seeds as often as you like.
+     */
+    static const uint64_t InsecurePRNG_DefaultSeed[4] = {
+        0x1EDC87AE5FDA334D, 0xCBD633180FD9371B,
+        0xA7D0130AD80AB611, 0x3A4CB28F2DBEF158,
+    };
 
-    InsecurePRNG *InsecurePRNG_Init(uint64_t Seed[4]) {
-        InsecurePRNG *Insecure = (InsecurePRNG*) calloc(1, sizeof(InsecurePRNG));
-        if (Insecure != NULL) {
-            static const uint64_t Phi[16] = {
-                0x9E3779B97F4A7C15, 0xF39CC0605CEDC834, 0x1082276BF3A27251, 0xF86C6A11D0C18E95,
-                0x2767F0B153D27B7F, 0x0347045B5BF1827F, 0x01886F0928403002, 0xC1D64BA40F335E36,
-                0xF06AD7AE9717877E, 0x85839D6EFFBD7DC6, 0x64D325D1C5371682, 0xCADD0CCCFDFFBBE1,
-                0x626E33B8D04B4331, 0xBBF73C790D94F79D, 0x471C4AB3ED3D82A5, 0xFEC507705E4AE6E5,
-            };
-            Insecure->State[0x0]   = Phi[0x3];
-            Insecure->State[0x1]   = Phi[0x2] ^ Seed[1];
-            Insecure->State[0x2]   = Phi[0x1];
-            Insecure->State[0x3]   = Phi[0x0] ^ Seed[0];
-            Insecure->State[0x4]   = Phi[0x7];
-            Insecure->State[0x5]   = Phi[0x6] ^ Seed[3];
-            Insecure->State[0x6]   = Phi[0x5];
-            Insecure->State[0x7]   = Phi[0x4] ^ Seed[2];
-            Insecure->State[0x8]   = Phi[0xB];
-            Insecure->State[0x9]   = Phi[0xA] ^ Seed[3];
-            Insecure->State[0xA]   = Phi[0x9];
-            Insecure->State[0xB]   = Phi[0x8] ^ Seed[2];
-            Insecure->State[0xC]   = Phi[0xF];
-            Insecure->State[0xD]   = Phi[0xE] ^ Seed[1];
-            Insecure->State[0xE]   = Phi[0xD];
-            Insecure->State[0xF]   = Phi[0xC] ^ Seed[0];
+    /*
+     Jump/long_jump and next require the state to be set to something that isn't zero before being called
+     */
+    static const uint64_t Xoshiro_Constants[2][4] = {
+        [0] = {0x180EC6D33CFD0ABA, 0xD5A61266F0C9392C, 0xA9582618E03FC9AA, 0x39ABDC4529B1661C}, // JUMP
+        [1] = {0x76E15D3EFEFDCBBF, 0xC5004E441C522FB3, 0x77710069854EE241, 0x39109BB02ACBE635}, // LONG_JUMP
+    };
 
-            for (uint8_t Index = 0; Index < 13; Index++) {
-                Insecure->State[0] = Insecure->Output[3];
-                Insecure->State[1] = Insecure->Output[2];
-                Insecure->State[2] = Insecure->Output[1];
-                Insecure->State[3] = Insecure->Output[0];
+    static uint64_t InsecurePRNG_Seed(uint64_t Seed) { // srand() replacement, based on CC0 SplitMix64
+        uint64_t Z = Seed + 0x9E3779B97F4A7C15;
+        Z          = (Z ^ (Z >> 30)) * 0xBF58476D1CE4E5B9;
+        Z          = (Z ^ (Z >> 27)) * 0x94D049BB133111EB;
+        return Z ^ (Z >> 31);
+    }
+
+    static void InsecurePRNG_MixState(InsecurePRNG *Insecure, bool IsLongJump) { // Xoshiro256** jump/long_jump + next
+        uint64_t S0 = 0, S1 = 0, S2 = 0, S3 = 0;
+        if (IsLongJump != false) {
+            if (Insecure->State[0] != 0) {
+                S0 = Insecure->State[0];
+            } else {
+                S0 = Xoshiro_Constants[1][0];
             }
+            S1 = Xoshiro_Constants[1][1];
+            S2 = Xoshiro_Constants[1][2];
+            S3 = Xoshiro_Constants[1][3];
+        } else {
+            if (Insecure->State[0] != 0) {
+                S0 = Insecure->State[0];
+            } else {
+                S0 = Xoshiro_Constants[0][0];
+            }
+            S1 = Xoshiro_Constants[0][1];
+            S2 = Xoshiro_Constants[0][2];
+            S3 = Xoshiro_Constants[0][3];
         }
+        for (uint8_t LeftShift = 0; LeftShift < 64; LeftShift++) {
+            S0 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[0]);
+            S1 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[1]);
+            S2 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[2]);
+            S3 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[3]);
+        }
+        const uint64_t Temp = S0 << 17;
+        Insecure->State[2] ^= S0;
+        Insecure->State[3] ^= S1;
+        Insecure->State[1] ^= S2;
+        Insecure->State[0] ^= S3;
+        Insecure->State[2] ^= Temp;
+        Insecure->State[3]  = Rotate(RotationType_Left, 45, Insecure->State[3]);
+        Insecure->NumBitsRemaining = 256;
+    }
+
+    InsecurePRNG *InsecurePRNG_Init(uint64_t Seed) {
+        InsecurePRNG *Insecure = calloc(1, sizeof(InsecurePRNG));
+        assert(Insecure != NULL && "Couldn't allocate InsecurePRNG!");
+        if (Seed == 0) {
+            Insecure->State[0] = InsecurePRNG_Seed(InsecurePRNG_DefaultSeed[0]);
+        } else {
+            Insecure->State[0] = InsecurePRNG_Seed(Seed);
+        }
+        Insecure->State[1]     = InsecurePRNG_Seed(InsecurePRNG_DefaultSeed[1]);
+        Insecure->State[2]     = InsecurePRNG_Seed(InsecurePRNG_DefaultSeed[2]);
+        Insecure->State[3]     = InsecurePRNG_Seed(InsecurePRNG_DefaultSeed[3]);
+        InsecurePRNG_MixState(Insecure, /*IsLongJump*/ true);
         return Insecure;
     }
 
-    void InsecurePRNG_Generate(InsecurePRNG *Insecure, uint8_t *Buffer, size_t BufferSize) {
-        if (Insecure != NULL) {
-            uint64_t *Buffer64                         = (uint64_t*) Buffer;
-            uint64_t State1                            = Insecure->State[1];
-            uint64_t State3                            = Insecure->State[3];
-            uint64_t Iteration                         = Insecure->Iteration;
-            uint64_t Increment[4] = {1, 3, 5, 7};
-
-            for (size_t OutputWord = 0; OutputWord < 4; OutputWord++) {
-                for (size_t BufferWord = 0; BufferWord < BufferSize; BufferWord += 64) {
-                    Buffer64[BufferWord + OutputWord]  = Insecure->Output[OutputWord];
-                    State1                            += Iteration;
-                    State3                            += Iteration;
-                    for (uint8_t Index = 0; Index < 4; Index++) {
-                        Iteration                     += Increment[Index];
-                    }
-                    uint64_t U0 = Insecure->State[0x0] >> 1;
-                    uint64_t U1 = Insecure->State[0x1] >> 1;
-                    uint64_t U2 = Insecure->State[0x2] >> 1;
-                    uint64_t U3 = Insecure->State[0x3] >> 1;
-                    uint64_t U4 = Insecure->State[0x4] >> 3;
-                    uint64_t U5 = Insecure->State[0x5] >> 3;
-                    uint64_t U6 = Insecure->State[0x6] >> 3;
-                    uint64_t U7 = Insecure->State[0x7] >> 3;
-                    uint64_t U8 = Insecure->State[0x8] >> 1;
-                    uint64_t U9 = Insecure->State[0x9] >> 1;
-                    uint64_t UA = Insecure->State[0xA] >> 1;
-                    uint64_t UB = Insecure->State[0xB] >> 1;
-                    uint64_t UC = Insecure->State[0xC] >> 3;
-                    uint64_t UD = Insecure->State[0xD] >> 3;
-                    uint64_t UE = Insecure->State[0xE] >> 3;
-                    uint64_t UF = Insecure->State[0xF] >> 3;
-
-                    uint64_t T0 = ((Insecure->State[0x2] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[1] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t T1 = ((Insecure->State[0x1] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t T2 = ((Insecure->State[0x0] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[3] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t T3 = ((Insecure->State[0x3] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[2] & 0xFFFFFFFF00000000) >> 32);
-
-                    uint64_t T4 = ((Insecure->State[0x5] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[4] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t T5 = ((Insecure->State[0x4] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[7] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t T6 = ((Insecure->State[0x7] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[6] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t T7 = ((Insecure->State[0x6] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[5] & 0xFFFFFFFF00000000) >> 32);
-
-                    uint64_t T8 = ((Insecure->State[0xA] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0x9] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t T9 = ((Insecure->State[0x9] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0x8] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t TA = ((Insecure->State[0x8] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0xB] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t TB = ((Insecure->State[0xB] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0xA] & 0xFFFFFFFF00000000) >> 32);
-
-                    uint64_t TC = ((Insecure->State[0xD] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0xC] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t TD = ((Insecure->State[0xC] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0xF] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t TE = ((Insecure->State[0xF] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0xE] & 0xFFFFFFFF00000000) >> 32);
-                    uint64_t TF = ((Insecure->State[0xE] & 0x00000000FFFFFFFF) << 32) | ((Insecure->State[0xD] & 0xFFFFFFFF00000000) >> 32);
-
-                    Insecure->State[0x0]  = T0 + U0;
-                    Insecure->State[0x1]  = T1 + U1;
-                    Insecure->State[0x2]  = T2 + U2;
-                    Insecure->State[0x3]  = T3 + U3;
-                    Insecure->State[0x4]  = T4 + U4;
-                    Insecure->State[0x5]  = T5 + U5;
-                    Insecure->State[0x6]  = T6 + U6;
-                    Insecure->State[0x7]  = T7 + U7;
-                    Insecure->State[0x8]  = T8 + U8;
-                    Insecure->State[0x9]  = T9 + U9;
-                    Insecure->State[0xA]  = TA + UA;
-                    Insecure->State[0xB]  = TB + UB;
-                    Insecure->State[0xC]  = TC + UC;
-                    Insecure->State[0xD]  = TD + UD;
-                    Insecure->State[0xE]  = TE + UE;
-                    Insecure->State[0xF]  = TF + UF;
-
-                    Insecure->Output[0x0] = U0 ^ T4;
-                    Insecure->Output[0x1] = U1 ^ T5;
-                    Insecure->Output[0x2] = U2 ^ T6;
-                    Insecure->Output[0x3] = U3 ^ T7;
-                    Insecure->Output[0x4] = U8 ^ TC;
-                    Insecure->Output[0x5] = U9 ^ TD;
-                    Insecure->Output[0x6] = UA ^ TE;
-                    Insecure->Output[0x7] = UB ^ TF;
-
-                    Insecure->Output[0x8] = Insecure->State[0x0] ^ Insecure->State[0xC];
-                    Insecure->Output[0x9] = Insecure->State[0x1] ^ Insecure->State[0xD];
-                    Insecure->Output[0xA] = Insecure->State[0x2] ^ Insecure->State[0xE];
-                    Insecure->Output[0xB] = Insecure->State[0x3] ^ Insecure->State[0xF];
-                    Insecure->Output[0xC] = Insecure->State[0x8] ^ Insecure->State[0x4];
-                    Insecure->Output[0xD] = Insecure->State[0x9] ^ Insecure->State[0x5];
-                    Insecure->Output[0xE] = Insecure->State[0xA] ^ Insecure->State[0x6];
-                    Insecure->Output[0xF] = Insecure->State[0xB] ^ Insecure->State[0x7];
-
-                    Insecure->Iteration   = Iteration;
-                }
+    /* RAND_MAX is just 31 bits on MacOS? weird */
+    static uint64_t InsecurePRNG_ExtractBits(InsecurePRNG *Insecure, uint8_t NumBits) {
+        uint64_t Value = 0;
+        if (Insecure != NULL && (NumBits > 0 && NumBits < 64)) {
+            if (Insecure->NumBitsRemaining < NumBits) {
+                // Mix the state again, this time
+                InsecurePRNG_MixState(Insecure, /*IsLongJump*/ true);
             }
+
+            while (NumBits > 0) {
+                uint8_t  Start                  = 256 - Insecure->NumBitsRemaining;
+                uint8_t  End                    = (Start + NumBits) % 64;
+                uint8_t  NumBitsAvailableInWord = 64 - ((End - Start) % 64);
+                uint8_t  Shift                  = (64 - (Start + NumBitsAvailableInWord));
+                uint64_t Mask                   = (Exponentiate(2, NumBitsAvailableInWord) - 1) << Shift;
+                uint64_t Extracted              = (Insecure->State[Start / 64] & Mask) >> Shift;
+                Value                         <<= Shift;
+                Value                          |= Extracted;
+                NumBits                        -= NumBitsAvailableInWord;
+                Insecure->NumBitsRemaining     -= NumBitsAvailableInWord;
+            }
+        }
+        return Value;
+    }
+
+    int64_t InsecurePRNG_CreateInteger(InsecurePRNG *Insecure, uint8_t IntegerSizeInBits) {
+        int64_t Value = InsecurePRNG_ExtractBits(Insecure, IntegerSizeInBits);
+        return Value; // SignExtend the Value before returning it
+    }
+
+    int64_t InsecurePRNG_CreateIntegerInRange(InsecurePRNG *Insecure, int64_t Min, int64_t Max) {
+        int64_t Value = 0;
+        uint8_t  BitsToRead = Logarithm(2, Max % Min);
+        uint64_t Extracted  = InsecurePRNG_ExtractBits(Insecure, BitsToRead);
+        if (Min <= 0 && Max <= 0) {
+            Value = (0xFFFFFFFFFFFFFFFF - Extracted) + 1;
+        } else if (Min >= 0 && Max >= 0) {
+            Value = (Extracted - 0x8000000000000001);
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
+            Value = Extracted;
         }
+        return Value;
     }
 
-    void InsecurePRNG_Deinit(InsecurePRNG *Insecure) {
-        if (Insecure != NULL) {
-            for (uint8_t Index = 0; Index < 16; Index++) {
-                Insecure->Output[Index] = 0;
-                Insecure->State[Index]  = 0;
-            }
-            Insecure->Iteration = 0;
-            free(Insecure->Output);
-            free(Insecure->State);
-            free(Insecure);
-        }
-    }
-
-    static int64_t SecureRNG_BaseSeed(uint8_t NumBytes) {
-        int64_t RandomValue = 0LL;
-        if (NumBytes <= 8) {
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
-            AsyncIOStream *Random     = AsyncIOStream_Init();
-            bool OpenedSuccessfully   = AsyncIOStream_OpenPathUTF8(Random, UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
-            if (OpenedSuccessfully) {
-                size_t BytesRead      = AsyncIOStream_Read(Random, &RandomValue, 8, 1);
-                if (BytesRead != 8) {
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Could not read 8 bytes from /dev/urandom"));
-                }
-            }
-            AsyncIOStream_Deinit(Random);
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
-            //int BytesRead             = syscall(SYS_getrandom, &RandomValue, NumBytes, 1);
-            ssize_t BytesRead           = getrandom(&RandomValue, NumBytes, 1);
-            if (BytesRead != NumBytes) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Could not read 8 bytes from getrandom on Linux"));
-            }
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsBSD)
-            arc4random_buf(&RandomValue, NumBytes);
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-            BCryptGenRandom(NULL, (PUCHAR) &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-#endif
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Can't return more than 8 bytes"));
-        }
-        return RandomValue;
-    }
-
-    static void SecureRNG_Seed(SecureRNG *Random) {
-        if (Random != NULL) {
-            if (Random->EntropyPool != NULL) {
-
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX) && !PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
-                arc4random_buf(Random->EntropyPool, Bits2Bytes(RoundingType_Down, Random->NumBits));
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
-                AsyncIOStream *Random     = AsyncIOStream_Init();
-                bool OpenedSuccessfully   = AsyncIOStream_OpenPathUTF8(Random, UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
-                if (OpenedSuccessfully) {
-                    size_t BytesRead      = AsyncIOStream_Read(&Random->EntropyPool, &RandomValue, Bits2Bytes(RoundingType_Down, Random->NumBits), 1);
-                    if (BytesRead != Bits2Bytes(RoundingType_Down, Random->NumBits)) {
-                        Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Could not read 8 bytes from /dev/urandom"));
-                    }
-                }
-                AsyncIOStream_Deinit(Random);
-#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, (ULONG) Bits2Bytes(RoundingType_Down, Random->NumBits), (ULONG) BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-                if (Status <= 0) {
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
-                    abort();
-                }
-#endif
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        }
-    }
-
-    static void SecureRNG_Mix(SecureRNG *Random) {
-        if (Random != NULL) {
-            for (uint64_t Word = 0ULL; Word < Bits2Bytes(RoundingType_Down, Random->NumBits) / 8; Word++) {
-                uint64_t Integer  = (int64_t) Random->EntropyPool;
-
-                uint64_t Seed1    = SecureRNG_BaseSeed(8);
-                uint64_t Seed2    = SecureRNG_BaseSeed(8);
-                uint64_t Seed3    = SecureRNG_BaseSeed(8);
-                uint64_t Seed4    = SecureRNG_BaseSeed(8);
-
-                uint8_t  Rotate1  = SecureRNG_BaseSeed(1) % 7;
-                uint8_t  Rotate2  = SecureRNG_BaseSeed(1) % 7;
-                uint8_t  Rotate3  = SecureRNG_BaseSeed(1) % 7;
-                uint8_t  Rotate4  = SecureRNG_BaseSeed(1) % 7;
-
-
-                uint64_t Mixed1   = Integer ^ Seed1;
-                uint64_t Rotated1 = Rotate(RotationType_Left, Rotate1, Mixed1);
-
-                uint64_t Mixed2   = Rotated1 & Seed2;
-                uint64_t Rotated2 = Rotate(RotationType_Left, Rotate2, Mixed2);
-
-                uint64_t Mixed3   = Rotated2 | Seed3;
-                uint64_t Rotated3 = Rotate(RotationType_Left, Rotate3, Mixed3);
-
-                uint64_t Mixed4   = Rotated3 | Seed4;
-                uint64_t Rotated4 = Rotate(RotationType_Left, Rotate4, Mixed4);
-
-                for (uint8_t Loop = 0; Loop < 8; Loop++) {
-                    Random->EntropyPool[Word + Loop] = (Rotated4 & (0xFF << Loop)) >> Loop;
-                }
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        }
-    }
-
-    static uint64_t SecureRNG_ExtractBits(SecureRNG *Random, uint8_t NumBits) {
-        uint64_t Bits                          = 0ULL;
-        if (Random != NULL && NumBits > 0) {
-            if (NumBits <= SecureRNG_GetRemainingEntropy(Random)) {
-                uint8_t  Bits2Read             = NumBits;
-
-                while (Bits2Read > 0) {
-                    uint8_t  BitsInCurrentByte = BitsAvailableInByte(Random->BitOffset);
-                    uint8_t  Bits2Get          = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
-                    uint8_t  BufferShift       = BitsInCurrentByte % 8;
-                    uint64_t BufferMask        = (Exponentiate(2, Bits2Get) - 1) << BufferShift;
-                    uint64_t BufferOffset      = Bits2Bytes(RoundingType_Down, Random->BitOffset);
-                    uint8_t  ExtractedBits     = Random->EntropyPool[BufferOffset] & BufferMask;
-                    uint8_t  ValueShift        = NumBits - Bits2Read;
-                    Bits                     <<= ValueShift;
-                    Bits                      |= ExtractedBits;
-
-                    Bits2Read                 -= Bits2Get;
-                    Random->BitOffset         += Bits2Get;
-                }
-            } else {
-                SecureRNG_Erase(Random, 0xFF);
-                SecureRNG_Seed(Random);
-                //SecureRNG_Mix(Random);
-                Bits                           = SecureRNG_ExtractBits(Random, NumBits);
-            }
-        } else if (Random == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        }
-        return Bits;
-    }
-
-    SecureRNG *SecureRNG_Init(size_t EntropyPoolSize) {
-        SecureRNG *Random             = (SecureRNG*) calloc(1, sizeof(SecureRNG));
-        if (Random != NULL) {
-            size_t PoolSize           = EntropyPoolSize;
-            if (EntropyPoolSize % 16 != 0) {
-                PoolSize              = EntropyPoolSize + (16 - (EntropyPoolSize % 16));
-            }
-            
-            Random->EntropyPool       = (uint8_t*) calloc(EntropyPoolSize, sizeof(uint8_t));
-            if (Random->EntropyPool != NULL) {
-                Random->NumBits       = EntropyPoolSize * 8;
-                Random->BitOffset     = 0ULL;
-                SecureRNG_Seed(Random);
-                //SecureRNG_Mix(Random);
-            } else {
-                SecureRNG_Deinit(Random);
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate EntropyPool"));
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate SecureRNG"));
-        }
-        return Random;
-    }
-
-    size_t SecureRNG_GetRemainingEntropy(SecureRNG *Random) {
-        size_t RemainingBits   = 0;
-        if (Random != NULL) {
-            RemainingBits      = Random->NumBits - Random->BitOffset;
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        }
-        return RemainingBits;
-    }
-
-    uint64_t SecureRNG_GenerateInteger(SecureRNG *Random, uint8_t NumBits) {
-        uint64_t GeneratedInteger = 0;
-        if (Random != NULL && NumBits >= 1 && NumBits <= 64) {
-            GeneratedInteger     = SecureRNG_ExtractBits(Random, NumBits);
-        } else if (Random == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        } else if (NumBits > 64) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Generating an integer %u bits long is invalid"), NumBits);
-        }
-        return GeneratedInteger;
-    }
-
-    uint64_t SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue) {
-        uint64_t RandomInteger                    = 0;
-        if (Random != NULL && MinValue <= MaxValue) {
-            uint8_t Bits2Read                     = (uint8_t) Exponentiate(2, Subtract(MinValue, MaxValue));
-            RandomInteger                         = SecureRNG_ExtractBits(Random, Bits2Read);
-
-            if (RandomInteger < MinValue || RandomInteger > MaxValue) {
-                uint8_t NumFixBits                = (uint8_t) Exponentiate(2, Subtract(RandomInteger, MaxValue) + Bits2Read);
-                NumFixBits                        = RoundD(NumFixBits / 2);
-                uint64_t FixBits                  = SecureRNG_ExtractBits(Random, NumFixBits);
-                if (RandomInteger < MinValue) {
-                    RandomInteger                += FixBits;
-                } else {
-                    RandomInteger                -= FixBits;
-                }
-            }
-        } else if (Random == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        } else if (MinValue > MaxValue) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("MinValue %lld is greater than MaxValue %lld"), MinValue, MaxValue);
-        }
-        return RandomInteger;
-    }
-
-    double SecureRNG_GenerateDecimal(SecureRNG *Random) {
+    double InsecurePRNG_CreateDecimal(InsecurePRNG *Insecure) {
         double Decimal        = 0.0;
-        if (Random != NULL) {
-            int8_t   Sign     = SecureRNG_GenerateInteger(Random, 1) == 1 ? 1 : -1;
-            int16_t  Exponent = (int16_t) SecureRNG_GenerateIntegerInRange(Random, -1023, 1023);
-            uint64_t Mantissa = SecureRNG_GenerateInteger(Random, 52);
+        if (Insecure != NULL) {
+            int8_t   Sign     = InsecurePRNG_CreateInteger(Insecure, 1);
+            int16_t  Exponent = InsecurePRNG_CreateIntegerInRange(Insecure, -1023, 1023);
+            uint64_t Mantissa = InsecurePRNG_CreateInteger(Insecure, 53);
 
             Decimal           = InsertSignD(Decimal, Sign);
             Decimal           = InsertExponentD(Decimal, Exponent);
             Decimal           = InsertMantissaD(Decimal, Mantissa);
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
         }
         return Decimal;
     }
 
-    uint8_t SecureRNG_Erase(SecureRNG *Random, uint8_t NewValue) {
-        uint8_t Verification = 0xFE;
-        if (Random != NULL) {
-            for (size_t Byte = 0ULL; Byte < Bits2Bytes(RoundingType_Down, Random->NumBits); Byte++) {
-                Random->EntropyPool[Byte] = NewValue;
-            }
-            Random->BitOffset             = NewValue;
-            Verification = Random->EntropyPool[0] & 0xFF;
+    bool InsecurePRNG_Erase(InsecurePRNG *Insecure) {
+        bool EraseWasSucessful = No;
+        if (Insecure != NULL) {
+            Insecure->State[0]         = 0;
+            Insecure->State[1]         = 0;
+            Insecure->State[2]         = 0;
+            Insecure->State[3]         = 0;
+            Insecure->NumBitsRemaining = 0;
+            EraseWasSucessful          = Yes;
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
         }
-        return Verification;
+        return EraseWasSucessful;
     }
 
-    void SecureRNG_Deinit(SecureRNG *Random) {
-        if (Random != NULL) {
-            free(Random->EntropyPool);
-            free(Random);
+    void InsecurePRNG_Deinit(InsecurePRNG *Insecure) {
+        if (Insecure != NULL) {
+            InsecurePRNG_Erase(Insecure);
+            free(Insecure);
         }
     }
     

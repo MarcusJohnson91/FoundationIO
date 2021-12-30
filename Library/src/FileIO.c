@@ -1,7 +1,7 @@
 #include "../include/FileIO.h"            /* Included for our declarations */
 
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
-#include "../include/CryptographyIO.h"    /* Included for SecureRNG_GenerateInteger */
+#include "../include/CryptographyIO.h"    /* Included for InsecurePRNG_CreateInteger */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
 #include "../include/TextIO/LogIO.h"      /* Included for Logging */

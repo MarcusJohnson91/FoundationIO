@@ -42,7 +42,7 @@ extern "C" {
 #define FieldSize3 7
 #define Field3     0x41
 
-    bool Test_WriteReadBits(SecureRNG *Secure) {
+    bool Test_WriteReadBits(InsecurePRNG *Insecure) {
         bool TestPassed   = No;
         BitBuffer *BitB   = BitBuffer_Init(8);
 
@@ -121,14 +121,14 @@ extern "C" {
         return TestPassed;
     }
     
-    bool Test_ReadWriteBitsNearNear(SecureRNG *Random) {
+    bool Test_ReadWriteBitsNearNear(InsecurePRNG *Insecure) {
         bool TestPassed                = Yes;
 
         BitBuffer *BitB                = BitBuffer_Init(8);
         
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
-            uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 6);
-            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract);
+            uint8_t    NumBits2Extract = InsecurePRNG_CreateInteger(Insecure, 6);
+            int64_t    RandomInteger   = InsecurePRNG_CreateInteger(Insecure, NumBits2Extract);
             
             BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
@@ -146,14 +146,14 @@ extern "C" {
         return TestPassed;
     }
 
-    bool Test_ReadWriteBitsFarFar(SecureRNG *Random) {
+    bool Test_ReadWriteBitsFarFar(InsecurePRNG *Insecure) {
         bool TestPassed                = Yes;
 
         BitBuffer *BitB                = BitBuffer_Init(8);
 
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
-            uint8_t    NumBits2Write   = SecureRNG_GenerateInteger(Random, 3); // 6
-            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Write);
+            uint8_t    NumBits2Write   = InsecurePRNG_CreateInteger(Insecure, 3); // 6
+            int64_t    RandomInteger   = InsecurePRNG_CreateInteger(Insecure, NumBits2Write);
             /*
 #define NumBits2Write 64
 #define RandomInteger 0x0807060504030201
@@ -174,14 +174,14 @@ extern "C" {
         return TestPassed;
     }
 
-    bool Test_ReadWriteBitsNearFar(SecureRNG *Random) {
+    bool Test_ReadWriteBitsNearFar(InsecurePRNG *Insecure) {
         bool TestPassed                = Yes;
 
         BitBuffer *BitB                = BitBuffer_Init(8);
 
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
-            uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
-            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract);
+            uint8_t    NumBits2Extract = InsecurePRNG_CreateInteger(Insecure, 3); // 6
+            int64_t    RandomInteger   = InsecurePRNG_CreateInteger(Insecure, NumBits2Extract);
 
             BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
@@ -195,14 +195,14 @@ extern "C" {
         return TestPassed;
     }
 
-    bool Test_ReadWriteBitsFarNear(SecureRNG *Random) {
+    bool Test_ReadWriteBitsFarNear(InsecurePRNG *Insecure) {
         bool TestPassed                = Yes;
 
         BitBuffer *BitB                = BitBuffer_Init(8);
 
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
-            uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3);
-            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract); // 2^3 = 8, 8 possible values
+            uint8_t    NumBits2Extract = InsecurePRNG_CreateInteger(Insecure, 3);
+            int64_t    RandomInteger   = InsecurePRNG_CreateInteger(Insecure, NumBits2Extract); // 2^3 = 8, 8 possible values
 
             BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
@@ -219,12 +219,12 @@ extern "C" {
     int main(const int argc, const char *argv[]) {
         TestIO_RunTests(BufferIOTests);
 
-        SecureRNG *Random            = SecureRNG_Init(8000000);
+        InsecurePRNG *Insecure       = InsecurePRNG_Init(0);
 
-        bool NearNearPassed          = Test_ReadWriteBitsNearNear(Random);
-        bool FarFarPassed            = Test_ReadWriteBitsFarFar(Random);
-        bool NearFarPassed           = Test_ReadWriteBitsNearFar(Random);
-        bool FarNearPassed           = Test_ReadWriteBitsFarNear(Random);
+        bool NearNearPassed          = Test_ReadWriteBitsNearNear(Insecure);
+        bool FarFarPassed            = Test_ReadWriteBitsFarFar(Insecure);
+        bool NearFarPassed           = Test_ReadWriteBitsNearFar(Insecure);
+        bool FarNearPassed           = Test_ReadWriteBitsFarNear(Insecure);
         uint8_t AllTestsPassed       = (NearNearPassed + FarFarPassed + NearFarPassed + FarNearPassed) == 4;
         return AllTestsPassed == true ? EXIT_SUCCESS : EXIT_FAILURE;
     }

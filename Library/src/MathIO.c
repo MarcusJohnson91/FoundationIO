@@ -57,21 +57,6 @@ extern "C" {
         uint64_t  Integer;
     } Double2Integer;
     
-    typedef union Integer2Bytes {
-        uint64_t Integer;
-        uint8_t  Bytes[8];
-    } Integer2Bytes;
-    
-    void GetBytesFromInteger(const uint64_t Integer, uint8_t *Bytes) {
-        Integer2Bytes Data = {.Integer = Integer};
-        Bytes              = Data.Bytes;
-    }
-    
-    uint64_t GetIntegerFromBytes(uint64_t *Bytes) {
-        Integer2Bytes Data = {.Integer = *Bytes};
-        return Data.Integer;
-    }
-    
     uint32_t ConvertFloat2Integer(float Decimal) {
         Float2Integer Integer = {.Float = Decimal};
         return Integer.Integer;
@@ -216,15 +201,22 @@ extern "C" {
         return Maximum(Integer1, Integer2) - Minimum(Integer1, Integer2);
     }
 
-    int64_t SignExtend(const uint8_t HighestSetBit, const int64_t Integer) {
+    /*
+     Value to extend = 10 aka 0b1010 aka 0x0A 5 bits
+     1 << (NumBits - 1) = Sign Bit
+     */
+    int64_t SignExtend(const int64_t Integer, const uint8_t IntegerSizeInBits) {
+        assert(Integer > 0 && IntegerSizeInBits > 0);
         int64_t Extended = 0;
-        int8_t  Shift    = HighestSetBit - 1;
-        int8_t  Sign     = Integer >> Shift;
-        if (Sign == 1) {
-            Extended     = (0xFFFFFFFFFFFFFFFF >> Shift) << Shift;
+        // (1 << IntegerSizeInBits) - 1 = all 1's for IntegerSizeInBits
+        if (Integer < 1) {
+            Extended     = (0xFFFFFFFFFFFFFFFF << IntegerSizeInBits) | Integer;
+        } else {
+            Extended     = Integer;
         }
-        Extended        |= Integer;
         return Extended;
+        // 0xFFFFFFFFFFFFFFFF XOR Integer = 0xFFFFFFFFFFFFFFF5
+        // ((0xFFFFFFFFFFFFFFFF << IntegerSizeInBits) | Integer) = 0xFFFFFFFFFFFFFFEA
     }
     
     bool DecimalIsNormalF(const float Decimal) {

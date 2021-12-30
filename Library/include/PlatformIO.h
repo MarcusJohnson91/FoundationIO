@@ -249,10 +249,10 @@
 #endif /* Target checks */
 #endif /* PlatformIO_ArchHasSIMDExtensions */
 
-    /*!
-     @abstract      PlatformIO_Immutable is for pointers and arrays.
-     @remark        Makes the pointer and the data it points to constant.
-     */
+/*!
+ @abstract      PlatformIO_Immutable is for pointers and arrays.
+ @remark        Makes the pointer and the data it points to constant.
+ */
 #ifndef             PlatformIO_Immutable
 #define             PlatformIO_Immutable(PointerTypeWithStar)                           const PointerTypeWithStar const
 #endif /* PlatformIO_Immutable */
@@ -505,14 +505,38 @@
 #define             PlatformIO_Expand(...) __VA_ARGS__
 #endif /* PlatformIO_Expand */
 
+#if defined(__has_include)
+
+#if __has_include(<assert.h>)
+#include <assert.h>
+#else
+// Define assert.h our selves
+
+#ifdef DEBUG
+#define assert(Expression) ((void)((Expression) || (PlatformIO_AssertFail(__FILE__, PlatformIO_FunctionName, #Expression),0)))
+#elif defined(NDEBUG)
+#define assert(Expression) ((void) Expression)
+#endif
+
+#endif /* Assert.h */
+
+#elif !defined(__has_include)
+#error "Update your compiler to one that supports __has_include"
+#endif /* __has_include */
+
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-    
+
     /*!
      @abstract      Gets the total amount of memory in the system.
      */
     size_t          PlatformIO_GetTotalMemoryInBytes(void);
+
+    /*!
+     @abstract      Error message for assert; Do not use directly.
+     */
+    void            PlatformIO_AssertFail(const char *FileName, const char *FunctionName, const char *Expression);
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
