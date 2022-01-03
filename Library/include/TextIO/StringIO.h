@@ -129,7 +129,7 @@ extern "C" {
     /*!
      @enum         StringIO_WhitespaceTypes
      @abstract                                           Should whitespace be ignored or not?
-     @constant     WhitespaceType_Unspecified            Unknown TrimString command.
+     @constant     WhitespaceType_Unspecified            Unknown WhiteSpace type.
      @constant     WhitespaceType_Insignificant          Ignore whitespace.
      @constant     WhitespaceType_Significant            Whitespace matters, don't ignore it.
      */
@@ -138,6 +138,33 @@ extern "C" {
                    WhitespaceType_Insignificant          = 1,
                    WhitespaceType_Significant            = 2,
     } StringIO_WhitespaceTypes;
+
+    /*!
+     @enum         StringIO_LineBreakTypes
+     @abstract                                           What kind of whitespace is this?
+     @constant     LineBreakType_Unspecified             Unknown LineBreak.
+     @constant     LineBreakType_LineFeed                Line Feed aka 0xA '\n'
+     @constant     LineBreakType_VerticalTab             Vertical Tab aka 0xB '\v'
+     @constant     LineBreakType_FormFeed                Form Feed aka 0xC '\f'
+     @constant     LineBreakType_CarriageReturn          Carriage Return aka 0xD '\r'
+     @constant     LineBreakType_CRLF                    CR+LF aka 0xDA '\r\n'
+     @constant     LineBreakType_LFCR                    LF+CR aka 0xAD '\n\r'
+     @constant     LineBreakType_NextLine                Next Line aka 0x85 '\u0085'
+     @constant     LineBreakType_LineSeparator           Line Seperator aka 0x2028 '\u2028'
+     @constant     LineBreakType_ParagraphSeparator      Paragraph Seperator aka 0x2029 '\u2029'
+     */
+    typedef enum StringIO_LineBreakTypes {
+                   LineBreakType_Unspecified             = 0,
+                   LineBreakType_LineFeed                = 1,
+                   LineBreakType_VerticalTab             = 2,
+                   LineBreakType_FormFeed                = 3,
+                   LineBreakType_CarriageReturn          = 4,
+                   LineBreakType_CRLF                    = 5,
+                   LineBreakType_LFCR                    = 6,
+                   LineBreakType_NextLine                = 7,
+                   LineBreakType_LineSeparator           = 8,
+                   LineBreakType_ParagraphSeparator      = 9,
+    } StringIO_LineBreakTypes;
 
     /*!
      @enum         CodePointClass
@@ -220,6 +247,27 @@ extern "C" {
      @param            NumCodePoints                     The size of the string not counting the NULL terminator.
      */
     UTF32             *UTF32_Init(size_t NumCodePoints);
+
+    /*!
+     @abstract                                           Hashes a string, useful for using switch statements with strings.
+     @param            String                            The string to hash.
+     @return                                             Returns the hash of the string.
+     */
+    uint64_t           UTF8_Hash(UTF8 *String);
+
+    /*!
+     @abstract                                           Hashes a string, useful for using switch statements with strings.
+     @param            String                            The string to hash.
+     @return                                             Returns the hash of the string.
+     */
+    uint64_t           UTF16_Hash(UTF16 *String);
+
+    /*!
+     @abstract                                           Hashes a string, useful for using switch statements with strings.
+     @param            String                            The string to hash.
+     @return                                             Returns the hash of the string.
+     */
+    uint64_t           UTF32_Hash(UTF32 *String);
     
     /*!
      @abstract                                           Sets NumCodeUnits to Value.
@@ -261,13 +309,13 @@ extern "C" {
      @abstract                                           Decodes a CodePoint from UTF-8 CodeUnits.
      @param            CodeUnits                         Must start at a leading codeunit and be followed by at least as many trailing codeunits as indicitated by the leading code unit.
      */
-    UTF32              UTF8_DecodeCodePoint(ImmutableString_UTF8 CodeUnits);
+    UTF32              UTF8_ExtractCodePoint(ImmutableString_UTF8 CodeUnits);
     
     /*!
      @abstract                                           Decodes a CodePoint from UTF-16 CodeUnits.
      @param            CodeUnits                         Must start at a leading codeunit and be followed by at least as many trailing codeunits as indicitated by the leading code unit.
      */
-    UTF32              UTF16_DecodeCodePoint(ImmutableString_UTF16 CodeUnits);
+    UTF32              UTF16_ExtractCodePoint(ImmutableString_UTF16 CodeUnits);
     
     /*!
      @abstract                                           Gets the number of Unicode codeunits in the UTF8 string.
@@ -322,6 +370,34 @@ extern "C" {
      @param            String                            The string to get the number of graphemes in.
      */
     size_t             UTF32_GetStringSizeInGraphemes(ImmutableString_UTF32 String);
+
+    /*!
+     @abstract                                           Gets the number of codepoints until a wordbreak is found.
+     @param            String                            The String the operate on.
+     @return                                             The number of CodePoints before the word break.
+     */
+    size_t             UTF8_GetWordSizeInCodePoints(ImmutableString_UTF8 String);
+
+    /*!
+     @abstract                                           Gets the number of codepoints until a wordbreak is found.
+     @param            String                            The String the operate on.
+     @return                                             The number of CodePoints before the word break.
+     */
+    size_t             UTF16_GetWordSizeInCodePoints(ImmutableString_UTF16 String);
+
+    /*!
+     @abstract                                           Gets the number of wordbreaks until a non-wordbreak is found.
+     @param            String                            The String the operate on.
+     @return                                             The number of CodePoints in the word break.
+     */
+    size_t             UTF8_GetWordBreakSizeInCodePoints(ImmutableString_UTF8 String);
+
+    /*!
+     @abstract                                           Gets the number of wordbreaks until a non-wordbreak is found.
+     @param            String                            The String the operate on.
+     @return                                             The number of CodePoints in the word break.
+     */
+    size_t             UTF16_GetWordBreakSizeInCodePoints(ImmutableString_UTF16 String);
     
     /*!
      @abstract                                           Converts yes/no/true/false/on/off/1/0 to true or false.
@@ -1213,22 +1289,64 @@ extern "C" {
      @return                                             Returns the UTF-16 encoded CodePoint which will be between 1-2 CodeUnits.
      */
     UTF16             *UTF16_ReadGrapheme(FILE *Source);
+
+    /*!
+     @abstract                                           How large is the line break starting at String[CodePoint]?
+     @param            String                            The string to check.
+     @return                                             The size of the Line Break in CodePoints.
+     */
+    size_t             UTF32_LineBreakSize(UTF32 *String);
     
     /*!
      @abstract                                           Writes a CodePoint to Source.
      @remark                                             Replaces Fputc and putc.
      @param            Source                            The file to write to.
-     @param            CodePoint                         An array of CodeUnits containing one CodePoint.
+     @param            Grapheme                          An array of CodeUnits containing one CodePoint.
      */
-    void               UTF8_WriteGrapheme(FILE *Source, ImmutableString_UTF8 CodePoint);
+    void               UTF8_WriteGrapheme(FILE *Source, ImmutableString_UTF8 Grapheme);
     
     /*!
      @abstract                                           Writes a CodePoint to Source.
      @remark                                             Replaces Fputwc and putwc.
      @param            Source                            The file to write to.
-     @param            CodePoint                         An array of CodeUnits containing one CodePoint.
+     @param            Grapheme                          The Grapheme to write.
      */
-    void               UTF16_WriteGrapheme(FILE *Source, ImmutableString_UTF16 CodePoint);
+    void               UTF16_WriteGrapheme(FILE *Source, ImmutableString_UTF16 Grapheme);
+
+    /*!
+     @abstract                                           Reads a single CodeUnit from a FILE
+     @param            Source                            Which FILE to read the CodeUnit from.
+     @return                                             Returns the CodeUnit that was read.
+     */
+    UTF8               UTF8_ReadCodeUnit(FILE *Source);
+
+    /*!
+     @abstract                                           Reads a single CodeUnit from a FILE
+     @param            Source                            Which FILE to read the CodeUnit from.
+     @return                                             Returns the CodeUnit that was read.
+     */
+    UTF16              UTF16_ReadCodeUnit(FILE *Source);
+
+    /*!
+     @abstract                                           Reads a single CodePoint from a FILE
+     @param            Source                            Which FILE to read the CodeUnit from.
+     @return                                             Returns the CodePoint that was read.
+     */
+    UTF32              UTF8_ReadCodePoint(FILE *Source);
+
+    /*!
+     @abstract                                           Reads a single CodePoint from a FILE
+     @param            Source                            Which FILE to read the CodeUnit from.
+     @return                                             Returns the CodePoint that was read.
+     */
+    UTF32              UTF16_ReadCodePoint(FILE *Source);
+
+    /*!
+     @abstract                                           Reads a single CodePoint from a FILE
+     @param            Source                            Which FILE to read the CodeUnit from.
+     @return                                             Returns the CodePoint that was read.
+     */
+    UTF32              UTF32_ReadCodePoint(FILE *Source);
     
     /*!
      @abstract                                           Reads a Sentence (Until it hits a newline, includes the newline) from Source.
