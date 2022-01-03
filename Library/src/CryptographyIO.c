@@ -25,13 +25,13 @@ extern "C" {
     } InsecurePRNG;
 
     /*!
-     @abstract Generated with WolframAlpha query "RandomInteger[{0, 18446744073709551615}]"
-     @date     Dec 29, 2021
+     @abstract Generated with ANU QRNG
+     @date     Dec 31, 2021
      @remark   Feel free to change these default seeds as often as you like.
      */
     static const uint64_t InsecurePRNG_DefaultSeed[4] = {
-        0x1EDC87AE5FDA334D, 0xCBD633180FD9371B,
-        0xA7D0130AD80AB611, 0x3A4CB28F2DBEF158,
+        0x66506C56A7381C49, 0x56512E8D36C1F104,
+        0x85DED0B33FDCBAC3, 0xB12A0DA1E2C23775,
     };
 
     /*
