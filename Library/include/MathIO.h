@@ -460,8 +460,9 @@ extern "C" {
     uint64_t     SwapEndian64(const uint64_t Value2Swap);
 #ifdef           SwapEndian
 #undef           SwapEndian
-#endif
-#define          SwapEndiamn(Value2Swap)          _Generic((Value2Swap), int16_t:SwapEndian16, uint16_t:SwapEndian16, int32_t:SwapEndian32, uint32_t:SwapEndian32, int64_t:SwapEndian64, uint64_t:SwapEndian64)(Value2Swap)
+#else
+#define          SwapEndian(Value2Swap)          _Generic((Value2Swap), int16_t:SwapEndian16, uint16_t:SwapEndian16, int32_t:SwapEndian32, uint32_t:SwapEndian32, int64_t:SwapEndian64, uint64_t:SwapEndian64)(Value2Swap)
+#endif /* SwapEndian */
     
     /*!
      @abstract                                    Computes the number of bits from the number of bytes.

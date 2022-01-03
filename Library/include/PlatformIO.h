@@ -180,27 +180,27 @@
 #endif
 
 #ifndef             PlatformIO_ExecutableFormatIsMachO
-#define             PlatformIO_ExecutableFormatIsMachO 1
+#define             PlatformIO_ExecutableFormatIsMachO                                  (1)
 #endif
 
 #ifndef             PlatformIO_ExecutableFormatIsPE
-#define             PlatformIO_ExecutableFormatIsPE 2
+#define             PlatformIO_ExecutableFormatIsPE                                     (2)
 #endif
 
 #ifndef             PlatformIO_ExecutableFormatIsELF
-#define             PlatformIO_ExecutableFormatIsELF 4
+#define             PlatformIO_ExecutableFormatIsELF                                    (4)
 #endif
 
 #ifndef             PlatformIO_ByteOrderIsUnknown
-#define             PlatformIO_ByteOrderIsUnknown                                        (0)
+#define             PlatformIO_ByteOrderIsUnknown                                       (0)
 #endif
 
-#ifndef             PlatformIO_ByteOrderIsBE
-#define             PlatformIO_ByteOrderIsBE                                             (1)
+#ifndef             PlatformIO_TargetByteOrderIsBE
+#define             PlatformIO_TargetByteOrderIsBE                                            (1)
 #endif
 
-#ifndef             PlatformIO_ByteOrderIsLE
-#define             PlatformIO_ByteOrderIsLE                                             (2)
+#ifndef             PlatformIO_TargetByteOrderIsLE
+#define             PlatformIO_TargetByteOrderIsLE                                            (2)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionC
@@ -347,12 +347,12 @@
 
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsBE)
+#define             PlatformIO_TargetByteOrder                                          (PlatformIO_TargetByteOrderIsBE)
 #elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsLE)
+#define             PlatformIO_TargetByteOrder                                          (PlatformIO_TargetByteOrderIsLE)
 #endif /* __BYTE_ORDER__ */
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
-#define             PlatformIO_TargetByteOrder                                          (PlatformIO_ByteOrderIsLE)
+#define             PlatformIO_TargetByteOrder                                          (PlatformIO_TargetByteOrderIsLE)
 #endif /* PlatformIO_Compiler */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
