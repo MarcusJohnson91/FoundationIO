@@ -78,6 +78,16 @@ extern "C" {
     } BufferIO_StringTerminators;
 
     /*!
+     @enum         BufferIO_CRCPolynomials
+     @constant     CRCPolynomial_Unspecified       Invalid Polynomial.
+     @constant     CRCPolynomial_IEEE802_3         CRC32 Polynomial used in PNG, MPEG-4, Zip, etc.
+     */
+    typedef enum BufferIO_CRCPolynomials : uint64_t {
+                   CRCPolynomial_Unspecified       = 0,
+                   CRCPolynomial_IEEE802_3         = 0xEDB88320,
+    } BufferIO_CRCPolynomials;
+
+    /*!
      @typedef      BitBuffer
      @abstract                                     Contains variables and a pointer to a buffer for reading and writing bits.
      */
@@ -286,7 +296,7 @@ extern "C" {
      @param        NumBytes                        The number of bytes to calculate.
      @return                                       Returns the calculated CRC.
      */
-    uint32_t       BitBuffer_CalculateCRC32(BitBuffer *BitB, size_t OffsetInBits, size_t NumBytes, uint32_t Polynomial);
+    uint32_t       BitBuffer_CalculateCRC(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, size_t OffsetInBits, size_t NumBytes, uint64_t InitValue, BufferIO_CRCPolynomials Polynomial);
 
     /*!
      @abstract                                     Runs Adler32 hash over the BitBuffer starting at Offset

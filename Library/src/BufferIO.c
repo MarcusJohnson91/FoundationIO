@@ -678,7 +678,7 @@ extern "C" {
         return GUUID;
     }
 
-    uint32_t BitBuffer_CalculateCRC32(BitBuffer *BitB, size_t OffsetInBits, size_t NumBytes, uint32_t Polynomial) {
+    uint32_t BitBuffer_CalculateCRC(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, size_t OffsetInBits, size_t NumBytes, uint64_t InitValue, BufferIO_CRCPolynomials Polynomial) {
         uint32_t Output = -1;
         if (BitB != NULL && OffsetInBits * 8 < BitBuffer_GetSize(BitB) && (OffsetInBits + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
             for (size_t Byte = OffsetInBits; Byte < NumBytes - 1; Byte++) {
