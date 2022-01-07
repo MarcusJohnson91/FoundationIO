@@ -6,12 +6,12 @@
  @brief           This header contains types and macros used across FoundationIO for Text handling.
  */
 
-#include "../PlatformIO.h" /* Included for Platform Independence macros */
-
 #pragma once
 
 #ifndef FoundationIO_TextIO_TextIOTypes_H
 #define FoundationIO_TextIO_TextIOTypes_H
+
+#include "../PlatformIO.h" /* Included for Platform Independence macros */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

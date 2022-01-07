@@ -7,12 +7,12 @@
  @TODO:           Look into replacing Xoshiro256** with Shishua
  */
 
-#include "PlatformIO.h"
-
 #pragma once
 
 #ifndef FoundationIO_CryptographyIO_H
 #define FoundationIO_CryptographyIO_H
+
+#include "PlatformIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

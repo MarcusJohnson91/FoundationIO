@@ -6,9 +6,9 @@
  @brief           This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
  */
 
-#include "TextIOTypes.h"    /* Included for Text types */
-
 #pragma once
+
+#include "TextIOTypes.h"    /* Included for Text types */
 
 #ifndef FoundationIO_TextIO_StringIO_H
 #define FoundationIO_TextIO_StringIO_H

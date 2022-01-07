@@ -6,13 +6,13 @@
  @brief           This header contains code for manipulating GUIDs and UUIDs.
  */
 
-#include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
-#include "TextIO/TextIOTypes.h" /* Included for Text types */
-
 #pragma once
 
 #ifndef FoundationIO_GUUID_H
 #define FoundationIO_GUUID_H
+
+#include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
+#include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

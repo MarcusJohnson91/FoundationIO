@@ -7,12 +7,12 @@
  @remark          ScriptHash is to know if the script has changed since the tables were last generated.
  */
 
-#include "../TextIOTypes.h"    /* Included for the Text types */
-
 #pragma once
 
 #ifndef FoundationIO_TextIO_TextIOTables_H
 #define FoundationIO_TextIO_TextIOTables_H
+
+#include "../TextIOTypes.h"    /* Included for the Text types */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

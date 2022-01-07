@@ -6,12 +6,12 @@
  @brief           This header contains types, functions, and tables for string formatting/deformatting
  */
 
-#include "TextIOTypes.h"    /* Included for Text types */
-
 #pragma once
 
 #ifndef FoundationIO_TextIO_FormatIO_H
 #define FoundationIO_TextIO_FormatIO_H
+
+#include "TextIOTypes.h"    /* Included for Text types */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <sal.h>

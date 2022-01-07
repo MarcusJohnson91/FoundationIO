@@ -6,12 +6,12 @@
  @brief           This header contains code for Asynchronous IO, and utilities to manage it.
  */
 
-#include "TextIO/TextIOTypes.h" /* Included for Text types */
-
 #pragma once
 
 #ifndef FoundationIO_AsynchronousIO_H
 #define FoundationIO_AsynchronousIO_H
+
+#include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

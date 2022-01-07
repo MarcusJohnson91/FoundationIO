@@ -6,19 +6,20 @@
  @brief           This header contains code for reading and writing files, and utilities to manage them.
  */
 
-#include "TextIO/TextIOTypes.h" /* Included for Text types */
-#include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
-
 #pragma once
 
 #ifndef FoundationIO_FileIO_H
 #define FoundationIO_FileIO_H
 
+#include "TextIO/TextIOTypes.h" /* Included for Text types */
+#include "AsynchronousIO.h"     /* Included for Asynchronous IO operations */
+
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
-    /* Path Operations */
+    typedef struct      FileIO_FILE                     FileIO_FILE; // Eventually replace all FILE references with our own implementation.
+
     /*!
      @abstract                                          Returns just the filename portion of a path string
      @remark                                            Equilivent to `basename` command,

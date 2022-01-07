@@ -6,21 +6,22 @@
  @brief           This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
  */
 
-#include "PlatformIO.h" /* Included for Platform Independence macros */
-
 #pragma once
 
 #ifndef  FoundationIO_MathIO_H
 #define  FoundationIO_MathIO_H
 
-#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-extern "C" {
-#endif
-    
-#include <math.h>
-    
+#include "PlatformIO.h" /* Included for Platform Independence macros */
+
 #if defined(__has_include) && __has_include(<tgmath.h>)
 #include <tgmath.h>
+#else
+#include <math.h>
+#endif
+
+
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+extern "C" {
 #endif
     
     /*!

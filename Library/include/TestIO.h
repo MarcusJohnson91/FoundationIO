@@ -10,16 +10,16 @@
  Suite:       Group of similar test cases.
  */
 
+#pragma once
+
+#ifndef FoundationIO_TestIO_H
+#define FoundationIO_TestIO_H
+
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
 #include "TextIO/LogIO.h"       /* Included for Logging, tests need to log errors */
 #include "RegistrationIO.h"
 
 #include <setjmp.h>
-
-#pragma once
-
-#ifndef FoundationIO_TestIO_H
-#define FoundationIO_TestIO_H
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

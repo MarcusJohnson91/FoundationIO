@@ -6,12 +6,12 @@
  @brief           This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include "TextIOTypes.h"    /* Included for Text types */
-
 #pragma once
 
 #ifndef FoundationIO_TextIO_LocalizationIO_H
 #define FoundationIO_TextIO_LocalizationIO_H
+
+#include "TextIOTypes.h"    /* Included for Text types */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

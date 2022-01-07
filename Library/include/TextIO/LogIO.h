@@ -6,14 +6,14 @@
  @brief           This header contains code for logging errors and testingR information.
  */
 
-#include "TextIOTypes.h"    /* Included for Text types */
-
 #pragma once
 
 #ifndef FoundationIO_TextIO_LogIO_H
 #define FoundationIO_TextIO_LogIO_H
 
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
+#include "TextIOTypes.h"    /* Included for Text types */
+
+#if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <sal.h>
 #endif
 

@@ -7,13 +7,13 @@
  @todo            Maybe BufferIO should be renamed ArrayIO?
  */
 
-#include "TextIO/TextIOTypes.h" /* Included for Text types */
-#include "GUUID.h"              /* Included for GUUIDTypes */
-
 #pragma once
 
 #ifndef FoundationIO_BufferIO_H
 #define FoundationIO_BufferIO_H
+
+#include "TextIO/TextIOTypes.h" /* Included for Text types */
+#include "GUUID.h"              /* Included for GUUIDTypes */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
