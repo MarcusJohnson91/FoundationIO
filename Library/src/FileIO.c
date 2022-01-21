@@ -1,5 +1,6 @@
 #include "../include/FileIO.h"            /* Included for our declarations */
 
+#include "../include/AsynchronousIO.h"    /* FileIO is a higher level wrapper around AsyncIO */
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
 #include "../include/CryptographyIO.h"    /* Included for InsecurePRNG_CreateInteger */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes */
@@ -17,17 +18,16 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-    
-    /*
-     File Operations:
-     Open
-     Close
-     Read
-     Write
-     Create
-     Delete
-     GetType
-     */
+
+    /* Create our own FILE implementation */
+    typedef struct FileIO_FILE {
+        void               *Buffer; // if there is a buffer, it's contents will be here
+        uint64_t            BufferSize;   // Size of the FILE
+        uint64_t            BufferOffset; // Offset into the Buffer
+        AsyncIO_Descriptor  FileNum; // File Descriptor
+        TextIO_StringTypes  Type; // Orientation
+        AsyncIO_FileModes   Mode; // like was the file opened for reading/writing, etc
+    } FileIO_FILE;
     
     UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
         UTF8 *Base = NULL;
@@ -109,10 +109,6 @@ extern "C" {
     
     UTF8 *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8) {
         UTF8 *Base = NULL;
-        /*
-         if you find a '.' before a slash or after the start of the string, it has an extension.
-         Start at the end of the string, loop until you find a dot or the start of the string or a slash
-         */
         size_t   Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
         size_t   Start                 = Path8SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -224,6 +220,21 @@ extern "C" {
         }
         return Base;
     }
+
+    TextIO_StringTypes FileIO_File_GetType(FileIO_FILE *File) { // fwide
+        return File->Type;
+    }
+
+    bool FileIO_File_SetType(FileIO_FILE *File, TextIO_StringTypes NewType) {
+        bool DidItWork = false;
+        if (File->Type != NewType) {
+            // We gotta change the type
+        } else {
+            // It's already that type,just flush the buffer and say yes
+            AsyncIOStream_Write(File->FileNum, File->Buffer, File->Type, File->BufferSize - File->BufferOffset);
+        }
+        return DidItWork;
+    }
     
     
     TextIO_StringTypes FileIO_GetFileOrientation(PlatformIO_Immutable(FILE *) File2Orient) {
@@ -240,11 +251,6 @@ extern "C" {
 #endif
         }
         return StringType;
-    }
-    
-    uint8_t FileIO_GetEncodingSize(AsyncIOStream *Stream) {
-        uint8_t EncodingSize = 0;
-        return EncodingSize;
     }
     
     /* File Operations */
@@ -369,11 +375,6 @@ extern "C" {
         return UsersPath;
     }
     
-    typedef struct FileID {
-        dev_t DeviceID;
-        ino_t iNodeID;
-    } FileID;
-    
     UTF8 *FileIO_UTF8_GetCurrentWorkingPath(void) {
         UTF8 *CurrentWorkingPath = NULL;
         /*
@@ -425,6 +426,28 @@ extern "C" {
     UTF16 *FileIO_UTF16_GetDirectoryName(ImmutableString_UTF16 Path16) {
         UTF16 *DirectoryName = NULL;
         return DirectoryName;
+    }
+
+    int64_t FileIO_GetPosition(FILE *Source) {
+        return ftello(Source);
+    }
+
+    bool FileIO_SetPosition(FILE *Source, int64_t Position) {
+        bool Worked = Yes;
+        fseeko(Source, Position, SeekType_Current);
+        return Worked;
+    }
+
+    size_t UTF8_GetStringSize(FILE *Source) {
+        size_t StringSizeInCodeUnits = 0;
+        off_t  OriginalOffset        = FileIO_GetPosition(Source);
+        UTF8   CodeUnit              = FileIO_Read(Source, &CodeUnit, sizeof(UTF8), 1);
+        while (CodeUnit != TextIO_NULLTerminator) {
+            CodeUnit                 = FileIO_Read(Source, &CodeUnit, sizeof(UTF8), 1);
+            StringSizeInCodeUnits   += 1;
+        }
+        fseeko(Source, -OriginalOffset, SEEK_CUR); // Reset the stream to it's original position
+        return StringSizeInCodeUnits;
     }
     
     size_t FileIO_Read(const FILE *const File2Read, void *Buffer, uint8_t BufferElementSize, size_t Elements2Read) {

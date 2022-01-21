@@ -43,7 +43,7 @@ extern "C" {
 
     typedef struct AsyncIOStream {
         size_t              StreamPosition;
-        size_t             StreamSize;
+        size_t              StreamSize;
         AsyncIO_Descriptor  StreamID;
         AsyncIO_StreamTypes StreamType;
     } AsyncIOStream;

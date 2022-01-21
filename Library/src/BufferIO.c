@@ -586,8 +586,8 @@ extern "C" {
             size_t OriginalOffset       = BitBuffer_GetPosition(BitB);
             size_t Extracted            = 1;
             while (Extracted != TextIO_NULLTerminator) {
-                Extracted                 = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
-                StringSize               += UTF8_GetCodePointSizeInCodeUnits((UTF8) Extracted);;
+                Extracted               = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
+                StringSize             += UTF8_GetCodePointSizeInCodeUnits((UTF8) Extracted);;
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {

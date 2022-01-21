@@ -46,10 +46,9 @@ extern "C" {
 
     static UTF8 *UTF8_ExtractCodePointAsCodeUnits(ImmutableString_UTF8 String) {
         UTF8 *CodeUnits                                       = NULL;
-        if (String != NULL  && String[0] != TextIO_NULLTerminator) {
+        if (String != NULL && String[0] != TextIO_NULLTerminator) {
             UTF8_Clear_Preallocated();
-            uint8_t CodePointSize                             = UTF8_GetCodePointSizeInCodeUnits(String[0]);
-            switch (CodePointSize) {
+            switch (UTF8_GetCodePointSizeInCodeUnits(String[0])) {
                 case 1:
                     StringIO_PreallocateCodePoint_UTF8[0]     = String[0];
                     CodeUnits                                 = StringIO_PreallocateCodePoint_UTF8;
@@ -272,9 +271,10 @@ extern "C" {
         return UTF16CodeUnits;
     }
     
-    UTF32 UTF8_ExtractCodePoint(ImmutableString_UTF8 CodeUnits) {
+    UTF32 UTF8_ExtractCodePoint(ImmutableString_UTF8 CodeUnits) { // The CodeUnits have already been checked
         UTF32 CodePoint                       = 0;
         if (CodeUnits != NULL) {
+            UTF8_Clear_Preallocated();
             UTF8 *Extracted                   = UTF8_ExtractCodePointAsCodeUnits(CodeUnits);
             switch (UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0])) {
                 case 1:
@@ -300,6 +300,30 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodeUnits Pointer is NULL"));
         }
         return CodePoint;
+    }
+
+    static void UTF8_EncodeCodePoint(UTF32 CodePoint) {
+        UTF8_Clear_Preallocated();
+        switch (UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint)) {
+            case 1:
+                StringIO_PreallocateCodePoint_UTF8[0] = (CodePoint & UTF8Max_ASCII);
+                break;
+            case 2:
+                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_2CodeUnits | (CodePoint & (UTF8Mask5Bit << 6)) >> 6;
+                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint &  UTF8Mask6Bit);
+                break;
+            case 3:
+                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_3CodeUnits | (CodePoint & (UTF8Mask4Bit << 12)) >> 12;
+                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
+                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
+                break;
+            case 4:
+                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_4CodeUnits | (CodePoint & (UTF8Mask3Bit << 18)) >> 18;
+                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 12)) >> 12;
+                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
+                StringIO_PreallocateCodePoint_UTF8[3] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
+                break;
+        }
     }
     
     UTF32 UTF16_ExtractCodePoint(ImmutableString_UTF16 CodeUnits) {
@@ -333,30 +357,6 @@ extern "C" {
             case 2:
                 StringIO_PreallocateCodePoint_UTF16[0] = UTF16HighSurrogateStart + (Ranged & (UTF16SurrogateMask << UTF16SurrogateShift) >> UTF16SurrogateShift);
                 StringIO_PreallocateCodePoint_UTF16[1] = UTF16LowSurrogateStart  + (Ranged & UTF16SurrogateMask);
-                break;
-        }
-    }
-    
-    static void UTF8_EncodeCodePoint(UTF32 CodePoint) {
-        uint8_t CodeUnitSize                          = UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint);
-        switch (CodeUnitSize) {
-            case 1:
-                StringIO_PreallocateCodePoint_UTF8[0] = (CodePoint & UTF8Max_ASCII);
-                break;
-            case 2:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_2CodeUnits | (CodePoint & (UTF8Mask5Bit << 6)) >> 6;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint &  UTF8Mask6Bit);
-                break;
-            case 3:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_3CodeUnits | (CodePoint & (UTF8Mask4Bit << 12)) >> 12;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
-                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
-                break;
-            case 4:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_4CodeUnits | (CodePoint & (UTF8Mask3Bit << 18)) >> 18;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 12)) >> 12;
-                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
-                StringIO_PreallocateCodePoint_UTF8[3] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
                 break;
         }
     }
@@ -1554,7 +1554,6 @@ extern "C" {
     UTF8 *UTF16_Convert(ImmutableString_UTF16 String) {
         UTF8 *String8       = NULL;
         if (String != NULL) {
-            // 0x3FF = UTF32_GetStringSizeInUTF8CodeUnits
             UTF32 *String32 = UTF16_Decode(String);
             String8         = UTF8_Encode(String32);
             UTF32_Deinit(String32);
@@ -4088,14 +4087,14 @@ extern "C" {
     }
 
     /* Unicode Conversion */
-    CharSet8 *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CharSets CodePage) {
+    CharSet8 *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CodePages CodePage) {
         CharSet8 *Encoded = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
+        if (String != NULL && CodePage != CodePage_Unspecified) {
             UTF32 *Decoded      = UTF8_Decode(String);
             UTF32 *Composed     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             size_t   Characters = 0ULL;
             size_t   Character  = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
+            if (CodePage == CodePage_ISO_8859_1) {
                 while (Composed[Characters] != TextIO_NULLTerminator) {
                     if (Composed[Characters] <= 0xFF) {
                         Characters += 1;
@@ -4113,20 +4112,20 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
+        } else if (CodePage == CodePage_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
         }
         return Encoded;
     }
 
-    CharSet16 *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CharSets CodePage) {
+    CharSet16 *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CodePages CodePage) {
         CharSet16 *Encoded = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
+        if (String != NULL && CodePage != CodePage_Unspecified) {
             UTF32 *Decoded      = UTF16_Decode(String);
             UTF32 *Composed     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             size_t   Characters = 0ULL;
             size_t   Character  = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
+            if (CodePage == CodePage_ISO_8859_1) {
                 while (Composed[Characters] != TextIO_NULLTerminator) {
                     if (Composed[Characters] <= 0xFF) {
                         Characters += 1;
@@ -4144,19 +4143,19 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
+        } else if (CodePage == CodePage_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
         }
         return Encoded;
     }
 
-    CharSet32 *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CharSets CodePage) {
+    CharSet32 *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CodePages CodePage) {
         CharSet32 *Encoded = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
+        if (String != NULL && CodePage != CodePage_Unspecified) {
             UTF32 *Composed     = UTF32_Normalize(String, NormalizationForm_KompatibleCompose);
             size_t   Characters = 0ULL;
             size_t   Character  = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
+            if (CodePage == CodePage_ISO_8859_1) {
                 while (Composed[Characters] != TextIO_NULLTerminator) {
                     if (Composed[Characters] <= 0xFF) {
                         Characters += 1;
@@ -4174,22 +4173,22 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
+        } else if (CodePage == CodePage_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
         }
         return Encoded;
     }
 
-    UTF8 *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CharSets CodePage) {
+    UTF8 *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CodePages CodePage) {
         UTF8 *Unicode = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
+        if (String != NULL && CodePage != CodePage_Unspecified) {
             UTF32   *Decoded          = UTF8_Decode(String);
             size_t   Character        = 0ULL;
             size_t   CodePoint        = 0ULL;
             size_t   NumCodeUnits     = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
+            if (CodePage == CodePage_ISO_8859_1) {
                 while (Decoded[Character] != TextIO_NULLTerminator) {
-                    if (Decoded[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
+                    if (UTF32_IsCodePointInTable(KompatibleNormalizationTable, KompatibleNormalizationTableSize, Decoded[Character])) { // Kompatible is just a standin here for the actual table
                         NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
                     }
                     Character        += 1;
@@ -4203,22 +4202,22 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
+        } else if (CodePage == CodePage_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
         }
         return Unicode;
     }
 
-    UTF16 *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CharSets CodePage) {
+    UTF16 *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CodePages CodePage) {
         UTF16 *Unicode = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
+        if (String != NULL && CodePage != CodePage_Unspecified) {
             UTF32   *Decoded          = UTF16_Decode(String);
             size_t   Character        = 0ULL;
             size_t   CodePoint        = 0ULL;
             size_t   NumCodeUnits     = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
+            if (CodePage == CodePage_ISO_8859_1) {
                 while (Decoded[Character] != TextIO_NULLTerminator) {
-                    if (Decoded[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
+                    if (UTF32_IsCodePointInTable(KompatibleNormalizationTable, KompatibleNormalizationTableSize, Decoded[Character])) { // Kompatible is just a standin here for the actual table
                         NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
                     }
                     Character        += 1;
@@ -4232,21 +4231,21 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
+        } else if (CodePage == CodePage_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
         }
         return Unicode;
     }
 
-    UTF32 *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CharSets CodePage) {
+    UTF32 *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CodePages CodePage) {
         UTF32 *Unicode = NULL;
-        if (String != NULL && CodePage != CharSet_Unspecified) {
+        if (String != NULL && CodePage != CodePage_Unspecified) {
             size_t   Character        = 0ULL;
             size_t   CodePoint        = 0ULL;
             size_t   NumCodeUnits     = 0ULL;
-            if (CodePage == CharSet_ISO_8859_1) {
+            if (CodePage == CodePage_ISO_8859_1) {
                 while (String[Character] != TextIO_NULLTerminator) {
-                    if (String[Character] == KompatibleNormalizationTable[Character][0][0]) { // Kompatible is just a standin here for the actual table
+                    if (UTF32_IsCodePointInTable(KompatibleNormalizationTable, KompatibleNormalizationTableSize, String[Character])) { // Kompatible is just a standin here for the actual table
                         NumCodeUnits += 1;
                     }
                     Character        += 1;
@@ -4258,7 +4257,7 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (CodePage == CharSet_Unspecified) {
+        } else if (CodePage == CodePage_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CodePage is Invalid"));
         }
         return Unicode;
