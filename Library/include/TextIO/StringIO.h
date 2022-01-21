@@ -458,6 +458,14 @@ extern "C" {
      @return                                             Returns Yes if the string starts with '/' or the second character is ':' on Windows, otherwise it returns No.
      */
     bool               UTF32_IsAbsolutePath(ImmutableString_UTF32 String);
+
+    /*!
+     @abstract                                           Is this CodePoint whitspace?
+     @remark                                             Checks if CodePoint matches one from LineBreakTable or WordBreakTable
+     @param            CodePoint                         The CodePoint to check.
+     @return                                             Returns Yes if the CodePoint matches a Whitespace codepoint.
+     */
+    bool               UTF32_IsWhitespace(UTF32 CodePoint);
     
     /*!
      @abstract                                           Tells if the string pointed to by String contains a Windows or UNIX style line ending.

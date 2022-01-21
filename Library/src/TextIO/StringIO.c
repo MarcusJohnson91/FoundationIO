@@ -1166,6 +1166,16 @@ extern "C" {
         }
         return PathIsAbsolute;
     }
+
+    bool UTF32_IsWhitespace(UTF32 CodePoint) {
+        bool IsWhitespace = false;
+        bool IsLineBreak  = UTF32_IsCodePointInTable(LineBreakTable, LineBreakTableSize, CodePoint);
+        bool IsWordBreak  = UTF32_IsCodePointInTable(WordBreakTable, WordBreakTableSize, CodePoint);
+        if (IsLineBreak || IsWordBreak) {
+            IsWhitespace  = true;
+        }
+        return IsWhitespace;
+    }
     
     bool UTF8_HasNewLine(ImmutableString_UTF8 String) {
         bool StringHasNewLine = No;
