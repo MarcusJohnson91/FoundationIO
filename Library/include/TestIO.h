@@ -102,8 +102,7 @@ extern "C" {
         jmp_buf Enviroment;
     } TestIO_Enviroment;
 
-    typedef void*                               (*TestIO_FixtureInit)(PlatformIO_Unused(TestIO_Enviroment *Enviroment));
-    typedef void                                (*TestIO_FixtureDeinit)(void *Deinit, PlatformIO_Unused(TestIO_Enviroment *Enviroment));
+    typedef void                                (*TestIO_FixtureFunction)(void *Suite); // PlatformIO_Unused(TestIO_Enviroment *Enviroment)
 
     /*!
      @abstract                                    Defines a test case.
@@ -131,14 +130,15 @@ extern "C" {
         size_t                         NumTests;
     } TestIO_Suite;
 
-    extern const TestIO_Suite NULLSuite;
+    extern const TestIO_Case  TestIO_NULLCase;
+    extern const TestIO_Suite TestIO_NULLSuite;
 
 #ifndef          TestIO_Internal_NumSuites
 #define          TestIO_Internal_NumSuites 0
 #endif /* TestIO_Internal_NumSuites */
 
 #ifndef          TestIO_Internal_SuiteNames
-#define          TestIO_Internal_SuiteNames NULLSuite
+#define          TestIO_Internal_SuiteNames TestIO_NULLSuite
 #endif /* TestIO_Internal_SuiteNames */
 
 #ifndef          TestIO_Internal_PushMacro
@@ -170,15 +170,6 @@ const TestIO_Case TestIOCase_##Function2Test TestIO_Internal_Section = { \
 #endif /* TestIO_RegisterTest */
 
     /* We also need to create a counter variable to store the number of cases */
-#ifndef TestIO_ReserveCasesForSuite
-#define TestIO_ReserveCasesForSuite(TestSuite_Name)
-#ifndef PlatformIO_Concat(TestIO_Suite_CasesFor_, TestSuite_Name)
-#define TestIOSuite_CasesFor_##TestSuite_Name
-#else
-#error "TestIOSuite_CasesFor_##TestSuite_Name is already registered, are you trying to create two suites with the same name?"
-#endif /* is TestIO_Suite_CasesFor_##TestSuiteName defined? */
-#endif /* TestIO_ReserveCasesForSuite */
-
 #ifndef TestIO_CreateTestCounterForSuite
 #define TestIO_CreateTestCounterForSuite(TestSuite_Name)
 #ifndef TestIOSuite_##TestSuite_Name##_NumTests

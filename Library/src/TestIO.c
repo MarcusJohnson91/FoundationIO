@@ -19,19 +19,19 @@
 extern "C" {
 #endif
 
-    const TestIO_Case NULLCase = {
+    const TestIO_Case TestIO_NULLCase = {
         .Name        = NULL,
         .Function    = NULL,
         .State       = TestState_Unspecified,
         .Expectation = Outcome_Unspecified,
     };
 
-    const TestIO_Suite NULLSuite = {
+    const TestIO_Suite TestIO_NULLSuite = {
         .Name     = NULL,
         .Init     = NULL,
         .Deinit   = NULL,
         .NumTests = 0,
-        .Tests    = &NULLCase,
+        .Tests    = &TestIO_NULLCase,
     };
 
     /*
