@@ -4,16 +4,18 @@
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
 #include "../include/FileIO.h"            /* Included for File operations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
-#include "../include/TextIO/LogIO.h"      /* Included for error logging */
-#include "../include/TextIO/StringIO.h"   /* Included for UTF8_GetStringSizeInCodeUnits */
+#include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
+#include "../include/TextIO/LogIO.h"      /* Included for Logging */
+#include "../include/TextIO/StringIO.h"   /* Included for StringIO's declarations */
 
-#if defined(__has_include)
-#if __has_include(<assert.h>)
-#include <assert.h>
-#endif /* __has_include */
-#else
-#define assert(X) _Assert(X)
-#endif
+#include <string.h>
+#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
+#include <BCrypt.h>
+#elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
+#include <linux/random.h>
+#include <sys/syscall.h>
+#include <sys/random.h>
+#endif /* TargetOS */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
