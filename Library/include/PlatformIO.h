@@ -536,7 +536,7 @@ extern "C" {
     /*!
      @abstract      Error message for assert; Do not use directly.
      */
-    void            PlatformIO_AssertFail(const char *FileName, const char *FunctionName, const char *Expression);
+    void            PlatformIO_AssertFail(const char *FileName, const char *FunctionName, const unsigned char *Expression, ...);
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

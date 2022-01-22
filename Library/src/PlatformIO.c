@@ -35,12 +35,20 @@ extern "C" {
         return TotalMemory;
     }
 
-    void PlatformIO_AssertFail(const char *FileName, const char *FunctionName, const char *Expression) {
-        UTF8 *Formatted = UTF8_Format(UTF8String("Assertion '%s' in %s::%s Failed%s"), Expression, FileName, FunctionName, TextIO_NewLine8);
+    void PlatformIO_AssertFail(const char *FileName, const char *FunctionName, const unsigned char *Expression, ...) {
+        // Check if there's any specifiers in Expression
+        uint64_t NumSpecifiers = UTF8_GetNumFormatSpecifiers(Expression);
+        UTF8    *ExpressionVA  = (UTF8*) Expression;
+        if (NumSpecifiers > 0) {
+            va_list VariadicArguments;
+            va_start(VariadicArguments, Expression);
+            ExpressionVA = UTF8_Format(ExpressionVA, VariadicArguments);
+            va_end(VariadicArguments);
+        }
+        UTF8 *Formatted = UTF8_Format(UTF8String("Assertion '%s' in %s::%s Failed%s"), ExpressionVA, FileName, FunctionName, TextIO_NewLine8);
         UTF8_File_WriteString(stderr, Formatted);
         UTF8_Deinit(Formatted);
         exit(EXIT_FAILURE);
-		/* Wonder if I could make Assert handle format args? */
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

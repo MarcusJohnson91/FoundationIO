@@ -13,13 +13,36 @@
 
 #include "TextIOTypes.h"    /* Included for Text types */
 
-#if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
+#if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #include <sal.h>
 #endif
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+    /* Low level helper functions */
+    /*!
+     @abstract                                    Counts the numbe of format specifiers in String.
+     @param           String                      The string to check.
+     @return                                      The number of specifiers in the string.
+     */
+    uint64_t          UTF8_GetNumFormatSpecifiers(ImmutableString_UTF8 String);
+
+    /*!
+     @abstract                                    Counts the numbe of format specifiers in String.
+     @param           String                      The string to check.
+     @return                                      The number of specifiers in the string.
+     */
+    uint64_t          UTF16_GetNumFormatSpecifiers(ImmutableString_UTF16 String);
+
+    /*!
+     @abstract                                    Counts the numbe of format specifiers in String.
+     @param           String                      The string to check.
+     @return                                      The number of specifiers in the string.
+     */
+    uint64_t          UTF32_GetNumFormatSpecifiers(ImmutableString_UTF32 String);
+    /* Low level helper functions */
     
     /*!
      @abstract                                    Formats a string according to the Format string.
