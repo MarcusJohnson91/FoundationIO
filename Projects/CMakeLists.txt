@@ -35,7 +35,7 @@ include(GetVersion.cmake)
 GetVersionString(${VERSION_DIRECTORY} VERSION_STRING)
 
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
-    message("We're checking if TextIOTables.h should be updated, it could take a few seconds to about 12 minutes.")
+    message("We're checking if TextIOTables.h should be updated, it will take between a few seconds and 5 minutes.")
     execute_process(
     COMMAND sh "${BASE_DIRECTORY}/Projects/TextIOTables_Create.sh"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
