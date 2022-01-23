@@ -11,6 +11,12 @@
 extern "C" {
 #endif
 
+    /*
+     I really want to rebase everything on Graphemes though
+
+     read CodeUnits from a string into a CodePoint, read CodePoints into Graphemes, then handle it all correctly.
+     */
+
     typedef enum StringIOConstants {
         UTF8Header_NumCodeUnits = 0xF8,
         UTF8Header_4CodeUnits   = 0xF0,
@@ -177,7 +183,7 @@ extern "C" {
         uint64_t Hash     = 0;
         size_t   CodeUnit = 0;
         while (String[CodeUnit] != TextIO_NULLTerminator) {
-            Hash         += (UTF8_ExtractCodePoint(UTF8_ExtractCodePointAsCodeUnits(&String[CodeUnit])) * 0x935d50f3) % 0x25D56F;
+            Hash         += (UTF8_ExtractCodePoint(&String[CodeUnit]) * 0x935d50f3) % 0x25D56F;
             CodeUnit     += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
         }
         return Hash;
@@ -187,7 +193,7 @@ extern "C" {
         uint64_t Hash     = 0;
         size_t   CodeUnit = 0;
         while (String[CodeUnit] != TextIO_NULLTerminator) {
-            Hash         += (UTF16_ExtractCodePoint(UTF16_ExtractCodePointAsCodeUnits(&String[CodeUnit])) * 0x935d50f3) % 0x25D56F;
+            Hash         += (UTF16_ExtractCodePoint(&String[CodeUnit]) * 0x935d50f3) % 0x25D56F;
             CodeUnit     += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
         }
         return Hash;
@@ -271,12 +277,11 @@ extern "C" {
         return UTF16CodeUnits;
     }
     
-    UTF32 UTF8_ExtractCodePoint(ImmutableString_UTF8 CodeUnits) { // The CodeUnits have already been checked
+    UTF32 UTF8_ExtractCodePoint(ImmutableString_UTF8 StartCodeUnit) { // The CodeUnits have already been checked
         UTF32 CodePoint                       = 0;
-        if (CodeUnits != NULL) {
-            UTF8_Clear_Preallocated();
-            UTF8 *Extracted                   = UTF8_ExtractCodePointAsCodeUnits(CodeUnits);
-            switch (UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0])) {
+        if (StartCodeUnit != NULL) {
+            UTF8 *Extracted                   = UTF8_ExtractCodePointAsCodeUnits(StartCodeUnit);
+            switch (UTF8_GetCodePointSizeInCodeUnits(StartCodeUnit[0])) {
                 case 1:
                     CodePoint                 = (Extracted[0] & UTF8Max_ASCII);
                     break;
@@ -347,6 +352,70 @@ extern "C" {
         }
         return CodePoint;
     }
+
+    UTF8 *UTF8_ExtractGrapheme(ImmutableString_UTF8 String, size_t GraphemeIndex) { // We could just return the size of the Grapheme in UTF8 CodeUnits
+        UTF8 *Grapheme        = NULL;
+        if (String != NULL) {
+            /*
+             Loop over chunks of CodeUnits extracting CodePoints, looking up each Codepoint in the Grapheme extender table; keeping track of the number of codeunits in this Grapheme.
+             */
+            UTF32 CodePoint   = UTF8_ExtractCodePoint(String);
+            if (UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint)) {
+                // If this CodePoint is a grapheme extender, we're kinda in the middle of a Grapheme, and we need to discard until we get to a codepoint that is not a Grapheme extender
+            }
+
+            UTF32 *String32   = UTF8_Decode(String);
+            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, GraphemeIndex);
+            UTF32_Deinit(String32);
+            Grapheme          = UTF8_Encode(Grapheme32);
+            UTF32_Deinit(Grapheme32);
+        } else {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+
+    UTF16 *UTF16_ExtractGrapheme(ImmutableString_UTF16 String, size_t GraphemeIndex) {
+        UTF16 *Grapheme        = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF16_Decode(String);
+            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, GraphemeIndex);
+            UTF32_Deinit(String32);
+            Grapheme          = UTF16_Encode(Grapheme32);
+            UTF32_Deinit(Grapheme32);
+        } else {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+
+    UTF32 *UTF32_ExtractGrapheme(ImmutableString_UTF32 String, size_t GraphemeIndex) {
+        UTF32 *Grapheme         = NULL;
+        if (String != NULL) {
+            UTF32  CodePoint1   = 0;
+            UTF32  CodePoint2   = 0;
+            size_t CodePoint    = 0;
+            while (String[CodePoint] != TextIO_NULLTerminator && String[CodePoint + 1] != TextIO_NULLTerminator) {
+                CodePoint1       = UTF32_ExtractCodePoint(&String[CodePoint]);
+                CodePoint2       = UTF32_ExtractCodePoint(&String[CodePoint + 1]);
+                // Now look up the codepoints to see if they're grapheme extenders
+                bool IsExtender1 = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint1);
+                bool IsExtender2 = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint2);
+                if (IsExtender1 == Yes && IsExtender2 == No) {
+                    // Grapheme Boundary; CodePoint1 is part of the previous boundary; CodePoint2 is part of the next Grapheme
+                } else if (IsExtender1 == No && IsExtender2 == Yes) {
+                    // Grapheme Boundary, CodePoint1 and CodePoint2 are part of a new Grapheme
+                } else if (IsExtender1 == Yes && IsExtender2 == Yes) {
+                    // Both codepoints are part of a previous grapheme
+                } else if (IsExtender1 == No && IsExtender2 == No) {
+                    // 2 graphemes here
+                }
+            }
+        } else {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
     
     static void UTF16_EncodeCodePoint(UTF32 CodePoint) {
         UTF32   Ranged                                 = CodePoint + UTF16SurrogatePairStart;
@@ -366,7 +435,7 @@ extern "C" {
         if (String != NULL) {
             size_t CodeUnit         = OffsetInCodeUnits;
             while (String[CodeUnit] != TextIO_NULLTerminator) {
-                UTF32 CodePoint1    = UTF8_ExtractCodePoint(UTF8_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+                UTF32 CodePoint1    = UTF8_ExtractCodePoint(&String[CodeUnit]);
                 bool IsGraphemeExt  = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint1);
                 if (IsGraphemeExt == true) {
                     GraphemeSize   += 1;
@@ -384,7 +453,7 @@ extern "C" {
         if (String != NULL) {
             size_t   CodeUnit         = OffsetInCodeUnits;
             while (String[CodeUnit] != TextIO_NULLTerminator) {
-                UTF32 CodePoint1      = UTF16_ExtractCodePoint(UTF16_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+                UTF32 CodePoint1      = UTF16_ExtractCodePoint(&String[CodeUnit]);
                 bool IsGraphemeExt    = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint1);
                 if (IsGraphemeExt == true) {
                     GraphemeSize     += 1;
@@ -560,11 +629,11 @@ extern "C" {
         size_t WordSize      = 0;
         if (String != NULL) {
             size_t CodeUnit  = 0;
-            UTF32 CodePoint  = UTF8_ExtractCodePoint(UTF8_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+            UTF32 CodePoint  = UTF8_ExtractCodePoint(&String[CodeUnit]);
             while (UTF32_IsCodePointInTable(WordBreakTable, WordBreakTableSize, CodePoint) == false) {
                 WordSize    += 1;
                 CodeUnit    += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint);
-                CodePoint    = UTF8_ExtractCodePoint(UTF8_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+                CodePoint    = UTF8_ExtractCodePoint(&String[CodeUnit]);
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
@@ -576,11 +645,11 @@ extern "C" {
         size_t WordSize      = 0;
         if (String != NULL) {
             size_t CodeUnit  = 0;
-            UTF32 CodePoint  = UTF16_ExtractCodePoint(UTF16_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+            UTF32 CodePoint  = UTF16_ExtractCodePoint(&String[CodeUnit]);
             while (UTF32_IsCodePointInTable(WordBreakTable, WordBreakTableSize, CodePoint) == false) {
                 WordSize    += 1;
                 CodeUnit    += UTF32_GetCodePointSizeInUTF16CodeUnits(CodePoint);
-                CodePoint    = UTF16_ExtractCodePoint(UTF16_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+                CodePoint    = UTF16_ExtractCodePoint(&String[CodeUnit]);
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
@@ -593,11 +662,11 @@ extern "C" {
         if (String != NULL) {
             /* Count the number of word breaks, for example /cr/lf before the start of a new word */
             size_t CodeUnit    = 0;
-            UTF32  CodePoint   = UTF8_ExtractCodePoint(UTF8_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+            UTF32  CodePoint   = UTF8_ExtractCodePoint(&String[CodeUnit]);
             while (UTF32_IsCodePointInTable(WordBreakTable, WordBreakTableSize, CodePoint) == true) {
                 WordBreakSize += 1;
                 CodeUnit      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint);
-                CodePoint      = UTF8_ExtractCodePoint(UTF8_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+                CodePoint      = UTF8_ExtractCodePoint(&String[CodeUnit]);
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
@@ -609,72 +678,16 @@ extern "C" {
         size_t WordBreakSize   = 0;
         if (String != NULL) {
             size_t CodeUnit    = 0;
-            UTF32 CodePoint    = UTF16_ExtractCodePoint(UTF16_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+            UTF32 CodePoint    = UTF16_ExtractCodePoint(&String[CodeUnit]);
             while (UTF32_IsCodePointInTable(WordBreakTable, WordBreakTableSize, CodePoint) == true) {
                 WordBreakSize += 1;
                 CodeUnit      += UTF32_GetCodePointSizeInUTF16CodeUnits(CodePoint);
-                CodePoint      = UTF16_ExtractCodePoint(UTF16_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+                CodePoint      = UTF16_ExtractCodePoint(&String[CodeUnit]);
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return WordBreakSize;
-    }
-    
-    UTF8 *UTF8_ExtractGrapheme(ImmutableString_UTF8 String, size_t Grapheme2Extract) {
-        UTF8 *Grapheme        = NULL;
-        if (String != NULL) {
-            UTF32 *String32   = UTF8_Decode(String);
-            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
-            UTF32_Deinit(String32);
-            Grapheme          = UTF8_Encode(Grapheme32);
-            UTF32_Deinit(Grapheme32);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
-        return Grapheme;
-    }
-    
-    UTF16 *UTF16_ExtractGrapheme(ImmutableString_UTF16 String, size_t Grapheme2Extract) {
-        UTF16 *Grapheme        = NULL;
-        if (String != NULL) {
-            UTF32 *String32   = UTF16_Decode(String);
-            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
-            UTF32_Deinit(String32);
-            Grapheme          = UTF16_Encode(Grapheme32);
-            UTF32_Deinit(Grapheme32);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
-        return Grapheme;
-    }
-    
-    UTF32 *UTF32_ExtractGrapheme(ImmutableString_UTF32 String, size_t GraphemeIndex) {
-        UTF32 *Grapheme         = NULL;
-        if (String != NULL) {
-            UTF32  CodePoint1   = 0;
-            UTF32  CodePoint2   = 0;
-            size_t CodePoint    = 0;
-            while (String[CodePoint] != TextIO_NULLTerminator && String[CodePoint + 1] != TextIO_NULLTerminator) {
-                CodePoint1       = UTF32_ExtractCodePoint(&String[CodePoint]);
-                CodePoint2       = UTF32_ExtractCodePoint(&String[CodePoint + 1]);
-                // Now look up the codepoints to see if they're grapheme extenders
-                bool IsExtender1 = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint1);
-                bool IsExtender2 = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint2);
-                if (IsExtender1 == Yes && IsExtender2 == No) {
-                    // Grapheme Boundary; CodePoint1 is part of the previous boundary; CodePoint2 is part of the next Grapheme
-                } else if (IsExtender1 == No && IsExtender2 == Yes) {
-                    // Grapheme Boundary, CodePoint1 and CodePoint2 are part of a new Grapheme
-                } else if (IsExtender1 == Yes && IsExtender2 == Yes) {
-                    // Both codepoints are part of a previous grapheme
-                } else if (IsExtender1 == No && IsExtender2 == No) {
-                    // 2 graphemes here
-                }
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
-        return Grapheme;
     }
 
     /* Low Level functions, be careful */
@@ -1442,7 +1455,7 @@ extern "C" {
             DecodedString                            = UTF32_Init(StringSize);
             if (DecodedString != NULL) {
                 for (size_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    DecodedString[CodePoint]         = UTF8_ExtractCodePoint(UTF8_ExtractCodePointAsCodeUnits(&String[CodeUnit]));
+                    DecodedString[CodePoint]         = UTF8_ExtractCodePoint(&String[CodeUnit]);
                     CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodePoint]);
                 }
             } else if (DecodedString == NULL) {
