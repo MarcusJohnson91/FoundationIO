@@ -254,7 +254,6 @@ extern "C" {
     
     uint8_t UTF32_GetCodePointSizeInUTF8CodeUnits(UTF32 CodePoint) {
         uint8_t UTF8CodeUnits = 0;
-
         if (CodePoint <= 0x7F) {
             UTF8CodeUnits     = 1;
         } else if (CodePoint >= 0x80 && CodePoint <= 0x7FF) {
@@ -573,6 +572,27 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumCodePoints;
+    }
+
+    /*!
+     FormatIO needs a similar function for replacing format specifiers
+     The general concept is: Take two strings, compare their sizes, saying the difference of the second string from the first.
+
+     All I need now is a good name.
+
+     ssize_t UTF32_CompareStringSizesInCodePoints(UTF32 *String1, UTF32 *String2);
+
+     e.g: String1 = 1, String2 = 3, then +2 should be returned.
+     */
+
+    ssize_t UTF32_CompareStringSizesInCodePoints(UTF32 *Old, UTF32 *New) {
+        ssize_t SizeDifference = 0;
+        if (Old != NULL && New != NULL) {
+            size_t OldSize     = UTF32_GetStringSizeInCodePoints(Old);
+            size_t NewSize     = UTF32_GetStringSizeInCodePoints(New);
+            SizeDifference     = NewSize - OldSize;
+        }
+        return SizeDifference;
     }
     
     size_t UTF8_GetStringSizeInGraphemes(ImmutableString_UTF8 String) {
@@ -2885,17 +2905,7 @@ extern "C" {
         return NULL;
     }
 
-    /*
-     There should be a helper function so that we can build up these multi-codepoints one at a time.
-
-     It'd be useful for Grapheme replacements too.
-
-     So, here we just need to know th size of the original string in codepoints, as well as the total number of codepoints to be replaced, as well as the total size of the replacements
-
-     So here I guess we just need to loop over looking for matching codepoints, and getting the size of the replacement strings
-     */
-
-    static size_t UTF32_ShouldBeNormalized(UTF32 CodePoint, StringIO_NormalizationForms NormalizationForm) {
+    static size_t UTF32_NeedsNormalization(UTF32 CodePoint, StringIO_NormalizationForms NormalizationForm) {
         size_t TableIndex         = 0;
         if (NormalizationForm == NormalizationForm_CanonicalCompose) {
             while (TableIndex < CanonicalNormalizationTableSize) {
@@ -2920,7 +2930,7 @@ extern "C" {
         size_t CodePoint = 0;
         if (NormalizationForm == NormalizationForm_CanonicalCompose) {
             while (String[CodePoint] != TextIO_NULLTerminator) {
-                size_t TableIndex              = UTF32_ShouldBeNormalized(String[CodePoint], NormalizationForm_CanonicalCompose);
+                size_t TableIndex              = UTF32_NeedsNormalization(String[CodePoint], NormalizationForm_CanonicalCompose);
                 if (TableIndex != -1) {
                     CumulativeReplacementSize += UTF32_GetStringSizeInCodePoints((const UTF32 *) &CanonicalNormalizationTable[TableIndex][1]);
                     CodePoint                 += 1;
@@ -2928,7 +2938,7 @@ extern "C" {
             }
         } else if (NormalizationForm == NormalizationForm_KompatibleCompose) {
             while (String[CodePoint] != TextIO_NULLTerminator) {
-                size_t TableIndex              = UTF32_ShouldBeNormalized(String[CodePoint], NormalizationForm_KompatibleCompose);
+                size_t TableIndex              = UTF32_NeedsNormalization(String[CodePoint], NormalizationForm_KompatibleCompose);
                 if (TableIndex != -1) {
                     CumulativeReplacementSize += UTF32_GetStringSizeInCodePoints((const UTF32 *) &KompatibleNormalizationTable[TableIndex][1]);
                     CodePoint                 += 1;
@@ -2946,7 +2956,7 @@ extern "C" {
             ComposedString            = UTF32_Init(ComposedStringSize);
             if (ComposedString != NULL) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
-                    size_t TableID = UTF32_ShouldBeNormalized(String[CodePoint], CompositionType);
+                    size_t TableID = UTF32_NeedsNormalization(String[CodePoint], CompositionType);
                     if (TableID != -1) {
                         // Find the length of the replacement string
                         bool Shifted  = UTF32_ShiftCodePoints(ComposedString, UTF32_GetStringSizeInCodePoints(String), ComposedStringSize, CodePoint, UTF32_GetStringSizeInCodePoints((const UTF32 *) &CanonicalNormalizationTable[TableID][1]));

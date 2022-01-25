@@ -350,6 +350,14 @@ extern "C" {
      @param            String                            The string to get the number of CodePoints in.
      */
     size_t             UTF32_GetStringSizeInCodePoints(ImmutableString_UTF32 String);
+
+    /*!
+     @abstract                                           Gets the difference in size between two strings.
+     @remark                                             Old is the original, New is the replacement; Diff = New - Old
+     @param            OldString                         The string being replaced.
+     @param            NewString                         The string doing the replacing.
+     */
+    ssize_t            UTF32_CompareStringSizesInCodePoints(UTF32 *OldString, UTF32 *NewString);
     
     /*!
      @abstract                                           Gets the number of user visible characters in a UTF-8 string.
