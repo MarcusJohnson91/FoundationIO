@@ -505,25 +505,6 @@
 #define             PlatformIO_Expand(...) __VA_ARGS__
 #endif /* PlatformIO_Expand */
 
-#if defined(__has_include)
-
-#if __has_include(<assert.h>)
-#include <assert.h>
-#else
-// Define assert.h our selves
-
-#ifdef DEBUG
-#define assert(Expression) ((void)((Expression) || (PlatformIO_AssertFail(__FILE__, PlatformIO_FunctionName, #Expression),0)))
-#elif defined(NDEBUG)
-#define assert(Expression) ((void) Expression)
-#endif
-
-#endif /* Assert.h */
-
-#elif !defined(__has_include)
-#error "Update your compiler to one that supports __has_include"
-#endif /* __has_include */
-
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
