@@ -81,7 +81,7 @@ set(PRIVATE_SOURCE
 "${LIBRARY_DIRECTORY}/src/TextIO/Private/TextIOTables.c"
 )
 
-option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library (.dylib/.dll/.so)?" ON)
+option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library? (.dylib/.dll/.so)" ON)
 
 if(BUILD_AS_SHARED_LIBRARY MATCHES ON)
     add_library(FoundationIO SHARED ${LIBRARY_SOURCE} ${PRIVATE_SOURCE})
