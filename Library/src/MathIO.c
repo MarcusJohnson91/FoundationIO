@@ -1,7 +1,5 @@
 #include "../include/MathIO.h"       /* Included for our declarations */
-
-#include "../include/TextIO/LogIO.h" /* Included for Logging */
-#include <assert.h>
+#include "../include/AssertIO.h"     /* Included for AssertIO */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -206,7 +204,7 @@ extern "C" {
      1 << (NumBits - 1) = Sign Bit
      */
     int64_t SignExtend(const int64_t Integer, const uint8_t IntegerSizeInBits) {
-        assert(Integer > 0 && IntegerSizeInBits > 0);
+        AssertIO(IntegerSizeInBits >= 1 && "IntegerSizeInBits must be at least one");
         int64_t Extended = 0;
         // (1 << IntegerSizeInBits) - 1 = all 1's for IntegerSizeInBits
         if (Integer < 1) {
@@ -486,7 +484,7 @@ __attribute__((no_sanitize("undefined")))
  */
     uint64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value) {
         uint64_t Rotated = 0ULL;
-        assert(RotationType != RotationType_Unspecified && "RotationType_Unspecified is invalid");
+        AssertIO(RotationType != RotationType_Unspecified && "RotationType_Unspecified is invalid");
         if (RotationType == RotationType_Left) {
             Rotated     = (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
         } else if (RotationType == RotationType_Right) {

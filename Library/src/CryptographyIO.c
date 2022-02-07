@@ -1,5 +1,6 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 
+#include "../include/AssertIO.h"          /* Included for AssertIO */
 #include "../include/AsynchronousIO.h"    /* Included for AsyncIOStream_Init */
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
 #include "../include/FileIO.h"            /* Included for File operations */
@@ -90,7 +91,7 @@ extern "C" {
 
     InsecurePRNG *InsecurePRNG_Init(uint64_t Seed) {
         InsecurePRNG *Insecure = calloc(1, sizeof(InsecurePRNG));
-        assert(Insecure != NULL && "Couldn't allocate InsecurePRNG!");
+        AssertIO(Insecure != NULL && "Couldn't allocate InsecurePRNG");
         if (Seed == 0) {
             Insecure->State[0] = InsecurePRNG_Seed(InsecurePRNG_DefaultSeed[0]);
         } else {

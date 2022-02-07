@@ -281,6 +281,10 @@
 #endif /* Language */
 #endif /* PlatformIO_FunctionName */
 
+#ifndef             PlatformIO_FileName
+#define             PlatformIO_FileName                                                 PlatformIO_Cast(ImmutableString_UTF8, __FILE__)
+#endif /* PlatformIO_FunctionName */
+
 #ifndef PlatformIO_TargetOS
 #if   defined(__APPLE__) && defined(__MACH__)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX | PlatformIO_TargetOSIsApple)
