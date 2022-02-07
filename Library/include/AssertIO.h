@@ -21,12 +21,12 @@ extern "C" {
 #define static_assert _Static_assert
 #endif
 
-    void AssertIO_Message(const UTF8 *FileName, const UTF8 *FunctionName, UTF8 *AssertionString);
+    void AssertIO_Message(const UTF8 *FileName, const UTF8 *FunctionName, UTF8 *ExpressionString, ...);
 
 #if PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug
-#define AssertIO(Expression) ((void)((Expression)||(AssertIO_Message(PlatformIO_FileName, PlatformIO_FunctionName, #Expression),0)))
+#define AssertIO(Expression, ...) ((void)((Expression)||(AssertIO_Message(PlatformIO_FileName, PlatformIO_FunctionName, #Expression, ##__VA_ARGS__),0)))
 #else
-#define AssertIO(Expression) ((void)0)
+#define AssertIO(Expression, ...) ((void)0)
 #endif /* Build type */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
