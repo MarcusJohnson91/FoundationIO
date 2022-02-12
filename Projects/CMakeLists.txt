@@ -7,14 +7,9 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "")
 	set(CMAKE_BUILD_TYPE "Debug")
 endif(NOT DEFINED CMAKE_BUILD_TYPE)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    include(CTest)
-    enable_testing()
-endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-
-if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-add_compile_definitions(PlatformIO_LoggingStatus=PlatformIO_EnableLogging)
-endif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" OR CMAKE_BUILD_TYPE STREQUAL "Debug")
+add_definitions(-DPlatformIO_LoggingStatus=PlatformIO_EnableLogging)
+endif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" OR CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 if(EXISTS "../../Dependencies")
 set(FoundationIO_Root_Dir "..")
@@ -29,9 +24,12 @@ set(FoundationIO_Resources_Dir "${FoundationIO_Root_Dir}/Resources" CACHE PATH I
 set(FoundationIO_Build_Dir     "${FoundationIO_Root_Dir}/BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
 set(FoundationIO_Projects_Dir  "${FoundationIO_Root_Dir}/Projects")
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FoundationIO_Build_Dir}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FoundationIO_Build_Dir}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FoundationIO_Build_Dir}/bin)
+if(IS_DIRECTORY "../.git")
+set(CMAKE_OUTPUT_DIRECTORY         "${FoundationIO_Build_Dir}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${FoundationIO_Build_Dir}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${FoundationIO_Build_Dir}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${FoundationIO_Build_Dir}/bin")
+endif(IS_DIRECTORY "../.git")
 
 set(FoundationIO_VERSION      "")
 include(${FoundationIO_Projects_Dir}/GetVersion.cmake)
@@ -42,7 +40,7 @@ include(${FoundationIO_Projects_Dir}/BuildSettings.cmake)
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
     message("We're checking if TextIOTables.h should be updated, it will take between a few seconds and 5 minutes.")
     execute_process(
-    COMMAND sh "${FoundationIO_Root_Dir}/Projects/TextIOTables_Create.sh"
+    COMMAND sh "${FoundationIO_Projects_Dir}/TextIOTables_Create.sh"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE TextIOTables_Create_Status 
     RESULTS_VARIABLE STDOUT
@@ -50,21 +48,11 @@ if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_
 )
 endif(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-set(DynlibExt dylib)
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-set(DynlibExt dll)
+if(IS_DIRECTORY "../.git")
+configure_file("${FoundationIO_Resources_Dir}/FoundationIO.pc.in" "${CMAKE_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc")
 else()
-set(DynlibExt so)
-endif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-
-configure_file("${FoundationIO_Resources_Dir}/FoundationIO.pc.in" "${FoundationIO_Build_Dir}/Resources/FoundationIO.pc")
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    set(LIBRARY_SOURCE "${LIBRARY_SOURCE}" "${FoundationIO_Library_Dir}/src/TestIO.c") #Only compile TestIO into FoundationIO if we're in debug mode and linking the test programs
-endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-
-option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library? (.dylib/.dll/.so)" ON)
+configure_file("${FoundationIO_Resources_Dir}/FoundationIO.pc.in" "${CMAKE_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc")
+endif(IS_DIRECTORY "../.git")
 
 set(FoundationIO_SOURCE
     "${FoundationIO_Library_Dir}/src/AssertIO.c"
@@ -87,10 +75,18 @@ set(FoundationIO_SOURCE
     "${FoundationIO_Library_Dir}/src/TextIO/Private/TextIOTables.c"
 )
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(FOUNDATIONIO_SOURCE_WITH_TESTIO "${FoundationIO_SOURCE}" "${FoundationIO_Library_Dir}/src/TestIO.c") #Only compile TestIO into FoundationIO if we're in debug mode and linking the test programs
+else()
+    set(FOUNDATIONIO_SOURCE_WITH_TESTIO "${FoundationIO_SOURCE}")
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+
+option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library? (.dylib/.dll/.so)" ON)
+
 if(BUILD_AS_SHARED_LIBRARY MATCHES ON)
-    add_library(FoundationIO SHARED ${FoundationIO_SOURCE})
+    add_library(FoundationIO SHARED ${FOUNDATIONIO_SOURCE_WITH_TESTIO})
 elseif(BUILD_AS_SHARED_LIBRARY MATCHES OFF)
-    add_library(FoundationIO STATIC ${FoundationIO_SOURCE})
+    add_library(FoundationIO STATIC ${FOUNDATIONIO_SOURCE_WITH_TESTIO})
 endif(BUILD_AS_SHARED_LIBRARY MATCHES ON)
 
 if(CMAKE_HOST_WIN32)
@@ -111,9 +107,10 @@ endif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
 
 install(TARGETS FoundationIO                                        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 install(DIRECTORY "${FoundationIO_Build_Dir}/include"               DESTINATION "${CMAKE_INSTALL_PREFIX}/include" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
-install(FILES "${FoundationIO_Build_Dir}/Resources/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
+install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    include(CTest)
     enable_testing()
     include(${FoundationIO_Projects_Dir}/RegisterTests.cmake)
 

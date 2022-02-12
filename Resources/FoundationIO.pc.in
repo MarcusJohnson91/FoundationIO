@@ -15,7 +15,7 @@ FileIO:             File and Path handling functions.
 MathIO:             Mathematical functions.
 NetworkIO:          TCPv6 and UDPv6 IP stack.
 PlatformIO:         Platform independence macros.
-TestIO:             Unit testing framework with automatic test registration.
+TestIO:             Unit testing framework with automatic test registration, only available in Debug builds.
 TextIO:             The Unicode handling portion of FoundationIO, consists of:
     StringIO:       Generic string handling functions.
     CommandLineIO:  Command line argument parsing and interface building.

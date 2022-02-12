@@ -8,5 +8,3 @@ macro(RegisterTest Path Name LibraryName)
 
     add_custom_command(TARGET ${LibraryName}_Tests COMMENT "Run ${LibraryName} tests" POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endmacro(RegisterTest)
-
-#set(LibraryTests ${LibraryName}_Tests)
