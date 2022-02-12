@@ -31,8 +31,6 @@ function(GetVersionString VERSION_FILE OUTPUT_VERSION_STRING)
     WORKING_DIRECTORY ${Submodule_Dir}
     OUTPUT_VARIABLE GIT_VERSION)
 
-    message("GIT_VERSION=${GIT_VERSION}")
-
     set(Version_CommitID "")
     string(TOUPPER ${GIT_VERSION} Version_CommitID)
     string(CONCAT VERSION_STRING "${Version_Major}" "." "${Version_Minor}" "." "${Version_Patch}" ":" "${Version_CommitID}")
