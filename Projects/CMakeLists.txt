@@ -31,9 +31,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FoundationIO_Build_Dir}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FoundationIO_Build_Dir}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FoundationIO_Build_Dir}/bin)
 
-set(VERSION_STRING      "")
+set(FoundationIO_VERSION      "")
 include(${FoundationIO_Projects_Dir}/GetVersion.cmake)
-GetVersionString("${FoundationIO_Library_Dir}/FoundationIO.h" VERSION_STRING)
+GetVersionString("${FoundationIO_Library_Dir}/FoundationIO.h" FoundationIO_VERSION)
 
 include(${FoundationIO_Projects_Dir}/BuildSettings.cmake)
 
@@ -92,7 +92,7 @@ elseif(BUILD_AS_SHARED_LIBRARY MATCHES OFF)
 endif(BUILD_AS_SHARED_LIBRARY MATCHES ON)
 
 if(NOT WIN32)
-  string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9a-fA-F]+)$" MATCH_STRING ${VERSION_STRING})
+  string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9a-fA-F]+)$" MATCH_STRING ${FoundationIO_VERSION})
   set("VERSION_MAJOR" ${CMAKE_MATCH_1})
   set("VERSION_MINOR" ${CMAKE_MATCH_2})
   set("VERSION_PATCH" ${CMAKE_MATCH_3})
