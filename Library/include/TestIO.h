@@ -125,8 +125,8 @@ extern "C" {
         const UTF8                    *Name;
         void                          *FixtureStruct;
         const TestIO_Case             *Tests;
-        TestIO_FixtureInit             Init;
-        TestIO_FixtureDeinit           Deinit;
+        TestIO_TestFunction            Init;
+        TestIO_TestFunction            Deinit;
         size_t                         NumTests;
     } TestIO_Suite;
 
