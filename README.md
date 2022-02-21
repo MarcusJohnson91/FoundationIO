@@ -10,7 +10,9 @@
 * Format: APILevel.ABILevel.CommitID
 
 # License:
-FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
+* All contributions are accepted only under the terms of the public-domain and CC0 licenses.
+* FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
+
 
 # Compiling:
 * To use FoundationIO in your project, add it as a submodule with `git submodule add git@github.com:MarcusJohnson91/FoundationIO.git Dependencies/FoundationIO`, then include whatever component headers you want to use.
