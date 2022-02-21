@@ -12,6 +12,10 @@ extern "C" {
 #endif
 
     /*
+     Sanitize strings: Remove U+202E from all strings in all cases, it is only used maliciously.
+     */
+
+    /*
      I really want to rebase everything on Graphemes though
 
      read CodeUnits from a string into a CodePoint, read CodePoints into Graphemes, then handle it all correctly.
