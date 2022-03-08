@@ -642,6 +642,13 @@ extern "C" {
     /* TextIOTables Operations */
     /*!
      @abstract                                           Checks if a given CodePoint is in the specified Table from TextIO.
+     @param            NormalizationType                 The kind of normalization to check.
+     @param            CodePoint                         The codepoint to check.
+     */
+    size_t             UTF32_ShouldCodePointBeNormalized(StringIO_NormalizationForms NormalizationType, UTF32 CodePoint); // UTF32_IsNormalizable
+
+    /*!
+     @abstract                                           Checks if a given CodePoint is in the specified Table from TextIO.
      @param            Table                             The table to check.
      @param            TableSize                         The size of the table.
      @param            CodePoint                         The codepoint to check.

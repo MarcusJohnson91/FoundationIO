@@ -474,7 +474,7 @@ extern "C" {
         if (String != NULL) {
             size_t CodePoint         = OffsetInCodePoints;
             while (String[CodePoint] != TextIO_NULLTerminator) {
-                bool IsGraphemeExt   = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, CodePoint);
+                bool IsGraphemeExt   = UTF32_IsCodePointInTable(GraphemeExtensionTable, GraphemeExtensionTableSize, String[CodePoint]);
                 if (IsGraphemeExt == true) {
                     GraphemeSize    += 1;
                     CodePoint       += 1;
@@ -2742,7 +2742,26 @@ extern "C" {
     }
 
     /* TextIOTables Operations */
-    bool UTF32_IsCodePointInTable(const UTF32 *Table, size_t TableSize, UTF32 CodePoint) {
+    size_t UTF32_ShouldCodePointBeNormalized(StringIO_NormalizationForms NormalizationType, UTF32 CodePoint) {
+        bool   NeedsNormalizaion = No;
+        size_t Index             = 0;
+        if (NormalizationType == NormalizationForm_KompatibleCompose) {
+            while (NeedsNormalizaion == No && Index < KompatibleNormalizationTableSize) {
+                if (KompatibleNormalizationTable[0][Index][0] == CodePoint) {
+                    NeedsNormalizaion = Yes;
+                }
+            }
+        } else if (NormalizationType == NormalizationForm_CanonicalCompose) {
+            while (NeedsNormalizaion == No && Index < CanonicalNormalizationTableSize) {
+                if (CanonicalNormalizationTable[0][Index][0] == CodePoint) {
+                    NeedsNormalizaion = Yes;
+                }
+            }
+        }
+        return NeedsNormalizaion ? Index : -1;
+    }
+
+    bool UTF32_IsCodePointInTable(const UTF32 *const Table, size_t TableSize, UTF32 CodePoint) {
         bool Match = No;
         for (size_t Index = 0; Index < TableSize; Index++) {
             if (CodePoint == Table[Index]) {
@@ -4225,7 +4244,8 @@ extern "C" {
             size_t   NumCodeUnits     = 0ULL;
             if (CodePage == CodePage_ISO_8859_1) {
                 while (Decoded[Character] != TextIO_NULLTerminator) {
-                    if (UTF32_IsCodePointInTable(KompatibleNormalizationTable, KompatibleNormalizationTableSize, Decoded[Character])) { // Kompatible is just a standin here for the actual table
+                    size_t NormOffset = UTF32_ShouldCodePointBeNormalized(NormalizationForm_KompatibleCompose, Decoded[Character]);
+                    if (NormOffset > -1) {
                         NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
                     }
                     Character        += 1;
@@ -4254,7 +4274,8 @@ extern "C" {
             size_t   NumCodeUnits     = 0ULL;
             if (CodePage == CodePage_ISO_8859_1) {
                 while (Decoded[Character] != TextIO_NULLTerminator) {
-                    if (UTF32_IsCodePointInTable(KompatibleNormalizationTable, KompatibleNormalizationTableSize, Decoded[Character])) { // Kompatible is just a standin here for the actual table
+                    size_t NormOffset = UTF32_ShouldCodePointBeNormalized(NormalizationForm_KompatibleCompose, Decoded[Character]);
+                    if (NormOffset > -1) {
                         NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(Decoded[Character]);
                     }
                     Character        += 1;
@@ -4282,8 +4303,9 @@ extern "C" {
             size_t   NumCodeUnits     = 0ULL;
             if (CodePage == CodePage_ISO_8859_1) {
                 while (String[Character] != TextIO_NULLTerminator) {
-                    if (UTF32_IsCodePointInTable(KompatibleNormalizationTable, KompatibleNormalizationTableSize, String[Character])) { // Kompatible is just a standin here for the actual table
-                        NumCodeUnits += 1;
+                    size_t NormOffset = UTF32_ShouldCodePointBeNormalized(NormalizationForm_KompatibleCompose, String[Character]);
+                    if (NormOffset > -1) {
+                        NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(String[Character]);
                     }
                     Character        += 1;
                 }
