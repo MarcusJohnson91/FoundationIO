@@ -1,12 +1,11 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 
-#include "../include/AssertIO.h"          /* Included for AssertIO */
+#include "../include/AssertIO.h"          /* Included for Assertions */
 #include "../include/AsynchronousIO.h"    /* Included for AsyncIOStream_Init */
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
 #include "../include/FileIO.h"            /* Included for File operations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
-#include "../include/TextIO/LogIO.h"      /* Included for Logging */
 #include "../include/TextIO/StringIO.h"   /* Included for StringIO's declarations */
 
 #include <string.h>
@@ -53,6 +52,8 @@ extern "C" {
     }
 
     static void InsecurePRNG_MixState(InsecurePRNG *Insecure, bool IsLongJump) { // Xoshiro256** jump/long_jump + next
+        AssertIO(Insecure != NULL);
+
         uint64_t S0 = 0, S1 = 0, S2 = 0, S3 = 0;
         if (IsLongJump != false) {
             if (Insecure->State[0] != 0) {
@@ -92,6 +93,7 @@ extern "C" {
     InsecurePRNG *InsecurePRNG_Init(uint64_t Seed) {
         InsecurePRNG *Insecure = calloc(1, sizeof(InsecurePRNG));
         AssertIO(Insecure != NULL && "Couldn't allocate InsecurePRNG");
+
         if (Seed == 0) {
             Insecure->State[0] = InsecurePRNG_Seed(InsecurePRNG_DefaultSeed[0]);
         } else {
@@ -106,35 +108,40 @@ extern "C" {
 
     /* RAND_MAX is just 31 bits on MacOS? weird */
     static uint64_t InsecurePRNG_ExtractBits(InsecurePRNG *Insecure, uint8_t NumBits) {
-        uint64_t Value = 0;
-        if (Insecure != NULL && (NumBits > 0 && NumBits < 64)) {
-            if (Insecure->NumBitsRemaining < NumBits) {
-                // Mix the state again, this time
-                InsecurePRNG_MixState(Insecure, /*IsLongJump*/ true);
-            }
+        AssertIO(Insecure != NULL);
+        AssertIO(NumBits <= 64);
 
-            while (NumBits > 0) {
-                uint8_t  Start                  = 256 - Insecure->NumBitsRemaining;
-                uint8_t  End                    = (Start + NumBits) % 64;
-                uint8_t  NumBitsAvailableInWord = 64 - ((End - Start) % 64);
-                uint8_t  Shift                  = (64 - (Start + NumBitsAvailableInWord));
-                uint64_t Mask                   = (Exponentiate(2, NumBitsAvailableInWord) - 1) << Shift;
-                uint64_t Extracted              = (Insecure->State[Start / 64] & Mask) >> Shift;
-                Value                         <<= Shift;
-                Value                          |= Extracted;
-                NumBits                        -= NumBitsAvailableInWord;
-                Insecure->NumBitsRemaining     -= NumBitsAvailableInWord;
-            }
+        uint64_t Value = 0;
+        if (Insecure->NumBitsRemaining < NumBits) {
+            // Mix the state again, this time
+            InsecurePRNG_MixState(Insecure, /*IsLongJump*/ true);
+        }
+
+        while (NumBits > 0) {
+            uint8_t  Start                  = 256 - Insecure->NumBitsRemaining;
+            uint8_t  End                    = (Start + NumBits) % 64;
+            uint8_t  NumBitsAvailableInWord = 64 - ((End - Start) % 64);
+            uint8_t  Shift                  = (64 - (Start + NumBitsAvailableInWord));
+            uint64_t Mask                   = (Exponentiate(2, NumBitsAvailableInWord) - 1) << Shift;
+            uint64_t Extracted              = (Insecure->State[Start / 64] & Mask) >> Shift;
+            Value                         <<= Shift;
+            Value                          |= Extracted;
+            NumBits                        -= NumBitsAvailableInWord;
+            Insecure->NumBitsRemaining     -= NumBitsAvailableInWord;
         }
         return Value;
     }
 
     int64_t InsecurePRNG_CreateInteger(InsecurePRNG *Insecure, uint8_t IntegerSizeInBits) {
-        int64_t Value = InsecurePRNG_ExtractBits(Insecure, IntegerSizeInBits);
-        return Value; // SignExtend the Value before returning it
+        AssertIO(Insecure != NULL);
+        AssertIO(IntegerSizeInBits <= 64);
+
+        return InsecurePRNG_ExtractBits(Insecure, IntegerSizeInBits); // SignExtend the Value before returning it
     }
 
     int64_t InsecurePRNG_CreateIntegerInRange(InsecurePRNG *Insecure, int64_t Min, int64_t Max) {
+        AssertIO(Insecure != NULL);
+
         int64_t Value = 0;
         uint8_t  BitsToRead = Logarithm(2, Max % Min);
         uint64_t Extracted  = InsecurePRNG_ExtractBits(Insecure, BitsToRead);
@@ -149,41 +156,37 @@ extern "C" {
     }
 
     double InsecurePRNG_CreateDecimal(InsecurePRNG *Insecure) {
-        double Decimal        = 0.0;
-        if (Insecure != NULL) {
-            int8_t   Sign     = InsecurePRNG_CreateInteger(Insecure, 1);
-            int16_t  Exponent = InsecurePRNG_CreateIntegerInRange(Insecure, -1023, 1023);
-            uint64_t Mantissa = InsecurePRNG_CreateInteger(Insecure, 53);
+        AssertIO(Insecure != NULL);
 
-            Decimal           = InsertSignD(Decimal, Sign);
-            Decimal           = InsertExponentD(Decimal, Exponent);
-            Decimal           = InsertMantissaD(Decimal, Mantissa);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
-        }
+        double Decimal        = 0.0;
+
+        int8_t   Sign     = InsecurePRNG_CreateInteger(Insecure, 1);
+        int16_t  Exponent = InsecurePRNG_CreateIntegerInRange(Insecure, -1023, 1023);
+        uint64_t Mantissa = InsecurePRNG_CreateInteger(Insecure, 53);
+
+        Decimal           = InsertSignD(Decimal, Sign);
+        Decimal           = InsertExponentD(Decimal, Exponent);
+        Decimal           = InsertMantissaD(Decimal, Mantissa);
         return Decimal;
     }
 
     bool InsecurePRNG_Erase(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
+
         bool EraseWasSucessful = No;
-        if (Insecure != NULL) {
-            Insecure->State[0]         = 0;
-            Insecure->State[1]         = 0;
-            Insecure->State[2]         = 0;
-            Insecure->State[3]         = 0;
-            Insecure->NumBitsRemaining = 0;
-            EraseWasSucessful          = Yes;
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
-        }
+        Insecure->State[0]         = 0;
+        Insecure->State[1]         = 0;
+        Insecure->State[2]         = 0;
+        Insecure->State[3]         = 0;
+        Insecure->NumBitsRemaining = 0;
+        EraseWasSucessful          = Yes;
         return EraseWasSucessful;
     }
 
     void InsecurePRNG_Deinit(InsecurePRNG *Insecure) {
-        if (Insecure != NULL) {
-            InsecurePRNG_Erase(Insecure);
-            free(Insecure);
-        }
+        AssertIO(Insecure != NULL);
+        InsecurePRNG_Erase(Insecure);
+        free(Insecure);
     }
 
     /* MD5, Based on WJCryptLib, Unlicense, Date = Dec_30_2021 */
@@ -218,6 +221,8 @@ extern "C" {
 (A) += (B);
 
     static void *MD5Transform(MD5Context *Context, void const *data, uintmax_t size) {
+        AssertIO(Context != NULL);
+
         uint8_t *ptr;
         uint32_t A;
         uint32_t B;
@@ -335,19 +340,23 @@ extern "C" {
 
     MD5Context *MD5Context_Init(void) {
         MD5Context *Context = calloc(1, sizeof(MD5Context));
-        if (Context != NULL) {
-            Context->A      = 0x67452301;
-            Context->B      = 0xEFCDAB89;
-            Context->C      = 0x98BADCFE;
-            Context->D      = 0x10325476;
+        AssertIO(Context != NULL);
 
-            Context->Low    = 0;
-            Context->High   = 0;
-        }
+        Context->A      = 0x67452301;
+        Context->B      = 0xEFCDAB89;
+        Context->C      = 0x98BADCFE;
+        Context->D      = 0x10325476;
+
+        Context->Low    = 0;
+        Context->High   = 0;
+
         return Context;
     }
 
     void MD5Update(MD5Context *Context, void const *Buffer, size_t BufferSize) {
+        AssertIO(Context != NULL);
+        AssertIO(Buffer != NULL);
+
         uint32_t Low_Saved = Context->Low;
         uint32_t Used;
         uint32_t Free;
@@ -382,6 +391,9 @@ extern "C" {
     }
 
     void MD5Finalize(MD5Context *Context, MD5Hash *Digest) {
+        AssertIO(Context != NULL);
+        AssertIO(Digest != NULL);
+
         uint32_t Used;
         uint32_t Free;
 
@@ -429,8 +441,10 @@ extern "C" {
         Digest->Bytes[14] = (uint8_t) (Context->D >> 16);
         Digest->Bytes[15] = (uint8_t) (Context->D >> 24);
     }
-
+    
     char *MD5ToString(MD5Hash *Digest) {
+        AssertIO(Digest != NULL);
+
         uint8_t  MD5StringSize = (MD5_HASH_SIZE * 2) + TextIO_NULLTerminatorSize;
         char    *String        = calloc(MD5StringSize, sizeof(char));
         uint8_t  Offset        = 0;

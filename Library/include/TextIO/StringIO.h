@@ -570,7 +570,7 @@ extern "C" {
      @abstract                                           Adds the BOM to the UTF-8 string, UTF-8's only valid BOM is BE.
      @param            String                            The string to add the BOM to.
      */
-    UTF8              *UTF8_AddBOM(ImmutableString_UTF8 String);
+    UTF8              *UTF8_AddBOM(ImmutableString_UTF8 String, StringIO_BOMs BOM2Add);
     
     /*!
      @abstract                                           Adds the specified BOM to the string.

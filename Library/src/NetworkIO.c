@@ -1,5 +1,6 @@
 #include "../include/NetworkIO.h"          /* Included for our declarations */
 
+#include "../include/AssertIO.h"           /* Included for Assertions */
 #include "../include/TextIO/LogIO.h"       /* Included for Logging */
 #include "../include/TextIO/TextIOTypes.h" /* Included for Text types */
 
@@ -46,37 +47,33 @@ extern "C" {
     }
 
     static IPV6Address *UTF8_String2IPV6Address(UTF8 *Address) {
+        AssertIO(Address != NULL);
+
         IPV6Address *IPV6 = NULL;
-        if (Address != NULL) {
-            IPV6          = IPV6Address_Init();
-            if (IPV6 != NULL && Address != NULL) {
-                uint8_t GroupCount = 0;
-                uint8_t DigitCount = 0;
-                uint8_t CodeUnit   = 1;
-                while (Address[CodeUnit] != TextIO_NULLTerminator) {
-                    if (Address[CodeUnit - 1] == U':' && Address[CodeUnit] == U':') {
-                        
-                    }
-                    CodeUnit      += 1;
-                }
-                // GroupCount needs to equal 8 at the end
-                // DigitCount needs to be reset for every group
+        IPV6          = IPV6Address_Init();
+        AssertIO(IPV6 != NULL);
 
-                /*
-                 Ok, so what do I need to do? Loop until the end of the string, building a correct address, little fucking endian.
-                 */
-                // Loop looking for double colons and counting digits for each
+        uint8_t GroupCount = 0;
+        uint8_t DigitCount = 0;
+        uint8_t CodeUnit   = 1;
+        while (Address[CodeUnit] != TextIO_NULLTerminator) {
+            if (Address[CodeUnit - 1] == U':' && Address[CodeUnit] == U':') {
 
-            } else if (IPV6 == NULL) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate IPV6Address"));
             }
-        } else if (Address == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Address Pointer is NULL"));
+            CodeUnit      += 1;
         }
+        // GroupCount needs to equal 8 at the end
+        // DigitCount needs to be reset for every group
+
+        /*
+         Ok, so what do I need to do? Loop until the end of the string, building a correct address, little fucking endian.
+         */
+        // Loop looking for double colons and counting digits for each
         return IPV6;
     }
 
     void IPV6Address_Deinit(IPV6Address *Address) {
+        AssertIO(Address != NULL);
         free(Address);
     }
 
@@ -94,7 +91,7 @@ extern "C" {
      5120
      2560
      1280
-     Then once we find the area that we're in of those 7 brackets up there, we 
+     Then once we find the area that we're in of those 7 brackets up there, we
      */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

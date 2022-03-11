@@ -1,5 +1,6 @@
 #include "../../include/TextIO/TextIOTypes.h"          /* Included for our declarations */
 
+#include "../../include/AssertIO.h"                    /* Included for Assertions */
 #include "../../include/TextIO/Private/TextIOTables.h" /* Included for the tables */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -7,6 +8,7 @@ extern "C" {
 #endif
 
     TextIO_Slice TextIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits) {
+        AssertIO(EndInCodeUnits > StartInCodeUnits);
         TextIO_Slice Slice;
         Slice.StartInCodeUnits = StartInCodeUnits;
         Slice.EndInCodeUnits   = EndInCodeUnits;

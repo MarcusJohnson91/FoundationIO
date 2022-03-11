@@ -1,5 +1,6 @@
 #include "../../include/TextIO/LogIO.h"    /* Included for the our declarations */
 
+#include "../../include/AssertIO.h"        /* Included for Assertions */
 #include "../../include/FileIO.h"          /* Included for FileIO_Close */
 #include "../../include/TextIO/FormatIO.h" /* Included for the Formatter */
 #include "../../include/TextIO/StringIO.h" /* Included for StringIO's declarations */
@@ -10,47 +11,42 @@ extern "C" {
     
     static FILE          *Log_LogFile       = NULL;
     static AsyncIOStream *Async_LogFile     = NULL;
-    //static UTF32         *Log_ProgramName   = NULL;
     static UTF8          *Log_ProgramName8  = NULL;
     
     void Log_SetProgramName(UTF8 *ProgramName) {
-        if (ProgramName != NULL) {
-            Log_ProgramName8 = ProgramName;
-            //Log_ProgramName  = UTF8_Decode(ProgramName);
-        }
+        AssertIO(ProgramName != NULL);
+        Log_ProgramName8 = ProgramName;
     }
     
     void Log_SetLogFile(FILE *File) {
-        if (File != NULL) {
-            Log_LogFile = File;
-        }
+        AssertIO(File != NULL);
+        Log_LogFile = File;
     }
     
     void Log_OpenLogFilePath(ImmutableString_UTF8 Path) {
-        if (Path != NULL && Async_LogFile == NULL) {
-            UTF8 *FoldedPath = UTF8_CaseFold(Path);
-            Async_LogFile    = AsyncIOStream_Init();
-            
-            if (UTF8_Compare(FoldedPath, UTF8String("stdin")) ||
-                UTF8_Compare(FoldedPath, UTF8String("zero")) ||
-                UTF8_Compare(FoldedPath, UTF8String("0"))
-                ) {
-                // STDIN
-            } else if (UTF8_Compare(FoldedPath, UTF8String("stdout")) ||
-                UTF8_Compare(FoldedPath, UTF8String("one")) ||
-                UTF8_Compare(FoldedPath, UTF8String("1"))
-                ) {
-                // STDOUT
-            } else if (UTF8_Compare(FoldedPath, UTF8String("stderr")) ||
-                UTF8_Compare(FoldedPath, UTF8String("two")) ||
-                UTF8_Compare(FoldedPath, UTF8String("2"))
-                ) {
-                // STDERR
-            }
+        AssertIO(Path != NULL);
+
+        UTF8 *FoldedPath = UTF8_CaseFold(Path);
+        Async_LogFile    = AsyncIOStream_Init();
+
+        if (UTF8_Compare(FoldedPath, UTF8String("stdin")) ||
+            UTF8_Compare(FoldedPath, UTF8String("zero")) ||
+            UTF8_Compare(FoldedPath, UTF8String("0"))
+            ) { // STDIN
+        } else if (UTF8_Compare(FoldedPath, UTF8String("stdout")) ||
+                   UTF8_Compare(FoldedPath, UTF8String("one")) ||
+                   UTF8_Compare(FoldedPath, UTF8String("1"))
+                   ) { // STDOUT
+        } else if (UTF8_Compare(FoldedPath, UTF8String("stderr")) ||
+                   UTF8_Compare(FoldedPath, UTF8String("two")) ||
+                   UTF8_Compare(FoldedPath, UTF8String("2"))
+                   ) { // STDERR
         }
     }
     
     void Log(LogIO_Severities Severity, ImmutableString_UTF8 FunctionName, ImmutableString_UTF8 Description, ...) {
+        AssertIO(FunctionName != NULL);
+        AssertIO(Description != NULL);
         if (Log_LogFile == NULL) {
             Log_LogFile  = stderr;
         }
@@ -77,6 +73,7 @@ extern "C" {
         va_start(Arguments, Description);
         int Size2           = vsnprintf(NULL, 0, (char*) Description, Arguments);
         UTF8 *FormattedArgs = UTF8_Init(Size2);
+        AssertIO(FormattedArgs != NULL);
         vsnprintf((char*) FormattedArgs, Size2, (char*) Description, Arguments);
         va_end(Arguments);
 
@@ -84,6 +81,7 @@ extern "C" {
         UTF8 *Combined   = NULL;
         int SizeCombined = snprintf(NULL, 0, "%s %s", SecurityName8, FormattedArgs);
         Combined         = UTF8_Init(SizeCombined);
+        AssertIO(Combined != NULL);
         snprintf((char*) Combined, SizeCombined, "%s %s", SecurityName8, FormattedArgs);
         
         free(FormattedArgs);
@@ -105,7 +103,7 @@ extern "C" {
             free(Log_ProgramName8);
         }
     }
-  
+
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */

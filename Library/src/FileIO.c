@@ -1,5 +1,6 @@
 #include "../include/FileIO.h"            /* Included for our declarations */
 
+#include "../include/AssertIO.h"          /* Included for Assertions */
 #include "../include/AsynchronousIO.h"    /* FileIO is a higher level wrapper around AsyncIO */
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
 #include "../include/CryptographyIO.h"    /* Included for InsecurePRNG_CreateInteger */
@@ -30,7 +31,9 @@ extern "C" {
     } FileIO_FILE;
     
     UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
-        UTF8 *Base = NULL;
+        AssertIO(Path8 != NULL);
+
+        UTF8  *Base                    = NULL;
         size_t Path8SizeInCodeUnits    = UTF8_GetStringSizeInCodeUnits(Path8);
         size_t Start                   = Path8SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -56,7 +59,9 @@ extern "C" {
     }
     
     UTF16 *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16) {
-        UTF16 *Base = NULL;
+        AssertIO(Path16 != NULL);
+
+        UTF16 *Base                    = NULL;
         size_t Path16SizeInCodeUnits   = UTF16_GetStringSizeInCodeUnits(Path16);
         size_t Start                   = Path16SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -82,7 +87,8 @@ extern "C" {
     }
     
     UTF32 *FileIO_UTF32_GetFileName(ImmutableString_UTF32 Path32) {
-        UTF32 *Base = NULL;
+        AssertIO(Path32 != NULL);
+        UTF32 *Base                  = NULL;
         size_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
         size_t Start                 = Path32SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -108,7 +114,9 @@ extern "C" {
     }
     
     UTF8 *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8) {
-        UTF8 *Base = NULL;
+        AssertIO(Path8 != NULL);
+
+        UTF8    *Base                  = NULL;
         size_t   Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
         size_t   Start                 = Path8SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -146,7 +154,9 @@ extern "C" {
     }
     
     UTF16 *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16) {
-        UTF16 *Base = NULL;
+        AssertIO(Path16 != NULL);
+
+        UTF16 *Base                    = NULL;
         size_t Path16SizeInCodeUnits   = UTF16_GetStringSizeInCodeUnits(Path16);
         size_t Start                   = Path16SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -184,7 +194,9 @@ extern "C" {
     }
     
     UTF32 *FileIO_UTF32_GetFileExtension(ImmutableString_UTF32 Path32) {
-        UTF32 *Base = NULL;
+        AssertIO(Path32 != NULL);
+
+        UTF32 *Base                  = NULL;
         size_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
         size_t Start                 = Path32SizeInCodeUnits;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -222,10 +234,14 @@ extern "C" {
     }
 
     TextIO_StringTypes FileIO_File_GetType(FileIO_FILE *File) { // fwide
+        AssertIO(File != NULL);
+
         return File->Type;
     }
 
     bool FileIO_File_SetType(FileIO_FILE *File, TextIO_StringTypes NewType) {
+        AssertIO(File != NULL);
+
         bool DidItWork = false;
         if (File->Type != NewType) {
             // We gotta change the type
@@ -238,6 +254,8 @@ extern "C" {
     
     
     TextIO_StringTypes FileIO_GetFileOrientation(PlatformIO_Immutable(FILE *) File2Orient) {
+        AssertIO(File2Orient != NULL);
+
         TextIO_StringTypes StringType       = StringType_Unspecified;
         FILE *File2Orient2                  = PlatformIO_Mutable(FILE*, File2Orient);
         int Orientation                     = fwide(File2Orient2, 0);
@@ -415,6 +433,8 @@ extern "C" {
      @abstract Dirname replacement
      */
     UTF8 *FileIO_UTF8_GetDirectoryName(ImmutableString_UTF8 Path8) {
+        AssertIO(Path8 != NULL);
+
         UTF8 *DirectoryName = NULL;
         // Just lob off the trailing slash, filename, and extension
         return DirectoryName;
@@ -424,21 +444,29 @@ extern "C" {
      @abstract Dirname replacement
      */
     UTF16 *FileIO_UTF16_GetDirectoryName(ImmutableString_UTF16 Path16) {
+        AssertIO(Path16 != NULL);
+
         UTF16 *DirectoryName = NULL;
         return DirectoryName;
     }
 
     int64_t FileIO_GetPosition(FILE *Source) {
+        AssertIO(Source != NULL);
+
         return ftello(Source);
     }
 
     bool FileIO_SetPosition(FILE *Source, int64_t Position) {
+        AssertIO(Source != NULL);
+
         bool Worked = Yes;
         fseeko(Source, Position, SeekType_Current);
         return Worked;
     }
 
     size_t UTF8_GetStringSize(FILE *Source) {
+        AssertIO(Source != NULL);
+
         size_t StringSizeInCodeUnits = 0;
         off_t  OriginalOffset        = FileIO_GetPosition(Source);
         UTF8   CodeUnit              = FileIO_Read(Source, &CodeUnit, sizeof(UTF8), 1);
@@ -451,6 +479,11 @@ extern "C" {
     }
     
     size_t FileIO_Read(const FILE *const File2Read, void *Buffer, uint8_t BufferElementSize, size_t Elements2Read) {
+        AssertIO(File2Read != NULL);
+        AssertIO(Buffer != NULL);
+        AssertIO(BufferElementSize >= 1 && BufferElementSize <= 8);
+        AssertIO(Elements2Read >= 1);
+
         size_t ElementsRead = 0;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         ElementsRead = fread(Buffer, BufferElementSize, Elements2Read, PlatformIO_Mutable(FILE*, File2Read));
@@ -461,6 +494,8 @@ extern "C" {
     }
     
     bool FileIO_Seek(FILE *File2Seek, ssize_t SeekSizeInBytes, AsyncIO_SeekTypes SeekType) {
+        AssertIO(File2Seek != NULL);
+
         bool SuccessIsZero      = 1;
         if ((SeekType & SeekType_Beginning) == SeekType_Beginning) {
             // TODO: Maybe we should make sure that SeekSize fits within the file
@@ -486,6 +521,11 @@ extern "C" {
     }
 
     size_t FileIO_Write(FILE *File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, size_t Elements2Write) {
+        AssertIO(File2Write != NULL);
+        AssertIO(Buffer != NULL);
+        AssertIO(BufferElementSize >= 1 && BufferElementSize <= 8);
+        AssertIO(Elements2Write >= 1);
+
         size_t ElementsWritten = 0;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         ElementsWritten        = fwrite(Buffer, BufferElementSize, Elements2Write, PlatformIO_Mutable(FILE*, File2Write));
@@ -493,12 +533,14 @@ extern "C" {
         WriteFile(File2Write, Buffer, Elements2Write, &ElementsWritten, NULL);
 #endif
         if (ElementsWritten != Elements2Write) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %zu Elements but %zu Elements were requested"), ElementsWritten, Elements2Write);
+            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("Wrote %zu Elements but %zu Elements were requested"), ElementsWritten, Elements2Write);
         }
         return ElementsWritten;
     }
     
     bool FileIO_Close(FILE *File) {
+        AssertIO(File != NULL);
+
         bool FileClosedSucessfully = No;
         if (File != NULL) {
             fflush(File);

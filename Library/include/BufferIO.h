@@ -262,9 +262,9 @@ extern "C" {
      @abstract                                     Reads a UTF-8 encoded string from the BitBuffer.
      @remark                                       We read exactly StringSize bytes, you need to account for any null terminators, etc.
      @param        BitB                            BitBuffer Pointer.
-     @param        StringSize                      Size of the string in CodeUnits, not counting an optional null.
+     @param        StringSizeInCodeUnits           Size of the string in CodeUnits, not counting an optional null.
      */
-    UTF8          *BitBuffer_ReadUTF8(BitBuffer *BitB, size_t StringSize);
+    UTF8          *BitBuffer_ReadUTF8(BitBuffer *BitB, size_t StringSizeInCodeUnits);
 
     /*!
      @abstract                                     Reads data from the BitBuffer until it stops matching the UTF-8 format.
@@ -277,9 +277,9 @@ extern "C" {
      @abstract                                     Reads a UTF-16 encoded string from the BitBuffer.
      @remark                                       We read exactly StringSize * 2 bytes, you need to account for any null terminators, etc.
      @param        BitB                            BitBuffer Pointer.
-     @param        StringSize                      Size of the string in CodeUnits, not counting an optional null.
+     @param        StringSizeInCodeUnits           Size of the string in CodeUnits, not counting an optional null.
      */
-    UTF16         *BitBuffer_ReadUTF16(BitBuffer *BitB, size_t StringSize);
+    UTF16         *BitBuffer_ReadUTF16(BitBuffer *BitB, size_t StringSizeInCodeUnits);
 
     /*!
      @abstract                                     Reads a BinaryGUUID/GUUIDString from the BitBuffer.

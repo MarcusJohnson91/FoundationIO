@@ -1,6 +1,6 @@
 #include "../../include/TextIO/LocalizationIO.h"       /* Included for our declarations */
 
-#include "../../include/TextIO/LogIO.h"                /* Included for error logging */
+#include "../../include/AssertIO.h"                    /* Included for Assertions */
 #include "../../include/TextIO/StringIO.h"             /* Included for UTF8_GetStringSizeInCodeUnits */
 #include "../../include/TextIO/StringSetIO.h"          /* Included for StringSet support */
 #include "../../include/TextIO/Private/TextIOTables.h" /* Included for Currency tables */
@@ -70,8 +70,6 @@ extern "C" {
             } else if (UTF8_Compare(LanguageString, UTF8String("is"))) {
                 LanguageID = WrittenLanguage_Icelandic;
             }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Invalid Language string length %zu"), StringSize);
         }
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 #endif
@@ -279,180 +277,204 @@ extern "C" {
     }
     
     UTF8 *UTF8_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF8 String) {
+        AssertIO(Base != Base_Unspecified);
+        AssertIO(String != NULL);
         UTF8 *Delocalized = NULL;
-        if (String != NULL) {
-            UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
-            free(String32);
-            Delocalized          = UTF8_Encode(Delocalized32);
-            free(Delocalized32);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
+
+        UTF32 *String32      = UTF8_Decode(String);
+        UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
+        free(String32);
+        Delocalized          = UTF8_Encode(Delocalized32);
+        free(Delocalized32);
+
         return Delocalized;
     }
     
     UTF16 *UTF16_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF16 String) {
+        AssertIO(Base != Base_Unspecified);
+        AssertIO(String != NULL);
+
         UTF16 *Delocalized = NULL;
-        if (String != NULL) {
-            UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
-            free(String32);
-            Delocalized          = UTF16_Encode(Delocalized32);
-            free(Delocalized32);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
+
+        UTF32 *String32      = UTF16_Decode(String);
+        UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
+        free(String32);
+        Delocalized          = UTF16_Encode(Delocalized32);
+        free(Delocalized32);
+
         return Delocalized;
     }
     
     UTF32 *UTF32_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF32 String) {
         UTF32 *Delocalized       = NULL;
-        if (String != NULL) {
-            typedef enum ASCIIConstants {
-                Zero   = 0x30,
-                UpperA = 0x41,
-                LowerA = 0x61,
-            } ASCIIConstants;
-            size_t   OGCodePoint = 0ULL;
-            size_t   DeCodePoint = 0ULL;
-            size_t   NumDigits   = UTF32_GetNumDigits(Base, String);
-            Delocalized          = UTF32_Init(NumDigits);
-            if (Delocalized != NULL) {
-                if ((Base & Base_Integer) == Base_Integer) {
-                    if ((Base & Base_Radix2) == Base_Radix2) {
-                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'1') {
-                                Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
-                                DeCodePoint += 1;
-                                OGCodePoint += 1;
-                            } else {
-                                OGCodePoint += 1;
-                            }
+        AssertIO(Base != Base_Unspecified);
+        AssertIO(String != NULL);
+
+        typedef enum ASCIIConstants {
+            Zero   = 0x30,
+            UpperA = 0x41,
+            LowerA = 0x61,
+        } ASCIIConstants;
+        size_t   OGCodePoint = 0ULL;
+        size_t   DeCodePoint = 0ULL;
+        size_t   NumDigits   = UTF32_GetNumDigits(Base, String);
+        Delocalized          = UTF32_Init(NumDigits);
+        AssertIO(Delocalized != NULL);
+
+        if ((Base & Base_Integer) == Base_Integer) {
+            if ((Base & Base_Radix2) == Base_Radix2) {
+                while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                    if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'1') {
+                        Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
+                        DeCodePoint += 1;
+                        OGCodePoint += 1;
+                    } else {
+                        OGCodePoint += 1;
+                    }
+                }
+            } else if ((Base & Base_Radix8) == Base_Radix8) {
+                while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                    if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'7') {
+                        Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
+                        DeCodePoint += 1;
+                        OGCodePoint += 1;
+                    } else {
+                        OGCodePoint += 1;
+                    }
+                }
+            } else if ((Base & Base_Radix10) == Base_Radix10) {
+                while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                    if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                        Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
+                        DeCodePoint += 1;
+                        OGCodePoint += 1;
+                    } else {
+                        OGCodePoint += 1;
+                    }
+                }
+            } else if ((Base & Base_Radix16) == Base_Radix16) {
+                if ((Base & Base_Uppercase) == Base_Uppercase) {
+                    while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                        if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                            Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
+                            DeCodePoint += 1;
+                            OGCodePoint += 1;
+                        } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
+                            Delocalized[DeCodePoint] = String[OGCodePoint] - UpperA;
+                            DeCodePoint += 1;
+                            OGCodePoint += 1;
+                        } else {
+                            OGCodePoint += 1;
                         }
-                    } else if ((Base & Base_Radix8) == Base_Radix8) {
-                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'7') {
-                                Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
-                                DeCodePoint += 1;
-                                OGCodePoint += 1;
-                            } else {
-                                OGCodePoint += 1;
-                            }
-                        }
-                    } else if ((Base & Base_Radix10) == Base_Radix10) {
-                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
-                                DeCodePoint += 1;
-                                OGCodePoint += 1;
-                            } else {
-                                OGCodePoint += 1;
-                            }
-                        }
-                    } else if ((Base & Base_Radix16) == Base_Radix16) {
-                        if ((Base & Base_Uppercase) == Base_Uppercase) {
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint] - UpperA;
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
-                            }
-                        } else if ((Base & Base_Lowercase) == Base_Lowercase) {
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' || String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] >= U'a' && String[OGCodePoint] <= U'f') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint] - LowerA;
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
-                            }
+                    }
+                } else if ((Base & Base_Lowercase) == Base_Lowercase) {
+                    while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                        if (String[OGCodePoint] >= U'0' || String[OGCodePoint] <= U'9') {
+                            Delocalized[DeCodePoint] = String[OGCodePoint] - Zero;
+                            DeCodePoint += 1;
+                            OGCodePoint += 1;
+                        } else if (String[OGCodePoint] >= U'a' && String[OGCodePoint] <= U'f') {
+                            Delocalized[DeCodePoint] = String[OGCodePoint] - LowerA;
+                            DeCodePoint += 1;
+                            OGCodePoint += 1;
+                        } else {
+                            OGCodePoint += 1;
                         }
                     }
                 }
-            } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate delocalized string"));
             }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
+
+
         return Delocalized;
     }
     
     UTF8 *UTF8_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF8 String) {
+        AssertIO(Base != Base_Unspecified);
+        AssertIO(String != NULL);
         UTF8 *Delocalized = NULL;
-        if (String != NULL) {
-            UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(Base, String32);
-            free(String32);
-            Delocalized          = UTF8_Encode(Delocalized32);
-            free(Delocalized32);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
+
+        UTF32 *String32      = UTF8_Decode(String);
+        UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(Base, String32);
+        free(String32);
+        Delocalized          = UTF8_Encode(Delocalized32);
+        free(Delocalized32);
+
         return Delocalized;
     }
     
     UTF16 *UTF16_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF16 String) {
         UTF16 *Delocalized = NULL;
-        if (String != NULL) {
-            UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(Base, String32);
-            free(String32);
-            Delocalized          = UTF16_Encode(Delocalized32);
-            free(Delocalized32);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        }
+        AssertIO(Base != Base_Unspecified);
+        AssertIO(String != NULL);
+
+        UTF32 *String32      = UTF16_Decode(String);
+        UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(Base, String32);
+        free(String32);
+        Delocalized          = UTF16_Encode(Delocalized32);
+        free(Delocalized32);
+
         return Delocalized;
     }
     
     static UTF32 UTF32_DiscoverDecimalSeperator(ImmutableString_UTF32 String) {
         UTF32 DiscoveredSeperator = TextIO_NULLTerminator;
-        if (String != TextIO_NULLTerminator) {
-            size_t   StringSize = UTF32_GetStringSizeInCodePoints(String);
-            size_t   CodePoint = StringSize;
-            while (CodePoint > 0 && DiscoveredSeperator == TextIO_NULLTerminator) {
-                if (String[CodePoint] == U'.' || String[CodePoint] == U',' || String[CodePoint] == U'\'') {
-                    DiscoveredSeperator = String[CodePoint];
-                }
-                CodePoint -= 1;
+        AssertIO(String != NULL);
+
+        size_t   StringSize = UTF32_GetStringSizeInCodePoints(String);
+        size_t   CodePoint = StringSize;
+        while (CodePoint > 0 && DiscoveredSeperator == TextIO_NULLTerminator) {
+            if (String[CodePoint] == U'.' || String[CodePoint] == U',' || String[CodePoint] == U'\'') {
+                DiscoveredSeperator = String[CodePoint];
             }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+            CodePoint -= 1;
         }
+
         return DiscoveredSeperator;
     }
     
     UTF32 *UTF32_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF32 String) {
+        AssertIO(Base != Base_Unspecified);
+        AssertIO(String != NULL);
         UTF32 *Delocalized       = NULL;
-        if (String != NULL) {
-            size_t   OGCodePoint = 0ULL;
-            size_t   DeCodePoint = 0ULL;
-            size_t   NumDigits   = UTF32_GetNumDigits(Base, String);
-            Delocalized          = UTF32_Init(NumDigits);
-            UTF32    Seperator   = UTF32_DiscoverDecimalSeperator(String);
-            if (Delocalized != NULL) {
-                if ((Base & Base_Decimal) == Base_Decimal) {
-                    if ((Base & Base_Radix10) == Base_Radix10) {
+
+        size_t   OGCodePoint = 0ULL;
+        size_t   DeCodePoint = 0ULL;
+        size_t   NumDigits   = UTF32_GetNumDigits(Base, String);
+        Delocalized          = UTF32_Init(NumDigits);
+        UTF32    Seperator   = UTF32_DiscoverDecimalSeperator(String);
+        if (Delocalized != NULL) {
+            if ((Base & Base_Decimal) == Base_Decimal) {
+                if ((Base & Base_Radix10) == Base_Radix10) {
+                    while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                        if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                            Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x30];
+                            DeCodePoint += 1;
+                            OGCodePoint += 1;
+                        } else if (String[OGCodePoint] == Seperator || String[OGCodePoint] == U'E') {
+                            Delocalized[DeCodePoint] = String[OGCodePoint];
+                            DeCodePoint += 1;
+                            OGCodePoint += 1;
+                        } else {
+                            OGCodePoint += 1;
+                        }
+                    }
+                } else if ((Base & Base_Uppercase) == Base_Uppercase) {
+                    if ((Base & Base_Radix16) == Base_Radix16) {
                         while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
                             if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x30];
+                                Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x30];
                                 DeCodePoint += 1;
                                 OGCodePoint += 1;
-                            } else if (String[OGCodePoint] == Seperator || String[OGCodePoint] == U'E') {
+                            } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
+                                Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x37];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] == U'P' || String[OGCodePoint] == U'X') {
+                                Delocalized[DeCodePoint] = String[OGCodePoint];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] == Seperator) {
                                 Delocalized[DeCodePoint] = String[OGCodePoint];
                                 DeCodePoint += 1;
                                 OGCodePoint += 1;
@@ -460,123 +482,97 @@ extern "C" {
                                 OGCodePoint += 1;
                             }
                         }
-                    } else if ((Base & Base_Uppercase) == Base_Uppercase) {
-                        if ((Base & Base_Radix16) == Base_Radix16) {
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x30];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
-                                    Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x37];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] == U'P' || String[OGCodePoint] == U'X') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] == Seperator) {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
-                            }
-                        } else if ((Base & Base_Shortest) == Base_Shortest) { // Base10/Scientific
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x30];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] >= U'E') {
-                                    Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x3B];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] == Seperator) {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
-                            }
-                        } else if ((Base & Base_Scientific) == Base_Scientific) {
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = DecimalTableScientificUppercase[String[OGCodePoint] - 0x30];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
-                                    Delocalized[DeCodePoint] = DecimalTableScientificUppercase[String[OGCodePoint] - 0x37];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] == U'P' || String[OGCodePoint] == U'X') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
+                    } else if ((Base & Base_Shortest) == Base_Shortest) { // Base10/Scientific
+                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                                Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x30];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] >= U'E') {
+                                Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x3B];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] == Seperator) {
+                                Delocalized[DeCodePoint] = String[OGCodePoint];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else {
+                                OGCodePoint += 1;
                             }
                         }
-                    } else if ((Base & Base_Lowercase) == Base_Lowercase) {
-                        if ((Base & Base_Radix16) == Base_Radix16) {
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = DecimalTableHexadecimalLowercase[String[OGCodePoint] - 0x30];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] >= U'a' && String[OGCodePoint] <= U'f') {
-                                    Delocalized[DeCodePoint] = DecimalTableHexadecimalLowercase[String[OGCodePoint] - 0x37];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] == U'p' || String[OGCodePoint] == U'x') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
+                    } else if ((Base & Base_Scientific) == Base_Scientific) {
+                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                                Delocalized[DeCodePoint] = DecimalTableScientificUppercase[String[OGCodePoint] - 0x30];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
+                                Delocalized[DeCodePoint] = DecimalTableScientificUppercase[String[OGCodePoint] - 0x37];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] == U'P' || String[OGCodePoint] == U'X') {
+                                Delocalized[DeCodePoint] = String[OGCodePoint];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else {
+                                OGCodePoint += 1;
                             }
-                        } else if ((Base & Base_Shortest) == Base_Shortest) { // Base10/Scientific
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x30];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] == U'e' || String[OGCodePoint] == U'.') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
+                        }
+                    }
+                } else if ((Base & Base_Lowercase) == Base_Lowercase) {
+                    if ((Base & Base_Radix16) == Base_Radix16) {
+                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                                Delocalized[DeCodePoint] = DecimalTableHexadecimalLowercase[String[OGCodePoint] - 0x30];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] >= U'a' && String[OGCodePoint] <= U'f') {
+                                Delocalized[DeCodePoint] = DecimalTableHexadecimalLowercase[String[OGCodePoint] - 0x37];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] == U'p' || String[OGCodePoint] == U'x') {
+                                Delocalized[DeCodePoint] = String[OGCodePoint];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else {
+                                OGCodePoint += 1;
                             }
-                        } else if ((Base & Base_Scientific) == Base_Scientific) {
-                            while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
-                                if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
-                                    Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x30];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
-                                    Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x37];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else if (String[OGCodePoint] == U'P' || String[OGCodePoint] == U'X') {
-                                    Delocalized[DeCodePoint] = String[OGCodePoint];
-                                    DeCodePoint += 1;
-                                    OGCodePoint += 1;
-                                } else {
-                                    OGCodePoint += 1;
-                                }
+                        }
+                    } else if ((Base & Base_Shortest) == Base_Shortest) { // Base10/Scientific
+                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                                Delocalized[DeCodePoint] = IntegerTableBase10[String[OGCodePoint] - 0x30];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] == U'e' || String[OGCodePoint] == U'.') {
+                                Delocalized[DeCodePoint] = String[OGCodePoint];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else {
+                                OGCodePoint += 1;
+                            }
+                        }
+                    } else if ((Base & Base_Scientific) == Base_Scientific) {
+                        while (String[OGCodePoint] != TextIO_NULLTerminator && Delocalized[DeCodePoint] != TextIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= U'0' && String[OGCodePoint] <= U'9') {
+                                Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x30];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] >= U'A' && String[OGCodePoint] <= U'F') {
+                                Delocalized[DeCodePoint] = DecimalTableHexadecimalUppercase[String[OGCodePoint] - 0x37];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else if (String[OGCodePoint] == U'P' || String[OGCodePoint] == U'X') {
+                                Delocalized[DeCodePoint] = String[OGCodePoint];
+                                DeCodePoint += 1;
+                                OGCodePoint += 1;
+                            } else {
+                                OGCodePoint += 1;
                             }
                         }
                     }
                 }
             }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
