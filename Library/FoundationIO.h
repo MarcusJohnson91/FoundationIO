@@ -11,6 +11,10 @@
 #ifndef FoundationIO_h
 #define FoundationIO_h
 
+#define FoundationIO_Version_Major 0
+#define FoundationIO_Version_Minor 9
+#define FoundationIO_Version_Patch 7
+
 #include "include/AssertIO.h"
 #include "include/AsynchronousIO.h"
 #include "include/BufferIO.h"
