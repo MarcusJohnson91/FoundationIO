@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef FoundationIO_h
-#define FoundationIO_h
+#ifndef FoundationIO_H
+#define FoundationIO_H
 
 #define FoundationIO_Version_Major 0
 #define FoundationIO_Version_Minor 9
@@ -33,4 +33,4 @@
 #include "include/TextIO/StringIO.h"
 #include "include/TextIO/StringSetIO.h"
 
-#endif /* FoundationIO_h */
+#endif /* FoundationIO_H */
