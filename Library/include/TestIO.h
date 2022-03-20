@@ -5,9 +5,9 @@
  @version     2.0.0
  @brief       This header contains types, functions, and tables for automated testing.
  @terminology
- Case:        Individual test.
- Fixture:     Operate on a user defined type.
- Suite:       Group of similar test cases.
+  Case:        Individual test.
+  Fixture:     Operate on a user defined type.
+  Suite:       Group of similar test cases.
  */
 
 #pragma once
@@ -158,9 +158,9 @@ extern "C" {
 
 #ifndef TestIO_RegisterTest
 #define TestIO_RegisterTest(Suite_TestCount, Suite_TestList, Suite, Function2Test, TestState, Outcome) \
-__redefine_macro(Suite_TestCount, Suite_TestCount + 1)                   \
+_Pragma("redefine_macro(\"Suite_TestCount Suite_TestCount + 1\")")       \
 _Pragma("push_macro("\""Suite_TestList"\"")"")                           \
-__redefine_macro(Suite_TestList, TestIOCase_##Function2Test)             \
+_Pragma("redefine_macro(\"Suite_TestList TestIOCase_##Function2Test\")") \
 const TestIO_Case TestIOCase_##Function2Test TestIO_Internal_Section = { \
 .Name        = PlatformIO_Stringify(Function2Test),                      \
 .Function    = Function2Test,                                            \
@@ -178,11 +178,6 @@ const TestIO_Case TestIOCase_##Function2Test TestIO_Internal_Section = { \
 #error "TestIOSuite_##TestSuite_Name##_NumTests is already registered, are you trying to create two suites with the same name?"
 #endif /* TestIO_CreateTestCounterForSuite */
 
-#ifndef TestIO_Internal_IncrementNumTests
-#define TestIO_Internal_IncrementNumTests(TestSuite_Name)
-    __redefine_macro(TestIOSuite_##TestSuite_Name##_NumTests)
-#endif /* TestIO_Internal_IncrementNumTests */
-
     /*
      When registering a test we need the function pointer of the test, the state, the expected outcome, the suitename, and the list macro
      */
@@ -195,8 +190,8 @@ static const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(Test
 .Init   = NULL,                                                                                                                     \
 .Deinit = NULL,                                                                                                                     \
 .Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))),                                \
-};
-    __redefine_macro(TestIO_Internal_NumSuites, TestIO_Internal_NumSuites + 1) /* Increment the count of TestIO_Suites each time RegisterSuite* macros are called */
+};                                                                                                                                  \
+_Pragma("redefine_macro(\"TestIO_Internal_NumSuites TestIO_Internal_NumSuites + 1\")")                                              \
 #define TestIO_Internal_SuiteNames PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))
     _Pragma("push_macro(\"TestIO_Internal_SuiteNames\")")
 #undef TestIO_Internal_SuiteNames
@@ -210,8 +205,8 @@ const TestIO_Suite PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_N
 .Init   = Fixture_Init,                                                                                                             \
 .Deinit = Fixture_Deinit,                                                                                                           \
 .Name   = PlatformIO_Stringify8(PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))),                                \
-};
-    __redefine_macro(TestIO_Internal_NumSuites, TestIO_Internal_NumSuites + 1)
+};                                                                                                                                  \
+_Pragma("redefine_macro(\"TestIO_Internal_NumSuites TestIO_Internal_NumSuites + 1\")")                                              \
 #define TestIO_Internal_SuiteNames PlatformIO_Concat(TestIOSuite_, PlatformIO_Expand(TestSuite_Name))
     _Pragma("push_macro(\"TestIO_Internal_SuiteNames\")")
 #undef TestIO_Internal_SuiteNames
