@@ -96,7 +96,7 @@
 #endif
 
 #ifndef             PlatformIO_LanguageVersionC23
-#define             PlatformIO_LanguageVersionC23                                       (202302UL)
+#define             PlatformIO_LanguageVersionC23                                       (202000L)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionCXX98
