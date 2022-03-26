@@ -6,9 +6,9 @@
  @brief       This header contains macros for compile-time registration.
  */
 
-#include "PlatformIO.h"                    /* Included for Platform Independence macros */
-
 #pragma once
+
+#include "PlatformIO.h"                    /* Included for Platform Independence macros */
 
 #ifndef FoundationIO_RegistrationIO_H
 #define FoundationIO_RegistrationIO_H

@@ -532,9 +532,7 @@ extern "C" {
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
         WriteFile(File2Write, Buffer, Elements2Write, &ElementsWritten, NULL);
 #endif
-        if (ElementsWritten != Elements2Write) {
-            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("Wrote %zu Elements but %zu Elements were requested"), ElementsWritten, Elements2Write);
-        }
+        AssertIO(ElementsWritten == Elements2Write);
         return ElementsWritten;
     }
     

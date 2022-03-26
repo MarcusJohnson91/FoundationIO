@@ -304,14 +304,12 @@ extern "C" {
     
     static void CommandLineIO_ShowBanner(CommandLineIO *CLI) {
         AssertIO(CLI != NULL);
-
+        AssertIO(CLI->LicenseType != LicenseType_Unspecified);
         UTF32 *License = NULL;
         if (CLI->LicenseType == LicenseType_Permissive || CLI->LicenseType == LicenseType_Copyleft) {
             License = UTF32_Format(UTF32String("Released under the \"%U32s\" license, you can see the details of this license at: %U32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : TextIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
         } else if (CLI->LicenseType == LicenseType_Proprietary) {
             License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%U32s%U32s%U32s"), TextIO_NewLine32, TextIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
-        } else {
-            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("LicenseType isn't set"));
         }
 
         UTF32 *Banner32 = UTF32_Format(UTF32String("%U32s, v. %U32s by %U32s © %U32s, %U32s, %U32s"),
@@ -341,7 +339,7 @@ extern "C" {
 
         uint8_t  ArgumentStringPrefixSize = 0;
         size_t   ArgumentStringSize       = UTF32_GetStringSizeInCodePoints(ArgumentString);
-
+        AssertIO(ArgumentStringSize >= 2);
         if (ArgumentStringSize >= 2) {
             if (ArgumentString[0] == UTF32Character('-') && ArgumentString[1] == UTF32Character('-')) {
                 ArgumentStringPrefixSize  = 2;

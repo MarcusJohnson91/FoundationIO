@@ -248,11 +248,8 @@ extern "C" {
             }
         }
         size_t BytesRead         = AsyncIOStream_Read(BitB->Input, Array, sizeof(Array[0]), Bytes2Read);
-        if (BytesRead == Bytes2Read) {
-            BitBuffer_SetSize(BitB, BytesRead + ArrayOffset);
-        } else {
-            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("BytesRead %zu does not match num bytes requested %zu"), BytesRead, Bytes2Read);
-        }
+        AssertIO(BytesRead == Bytes2Read);
+        BitBuffer_SetSize(BitB, BytesRead + ArrayOffset);
     }
 
     void BitBuffer_WriteStream(BitBuffer *BitB) {
@@ -264,15 +261,12 @@ extern "C" {
         size_t Bytes2Write       = Bits2Bytes(RoundingType_Down, BitBuffer_GetPosition(BitB));
         size_t Bits2Keep         = ArrayOffset % 8;
         size_t BytesWritten      = AsyncIOStream_Write(BitB->Output, Array, sizeof(Array[0]), Bytes2Write);
-        if (BytesWritten == Bytes2Write) {
-            Array[0]             = 0;
-            Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
-            BitBuffer_SetPosition(BitB, Bits2Keep + 1);
-            for (size_t Byte = Bits2Bytes(RoundingType_Up, ArrayOffset); Byte < Bits2Bytes(RoundingType_Down, ArraySizeInBits); Byte++) {
-                Array[Byte]      = 0;
-            }
-        } else {
-            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("Wrote %zu of %zu bits"), Bytes2Bits(BytesWritten), Bytes2Bits(Bytes2Write));
+        AssertIO(BytesWritten == Bytes2Write);
+        Array[0]             = 0;
+        Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
+        BitBuffer_SetPosition(BitB, Bits2Keep + 1);
+        for (size_t Byte = Bits2Bytes(RoundingType_Up, ArrayOffset); Byte < Bits2Bytes(RoundingType_Down, ArraySizeInBits); Byte++) {
+            Array[Byte]      = 0;
         }
     }
     

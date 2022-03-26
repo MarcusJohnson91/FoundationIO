@@ -1,4 +1,6 @@
 #include "../Library/include/TestIO.h"
+
+#include "../../Library/include/AssertIO.h"
 #include "../Library/include/TextIO/StringIO.h"
 #include "../Library/include/CryptographyIO.h"
 
@@ -10,10 +12,7 @@ extern "C" {
         bool TestPassed = Yes;
         ImmutableStringSet_UTF8 StringSet = UTF8StringSet(UTF8String("String1"), UTF8String("String2"), UTF8String("String3"));
         uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet); // 14?!
-        if (NumStrings != 3) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings is %zu but should be 3"), NumStrings);
-            TestPassed = No;
-        }
+        AssertIO(NumStrings == 3);
         uint64_t *StringSizes = UTF8_StringSet_GetStringSizesInCodeUnits(StringSet);
         if (StringSizes[0] != 7 || StringSizes[1] != 7 || StringSizes[2] != 7) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Size of StringSet's Strings doesn't = 7"));

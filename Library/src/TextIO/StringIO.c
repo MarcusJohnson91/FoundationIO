@@ -634,9 +634,9 @@ extern "C" {
     bool UTF32_ShiftCodePoints(UTF32 *String, size_t StringSize, size_t StringCapacity, size_t Start, size_t NumCodePointsToShift) {
         AssertIO(String != NULL);
         AssertIO(StringSize + NumCodePointsToShift <= StringCapacity);
-            for (size_t New = StringSize + NumCodePointsToShift; New > Start; New--) {
-                String[New] = String[New - NumCodePointsToShift];
-            }
+        for (size_t New = StringSize + NumCodePointsToShift; New > Start; New--) {
+            String[New] = String[New - NumCodePointsToShift];
+        }
         return Yes;
     }
 
@@ -1280,26 +1280,26 @@ extern "C" {
         AssertIO(BOM2Add != StringIO_BOM_Unspecified);
         UTF32   *StringWithBOM        = NULL;
         UTF32    ByteOrder            = 0;
-            if (String[0] != UTF32BOM_LE && String[0] != UTF32BOM_BE) {
-                size_t StringSize     = UTF32_GetStringSizeInCodePoints(String);
-                StringWithBOM         = UTF32_Init(StringSize + UnicodeBOMSizeInCodePoints);
-                AssertIO(StringWithBOM != NULL);
-                if (BOM2Add == StringIO_BOM_Native) {
+        if (String[0] != UTF32BOM_LE && String[0] != UTF32BOM_BE) {
+            size_t StringSize     = UTF32_GetStringSizeInCodePoints(String);
+            StringWithBOM         = UTF32_Init(StringSize + UnicodeBOMSizeInCodePoints);
+            AssertIO(StringWithBOM != NULL);
+            if (BOM2Add == StringIO_BOM_Native) {
 #if   (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsLE)
-                    ByteOrder     = UTF32BOM_LE;
+                ByteOrder     = UTF32BOM_LE;
 #elif (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsBE)
-                    ByteOrder     = UTF32BOM_BE;
+                ByteOrder     = UTF32BOM_BE;
 #endif
-                } else if (BOM2Add == StringIO_BOM_Little) {
-                    ByteOrder     = UTF32BOM_LE;
-                } else if (BOM2Add == StringIO_BOM_Big) {
-                    ByteOrder     = UTF32BOM_BE;
-                }
-                StringWithBOM[0] = ByteOrder;
-                for (size_t CodePoint = 1ULL; CodePoint < StringSize; CodePoint++) {
-                    StringWithBOM[CodePoint] = String[CodePoint + 1];
-                }
+            } else if (BOM2Add == StringIO_BOM_Little) {
+                ByteOrder     = UTF32BOM_LE;
+            } else if (BOM2Add == StringIO_BOM_Big) {
+                ByteOrder     = UTF32BOM_BE;
             }
+            StringWithBOM[0] = ByteOrder;
+            for (size_t CodePoint = 1ULL; CodePoint < StringSize; CodePoint++) {
+                StringWithBOM[CodePoint] = String[CodePoint + 1];
+            }
+        }
         return StringWithBOM;
     }
     
@@ -1554,8 +1554,8 @@ extern "C" {
     void UTF16_WriteGrapheme(FILE *Source, ImmutableString_UTF16 Grapheme) {
         AssertIO(Source != NULL);
         AssertIO(Grapheme != NULL);
-            size_t   StringSize       = UTF16_GetStringSizeInCodeUnits(Grapheme);
-            size_t   CodeUnitsWritten = FileIO_Write(Source, Grapheme, sizeof(UTF8), StringSize);
+        size_t   StringSize       = UTF16_GetStringSizeInCodeUnits(Grapheme);
+        size_t   CodeUnitsWritten = FileIO_Write(Source, Grapheme, sizeof(UTF8), StringSize);
         AssertIO(CodeUnitsWritten == StringSize);
     }
     
@@ -1576,48 +1576,48 @@ extern "C" {
     UTF32 UTF8_ReadCodePoint(FILE *Source) {
         AssertIO(Source != NULL);
         UTF32 CodePoint         = 0;
-            UTF8_Clear_Preallocated();
-            UTF8 HeaderCodeUnit = UTF8_ReadCodeUnit(Source);
-            StringIO_PreallocateCodePoint_UTF8[0] = HeaderCodeUnit;
-            switch (UTF8_GetCodePointSizeInCodeUnits(HeaderCodeUnit)) {
-                case 4:
-                    // Read the following 3 CodeUnits and decode them all
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], sizeof(UTF8), 1);
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[2], sizeof(UTF8), 1);
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[3], sizeof(UTF8), 1);
-                    break;
-                case 3:
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], sizeof(UTF8), 1);
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[2], sizeof(UTF8), 1);
-                    break;
-                case 2:
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], sizeof(UTF8), 1);
-                    break;
-            }
-            CodePoint           = UTF8_Decode(&StringIO_PreallocateCodePoint_UTF8[0]);
+        UTF8_Clear_Preallocated();
+        UTF8 HeaderCodeUnit = UTF8_ReadCodeUnit(Source);
+        StringIO_PreallocateCodePoint_UTF8[0] = HeaderCodeUnit;
+        switch (UTF8_GetCodePointSizeInCodeUnits(HeaderCodeUnit)) {
+            case 4:
+                // Read the following 3 CodeUnits and decode them all
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], sizeof(UTF8), 1);
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[2], sizeof(UTF8), 1);
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[3], sizeof(UTF8), 1);
+                break;
+            case 3:
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], sizeof(UTF8), 1);
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[2], sizeof(UTF8), 1);
+                break;
+            case 2:
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], sizeof(UTF8), 1);
+                break;
+        }
+        CodePoint           = UTF8_Decode(&StringIO_PreallocateCodePoint_UTF8[0]);
         return CodePoint;
     }
     
     UTF32 UTF16_ReadCodePoint(FILE *Source) {
         AssertIO(Source != NULL);
         UTF32 CodePoint          = 0;
-            UTF16_Clear_Preallocated();
-            UTF16 HeaderCodeUnit = UTF16_ReadCodeUnit(Source);
-            StringIO_PreallocateCodePoint_UTF16[0] = HeaderCodeUnit;
-            switch (UTF16_GetCodePointSizeInCodeUnits(HeaderCodeUnit)) {
-                case 4:
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], sizeof(UTF16), 1);
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[2], sizeof(UTF16), 1);
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[3], sizeof(UTF16), 1);
-                    break;
-                case 3:
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], sizeof(UTF16), 1);
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[2], sizeof(UTF16), 1);
-                    break;
-                case 2:
-                    FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], sizeof(UTF16), 1);
-                    break;
-            }
+        UTF16_Clear_Preallocated();
+        UTF16 HeaderCodeUnit = UTF16_ReadCodeUnit(Source);
+        StringIO_PreallocateCodePoint_UTF16[0] = HeaderCodeUnit;
+        switch (UTF16_GetCodePointSizeInCodeUnits(HeaderCodeUnit)) {
+            case 4:
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], sizeof(UTF16), 1);
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[2], sizeof(UTF16), 1);
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[3], sizeof(UTF16), 1);
+                break;
+            case 3:
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], sizeof(UTF16), 1);
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[2], sizeof(UTF16), 1);
+                break;
+            case 2:
+                FileIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], sizeof(UTF16), 1);
+                break;
+        }
         CodePoint         = UTF16_Decode(&StringIO_PreallocateCodePoint_UTF16[0]);
         return CodePoint;
     }
@@ -1625,79 +1625,65 @@ extern "C" {
     UTF32 UTF32_ReadCodePoint(FILE *Source) {
         AssertIO(Source != NULL);
         UTF32 CodePoint          = 0;
-            size_t CodeUnitsRead = FileIO_Read(Source, &CodePoint, sizeof(UTF32), 1);
+        size_t CodeUnitsRead = FileIO_Read(Source, &CodePoint, sizeof(UTF32), 1);
         return CodePoint;
     }
     
     UTF8 *UTF8_ReadGrapheme(FILE *Source) {
         AssertIO(Source != NULL);
         UTF8 *Grapheme       = NULL;
-            /*
-             Read a CodePoint, look it up in the GrapheneTable, if it, or the following CodePoint are GraphemeExtenders, keep going.
-             */
-            UTF32 CodePoint1 = UTF8_ReadCodePoint(Source);
-            UTF32 CodePoint2 = UTF8_ReadCodePoint(Source);
-            
-            bool     GraphemeFound                 = No;
-            size_t   CodePointSizeInCodeUnits      = 0ULL;
-            size_t   CodeUnitsRead                 = 0ULL;
-            UTF8     CodeUnit                      = 0;
-            while (GraphemeFound == No) {
-                CodeUnitsRead                      = FileIO_Read(Source, &CodeUnit, sizeof(UTF8), 1);
-                if (CodeUnitsRead == 1) {
-                    CodePointSizeInCodeUnits      += UTF8_GetCodePointSizeInCodeUnits(CodeUnit);
-                    FileIO_Seek(Source, CodePointSizeInCodeUnits, SeekType_Current);
-                    Grapheme                       = UTF8_Init(CodePointSizeInCodeUnits);
-                    CodeUnitsRead                  = FileIO_Read(Source, &Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits);
-                    if (CodeUnitsRead == CodePointSizeInCodeUnits) {
-                        FileIO_Read(Source, &Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits);
-                        UTF32 *CodePoint           = UTF8_Decode(Grapheme);
-                        for (size_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
-                            if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
-                            } else if (CodePoint[0] != GraphemeExtensionTable[GraphemeExtension] && GraphemeExtension == GraphemeExtensionTableSize - 1) {
-                                GraphemeFound      = Yes;
-                            }
-                        }
-                    } else {
-                        Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Read %zu bytes but %zu was requested"), CodeUnitsRead, CodePointSizeInCodeUnits);
-                    }
-                } else {
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Read %zu bytes but 1 was requested"), CodeUnitsRead);
+        /*
+         Read a CodePoint, look it up in the GrapheneTable, if it, or the following CodePoint are GraphemeExtenders, keep going.
+         */
+        UTF32 CodePoint1 = UTF8_ReadCodePoint(Source);
+        UTF32 CodePoint2 = UTF8_ReadCodePoint(Source);
+
+        bool     GraphemeFound                 = No;
+        size_t   CodePointSizeInCodeUnits      = 0ULL;
+        size_t   CodeUnitsRead                 = 0ULL;
+        UTF8     CodeUnit                      = 0;
+        while (GraphemeFound == No) {
+            CodeUnitsRead                      = FileIO_Read(Source, &CodeUnit, sizeof(UTF8), 1);
+            CodePointSizeInCodeUnits      += UTF8_GetCodePointSizeInCodeUnits(CodeUnit);
+            FileIO_Seek(Source, CodePointSizeInCodeUnits, SeekType_Current);
+            Grapheme                       = UTF8_Init(CodePointSizeInCodeUnits);
+            CodeUnitsRead                  = FileIO_Read(Source, &Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits);
+            AssertIO(CodeUnitsRead == CodePointSizeInCodeUnits);
+            FileIO_Read(Source, &Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits);
+            UTF32 *CodePoint           = UTF8_Decode(Grapheme);
+            for (size_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
+                } else if (CodePoint[0] != GraphemeExtensionTable[GraphemeExtension] && GraphemeExtension == GraphemeExtensionTableSize - 1) {
+                    GraphemeFound      = Yes;
                 }
             }
+        }
         return Grapheme;
     }
     
     UTF16 *UTF16_ReadGrapheme(FILE *Source) {
         AssertIO(Source != NULL);
         UTF16 *Grapheme                            = NULL;
-            bool     GraphemeFound                 = No;
-            size_t   CodePointSizeInCodeUnits      = 0;
-            size_t   CodeUnitsRead                 = 0;
-            UTF16    CodeUnit                      = 0;
-            while (GraphemeFound == No) {
-                CodeUnitsRead                      = FileIO_Read(Source, &CodeUnit, sizeof(UTF16), 1);
-                if (CodeUnitsRead == 1) {
-                    CodePointSizeInCodeUnits      += UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
-                    FileIO_Seek(Source, CodePointSizeInCodeUnits, SeekType_Current);
-                    Grapheme                       = UTF16_Init(CodePointSizeInCodeUnits);
-                    CodeUnitsRead                  = FileIO_Read(Source, &Grapheme, sizeof(UTF16), CodePointSizeInCodeUnits);
-                    if (CodeUnitsRead == CodePointSizeInCodeUnits) {
-                        FileIO_Read(Source, &Grapheme, sizeof(UTF16), CodePointSizeInCodeUnits);
-                        UTF32 *CodePoint           = UTF16_Decode(Grapheme);
-                        for (size_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
-                            if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
-                            } else if (CodePoint[0] != GraphemeExtensionTable[GraphemeExtension] && GraphemeExtension == GraphemeExtensionTableSize - 1) {
-                                GraphemeFound      = Yes;
-                            }
-                        }
-                    } else {
-                        Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Read %zu bytes but %zu was requested"), CodeUnitsRead, CodePointSizeInCodeUnits);
-                    }
-                } else {
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Read %zu bytes but 1 was requested"), CodeUnitsRead);
+        bool     GraphemeFound                 = No;
+        size_t   CodePointSizeInCodeUnits      = 0;
+        size_t   CodeUnitsRead                 = 0;
+        UTF16    CodeUnit                      = 0;
+        while (GraphemeFound == No) {
+            CodeUnitsRead                      = FileIO_Read(Source, &CodeUnit, sizeof(UTF16), 1);
+            CodePointSizeInCodeUnits      += UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
+            FileIO_Seek(Source, CodePointSizeInCodeUnits, SeekType_Current);
+            Grapheme                       = UTF16_Init(CodePointSizeInCodeUnits);
+            CodeUnitsRead                  = FileIO_Read(Source, &Grapheme, sizeof(UTF16), CodePointSizeInCodeUnits);
+            AssertIO(CodeUnitsRead == CodePointSizeInCodeUnits);
+            FileIO_Read(Source, &Grapheme, sizeof(UTF16), CodePointSizeInCodeUnits);
+            UTF32 *CodePoint           = UTF16_Decode(Grapheme);
+            for (size_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
+                } else if (CodePoint[0] != GraphemeExtensionTable[GraphemeExtension] && GraphemeExtension == GraphemeExtensionTableSize - 1) {
+                    GraphemeFound      = Yes;
                 }
             }
+        }
         return Grapheme;
     }
     
@@ -1739,31 +1725,31 @@ extern "C" {
     UTF8 *UTF8_ReadSentence(FILE *Source) {
         AssertIO(Source != NULL);
         UTF8 *Sentence                                     = NULL;
-            size_t    SentenceSize                         = 0LL;
-            StringIO_LineBreakTypes LineBreakType          = LineBreakType_Unspecified;
-            while (LineBreakType == LineBreakType_Unspecified) {
-                UTF32 CodePoint1                           = UTF8_ReadCodePoint(Source);
-                UTF32 CodePoint2                           = UTF8_ReadCodePoint(Source);
-                LineBreakType                              = UTF32_GetLineBreakType(CodePoint1, CodePoint2);
-                if (LineBreakType == LineBreakType_Unspecified) {
-                    SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
-                    SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
-                } else if (LineBreakType != LineBreakType_CRLF && LineBreakType != LineBreakType_LFCR) {
-                    StringIO_LineBreakTypes LineBreakType1 = UTF32_GetLineBreakType(CodePoint1, InvalidReplacementCodePoint);
-                    StringIO_LineBreakTypes LineBreakType2 = UTF32_GetLineBreakType(CodePoint2, InvalidReplacementCodePoint);
-                    if (LineBreakType1 != LineBreakType_Unspecified) {
-                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
-                    } else if (LineBreakType2 != LineBreakType_Unspecified) {
-                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
-                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
-                    }
+        size_t    SentenceSize                         = 0LL;
+        StringIO_LineBreakTypes LineBreakType          = LineBreakType_Unspecified;
+        while (LineBreakType == LineBreakType_Unspecified) {
+            UTF32 CodePoint1                           = UTF8_ReadCodePoint(Source);
+            UTF32 CodePoint2                           = UTF8_ReadCodePoint(Source);
+            LineBreakType                              = UTF32_GetLineBreakType(CodePoint1, CodePoint2);
+            if (LineBreakType == LineBreakType_Unspecified) {
+                SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
+            } else if (LineBreakType != LineBreakType_CRLF && LineBreakType != LineBreakType_LFCR) {
+                StringIO_LineBreakTypes LineBreakType1 = UTF32_GetLineBreakType(CodePoint1, InvalidReplacementCodePoint);
+                StringIO_LineBreakTypes LineBreakType2 = UTF32_GetLineBreakType(CodePoint2, InvalidReplacementCodePoint);
+                if (LineBreakType1 != LineBreakType_Unspecified) {
+                    SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                } else if (LineBreakType2 != LineBreakType_Unspecified) {
+                    SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                    SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
                 }
             }
-            Sentence                                       = UTF8_Init(SentenceSize);
-            if (Sentence != NULL) {
-                FileIO_Seek(Source, SentenceSize * -1, SeekType_Current); // Seek back to the beginning, allocate
-                FileIO_Read(Source, &Sentence, 1, SentenceSize);
-            }
+        }
+        Sentence                                       = UTF8_Init(SentenceSize);
+        if (Sentence != NULL) {
+            FileIO_Seek(Source, SentenceSize * -1, SeekType_Current); // Seek back to the beginning, allocate
+            FileIO_Read(Source, &Sentence, 1, SentenceSize);
+        }
         return Sentence;
     }
     
@@ -1900,9 +1886,9 @@ extern "C" {
         size_t StringSize   = UTF32_GetStringSizeInCodePoints(String);
         Reverse             = UTF32_Init(StringSize);
         AssertIO(Reverse != NULL);
-            for (size_t CodePoint = StringSize; CodePoint > 0; CodePoint--) {
-                Reverse[CodePoint] = String[CodePoint - StringSize];
-            }
+        for (size_t CodePoint = StringSize; CodePoint > 0; CodePoint--) {
+            Reverse[CodePoint] = String[CodePoint - StringSize];
+        }
         return Reverse;
     }
     

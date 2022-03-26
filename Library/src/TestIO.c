@@ -1,5 +1,6 @@
 #include "../include/TestIO.h"          /* Included for our declarations */
 
+#include "../include/AssertIO.h"        /* Included for Assertions */
 #include "../include/CryptographyIO.h"  /* Included for InsecurePRNG */
 #include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
 #include "../include/TextIO/LogIO.h"    /* Included for error reporting */
@@ -41,33 +42,33 @@ extern "C" {
      TestIOSectionMarker
      ?NumSuites?
      Suite[0] = {
-        .Name     = SuiteName,
-        .Init     = <FunctionPointer>,
-        .Deinit   = <FunctionPointer>,
-        .NumTests = <size_t> 3,
-        .Tests[]  = {
-            [0] = {
-                .Name       = TestName,
-                .Function   = <FunctionPointer>,
-                .State      = <TestState>,
-                .Expetation = <TestOutcome>,
-                .Result     = <TestOutcome>,
-            },
-            [1] = {
-                .Name       = TestName,
-                .Function   = <FunctionPointer>,
-                .State      = <TestState>,
-                .Expetation = <TestOutcome>,
-                .Result     = <TestOutcome>,
-            },
-            [2] = {
-                .Name       = TestName,
-                .Function   = <FunctionPointer>,
-                .State      = <TestState>,
-                .Expetation = <TestOutcome>,
-                .Result     = <TestOutcome>,
-            },
-        },
+     .Name     = SuiteName,
+     .Init     = <FunctionPointer>,
+     .Deinit   = <FunctionPointer>,
+     .NumTests = <size_t> 3,
+     .Tests[]  = {
+     [0] = {
+     .Name       = TestName,
+     .Function   = <FunctionPointer>,
+     .State      = <TestState>,
+     .Expetation = <TestOutcome>,
+     .Result     = <TestOutcome>,
+     },
+     [1] = {
+     .Name       = TestName,
+     .Function   = <FunctionPointer>,
+     .State      = <TestState>,
+     .Expetation = <TestOutcome>,
+     .Result     = <TestOutcome>,
+     },
+     [2] = {
+     .Name       = TestName,
+     .Function   = <FunctionPointer>,
+     .State      = <TestState>,
+     .Expetation = <TestOutcome>,
+     .Result     = <TestOutcome>,
+     },
+     },
      }
      Suite[1] = {
 
@@ -178,15 +179,15 @@ extern "C" {
 
     bool TestIO_RegisterCase(TestSuite *Suite, UTF8 *FunctionName, TestIO_TestFunction Function2Test, TestIO_TestStates State, TestIO_TestOutcomes Expectation) {
         TestCase Case = {
-           .Name         = FunctionName,
-           .Function     = Function2Test,
-           .State        = State,
-           .Expectation  = Expectation,
-       };
-       Suite->Tests[Suite->NumTests] = Case;
-       Suite->NumTests += 1;
-       return true;
-   }
+            .Name         = FunctionName,
+            .Function     = Function2Test,
+            .State        = State,
+            .Expectation  = Expectation,
+        };
+        Suite->Tests[Suite->NumTests] = Case;
+        Suite->NumTests += 1;
+        return true;
+    }
 
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
@@ -231,33 +232,25 @@ extern "C" {
     }
 
     static UTF32 UTF32_GenerateCodePoint(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         UTF32 CodePoint          = 0UL;
-        if (Insecure != NULL) {
-            CodePoint            = (UTF32) InsecurePRNG_CreateInteger(Insecure, UTF16HighSurrogateStart - 1);
-            /*
-            UTF32  CodePointHigh = (UTF32) InsecurePRNG_CreateIntegerInRange(Insecure, 1, 0xD7FF);
-            UTF32  CodePointLow  = (UTF32) InsecurePRNG_CreateIntegerInRange(Insecure, 0xE000, 0x10FFFF);
-            CodePoint            = CodePointLow | CodePointHigh;
-             */
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Insecure Pointer is NULL"));
-        }
+        CodePoint            = (UTF32) InsecurePRNG_CreateInteger(Insecure, UTF16HighSurrogateStart - 1);
+        /*
+         UTF32  CodePointHigh = (UTF32) InsecurePRNG_CreateIntegerInRange(Insecure, 1, 0xD7FF);
+         UTF32  CodePointLow  = (UTF32) InsecurePRNG_CreateIntegerInRange(Insecure, 0xE000, 0x10FFFF);
+         CodePoint            = CodePointLow | CodePointHigh;
+         */
         return CodePoint;
     }
 
     UTF32 *UTF32_GenerateString(InsecurePRNG *Insecure, size_t NumCodePoints) {
+        AssertIO(Insecure != NULL);
+        AssertIO(NumCodePoints > 0);
         UTF32 *String                 = 0UL;
-        if (Insecure != NULL) {
-            String                    = UTF32_Init(NumCodePoints);
-            if (String != NULL) {
-                for (size_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
-                    String[CodePoint] = UTF32_GenerateCodePoint(Insecure);
-                }
-            } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate string with %zu CodePoints"), NumCodePoints);
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Insecure Pointer is NULL"));
+        String                    = UTF32_Init(NumCodePoints);
+        AssertIO(String != NULL);
+        for (size_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
+            String[CodePoint] = UTF32_GenerateCodePoint(Insecure);
         }
         return String;
     }
