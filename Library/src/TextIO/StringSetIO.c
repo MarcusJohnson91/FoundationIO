@@ -4,7 +4,6 @@
 #include "../../include/BufferIO.h"                    /* Included for BufferIO_MemorySet */
 #include "../../include/FileIO.h"                      /* Included for File operations */
 #include "../../include/MathIO.h"                      /* Included for endian swapping */
-#include "../../include/TextIO/LogIO.h"                /* Included for error logging */
 #include "../../include/TextIO/StringIO.h"             /* Included for Encoding/Decoding functions */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

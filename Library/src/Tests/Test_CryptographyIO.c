@@ -1,6 +1,6 @@
-#include "../Library/include/TestIO.h"
-#include "../Library/include/CryptographyIO.h"
-#include "../Library/include/TextIO/StringIO.h"
+#include "../../include/CryptographyIO.h"         /* Included for our declarations */
+#include "../../include/TestIO.h"                 /* Included for testing */
+#include "../../include/include/TextIO/StringIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

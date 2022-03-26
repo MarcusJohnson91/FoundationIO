@@ -1,6 +1,6 @@
-#include "../Library/include/TestIO.h"
-#include "../Library/include/TextIO/CommandLineIO.h"
-#include "../Library/include/TextIO/StringIO.h"
+#include "../../../include/TextIO/CommandLineIO.h"   /* Included for our declarations */
+#include "../../../include/TextIO/StringIO.h"        /* Included for StringIO */
+#include "../../../include/TestIO.h"                 /* Included for testing */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

@@ -16,7 +16,6 @@
 #define FoundationIO_TestIO_H
 
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
-#include "TextIO/LogIO.h"       /* Included for Logging, tests need to log errors */
 #include "RegistrationIO.h"
 
 #include <setjmp.h>

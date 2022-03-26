@@ -3,7 +3,6 @@
 #include "../include/AssertIO.h"        /* Included for Assertions */
 #include "../include/CryptographyIO.h"  /* Included for InsecurePRNG */
 #include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
-#include "../include/TextIO/LogIO.h"    /* Included for error reporting */
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
 
 #if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)

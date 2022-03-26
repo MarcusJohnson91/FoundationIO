@@ -1,5 +1,5 @@
-#include "../Library/include/TestIO.h"
-#include "../Library/include/PlatformIO.h"
+#include "../../include/PlatfomIO.h"              /* Included for our declarations */
+#include "../../include/TestIO.h"                 /* Included for testing */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

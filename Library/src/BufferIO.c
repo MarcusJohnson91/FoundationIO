@@ -5,7 +5,6 @@
 #include "../include/CryptographyIO.h"    /* Included for InsecurePRNG_CreateInteger */
 #include "../include/MathIO.h"            /* Included for Integer functions */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
-#include "../include/TextIO/LogIO.h"      /* Included for Logging */
 #include "../include/TextIO/StringIO.h"   /* Included for StringIO's declarations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
