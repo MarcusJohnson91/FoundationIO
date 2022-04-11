@@ -21,16 +21,19 @@ extern "C" {
 
     /*!
      @enum         BufferIO_UnaryTypes
+     Natural number 1 to +Infinity
+     Whole number: 0 to +Infinity
+
      @constant     UnaryType_Unspecified           Invalid.
-     @constant     UnaryType_Count                 Supports whole numbers (including zero).
-     @constant     UnaryType_Truncated             Supports counting numbers (excluding zero).
-     @constant     UnaryType_Whole                 Supports all the integers including zero and negatives (up to 2^63 anyway).
+     @constant     UnaryType_Natural               Supports counting numbers (excluding zero).
+     @constant     UnaryType_Whole                 Supports whole numbers (including zero).
+     @constant     UnaryType_Truncated             Supports all the integers including zero and negatives (up to 2^63 anyway).
      */
     typedef enum BufferIO_UnaryTypes {
                    UnaryType_Unspecified           = 0,
-                   UnaryType_Count                 = 1,
-                   UnaryType_Truncated             = 2,
+                   UnaryType_Natural               = 1,
                    UnaryType_Whole                 = 3,
+                   UnaryType_Truncated             = 2,
     } BufferIO_UnaryTypes;
 
     /*!
@@ -223,6 +226,14 @@ extern "C" {
      */
     void           BitBuffer_WriteStream(BitBuffer *BitB);
 
+    /* Ignore clang's warning: shorten-64-to-32 aka Wnarrowing */
+
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#pragma gcc diagnostic push
+#pragma gcc diagnostic ignored "-Wnarrowing"
+#pragma gcc diagnostic ignored "-Wshorten-64-to-32"
+#endif /* PlatformIO_Compiler */
+
     /*!
      @abstract                                     Peeks (reads but without recording that it's been read) bits from BitBuffer.
      @param        BitB                            BitBuffer Pointer.
@@ -242,6 +253,15 @@ extern "C" {
     uint64_t       BitBuffer_ReadBits(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read);
 
     /*!
+     @abstract                                     Reads Rice encoded bits from BitBuffer.
+     @param        BitB                            BitBuffer Pointer.
+     @param        ByteOrder                       What byte order are the bits to be read?
+     @param        BitOrder                        What bit order are the bits to be read?
+     @param        Terminator                      Should we stop at zero or one?
+     */
+    uint64_t       BitBuffer_ReadRICE(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTerminators Terminator);
+
+    /*!
      @abstract                                     Reads unary encoded fields from the BitBuffer.
      @param        BitB                            BitBuffer Pointer.
      @param        ByteOrder                       What byte order are the bits to be read?
@@ -250,6 +270,10 @@ extern "C" {
      @param        UnaryTerminator                 Is the stop bit a one or a zero?
      */
     uint64_t       BitBuffer_ReadUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators UnaryTerminator);
+
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#pragma gcc diagnostic pop
+#endif /* PlatformIO_Compiler */
 
     /*!
      @abstract                                     Reads data from the BitBuffer until it stops matching the UTF-8 format.
@@ -350,7 +374,7 @@ extern "C" {
      @param        BitB                            BitBuffer Pointer.
      @param        GUUID2Write                     Pointer to the GUUID you want to write.
      */
-    void           BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, uint8_t *GUUID2Write);
+    void           BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, const uint8_t *const GUUID2Write);
 
     /*!
      @abstract                                     Deletes the BitBuffer.
