@@ -225,19 +225,13 @@ extern "C" {
 #ifdef                    CharSet8
 #undef                    CharSet8
 #endif /* CharSet8 */
-/*!
-@abstract                 UTF8                                 is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
-*/
 typedef                   char8_t                              UTF8;
-/*!
-@abstract                 CharSet8                             is for non-Unicode character sets.
-*/
 typedef                   char8_t                              CharSet8;
-typedef const             UTF8                                 ImmutableChar_UTF8;
-typedef const             UTF8                                 *const ImmutableString_UTF8;
-typedef const             UTF8                                 *StringSet_UTF8;
-typedef const             UTF8                                 *const ImmutableStringSet_UTF8[]; // const Type *const *
-typedef const             UTF8                                 *MutableStringSet_UTF8[]; // const Type *
+typedef                   const UTF8                           ImmutableChar_UTF8;
+typedef                   const UTF8 *const                    ImmutableString_UTF8;
+typedef                   const UTF8                          *StringSet_UTF8;
+typedef                   const UTF8 *const *const             ImmutableStringSet_UTF8;
+typedef                   const UTF8                          *MutableStringSet_UTF8[];
 #endif /* TextIO_StringTypes8 */
 
 #ifndef                   TextIO_StringTypes16
@@ -248,21 +242,13 @@ typedef const             UTF8                                 *MutableStringSet
 #ifdef                    CharSet16
 #undef                    CharSet16
 #endif /* CharSet16 */
-/*!
-@abstract                 UTF16                                is guaranteed to only contain valid Unicode, use CharSet16 otherwise.
-*/
 typedef                   char16_t                             UTF16;
-/*!
-@abstract                 CharSet16                            is for non-Unicode character sets.
-*/
 typedef                   char16_t                             CharSet16;
-
-
-  typedef const UTF16    ImmutableChar_UTF16;
-  typedef const UTF16    *const ImmutableString_UTF16;
-  typedef const UTF16    *StringSet_UTF16;
-  typedef const UTF16 *const ImmutableStringSet_UTF16[];
-  typedef const UTF16      *MutableStringSet_UTF16[];
+typedef                   const UTF16                          ImmutableChar_UTF16;
+typedef                   const UTF16 *const                   ImmutableString_UTF16;
+typedef                   const UTF16                         *StringSet_UTF16;
+typedef                   const UTF16 *const *const            ImmutableStringSet_UTF16;
+typedef                   const UTF16                         *MutableStringSet_UTF16[];
 #endif /* TextIO_StringTypes16 */
 
 #ifndef                   TextIO_StringTypes32
@@ -273,21 +259,13 @@ typedef                   char16_t                             CharSet16;
 #ifdef                    CharSet32
 #undef                    CharSet32
 #endif /* CharSet32 */
-/*!
-@abstract                 UTF32                                is guaranteed to only contain valid Unicode, use CharSet32 otherwise.
- */
 typedef                   char32_t                             UTF32;
-/*!
-@abstract                 CharSet32                            is for non-Unicode character sets.
- */
 typedef                   char32_t                             CharSet32;
-
-  typedef                 const char32_t                       ImmutableChar32;
-typedef const UTF32    ImmutableChar_UTF32;
-typedef const UTF32    *const ImmutableString_UTF32;
-typedef const UTF32    *StringSet_UTF32;
-typedef const UTF32 *const *const ImmutableStringSet_UTF32;
-typedef const UTF32      *MutableStringSet_UTF32[];
+typedef                   const UTF32                          ImmutableChar_UTF32;
+typedef                   const UTF32 *const                   ImmutableString_UTF32;
+typedef                   const UTF32                         *StringSet_UTF32;
+typedef                   const UTF32 *const *const            ImmutableStringSet_UTF32;
+typedef                   const UTF32                         *MutableStringSet_UTF32[];
 #endif /* TextIO_StringTypes32 */
 
 #ifndef                   TextIOTypes_PropertyConversion8
