@@ -1,6 +1,6 @@
 #include "../include/AsynchronousIO.h"    /* Included for our declarations */
 
-#include "../include/AssertIO.h"          /* Included for AssertIO */
+#include "../include/AssertIO.h"          /* Included for Assertions */
 #include "../include/TextIO/StringIO.h"   /* Included for UTF-X operations */
 
 #if defined(__has_include)

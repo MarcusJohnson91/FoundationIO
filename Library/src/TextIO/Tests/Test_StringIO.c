@@ -1,4 +1,6 @@
 #include "../../../include/TextIO/StringIO.h"   /* Included for our declarations */
+
+#include "../../../include/AssertIO.h"          /* Included for Assertions */
 #include "../../../include/TestIO.h"            /* Included for testing */
 #include "../../../include/CryptographyIO.h"    /* Included for testing */
 
@@ -12,15 +14,13 @@ extern "C" {
         uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet); // 14?!
         AssertIO(NumStrings == 3);
         uint64_t *StringSizes = UTF8_StringSet_GetStringSizesInCodeUnits(StringSet);
-        if (StringSizes[0] != 7 || StringSizes[1] != 7 || StringSizes[2] != 7) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Size of StringSet's Strings doesn't = 7"));
-        }
+        AssertIO(StringSizes[0] == 7);
+        AssertIO(StringSizes[1] == 7);
+        AssertIO(StringSizes[2] == 7);
         /* So far so good, now lets test Allocation, Assignment, and Deinitalization */
         ImmutableStringSet_UTF8 StringSet2 = UTF8StringSet(UTF8String("String1"), UTF8String("String2"), UTF8String("String3"));
-        
-        if (StringSet[0] != StringSet2[0]) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Addresses don't match"));
-        }
+
+        AssertIO(StringSet[0] == StringSet2[0]);
         
         return TestPassed;
     }
@@ -31,23 +31,19 @@ extern "C" {
         UTF8 *Grapheme2 = UTF8String("NumGraphemes = 16");
         uint8_t Grapheme1Size = UTF8_GetStringSizeInGraphemes(Grapheme1);
         uint8_t Grapheme2Size = UTF8_GetStringSizeInGraphemes(Grapheme2);
-        if (Grapheme1Size == 1 && Grapheme2Size == 16) {
-            TestPassed = Yes;
-        }
+        AssertIO(Grapheme1Size == 1);
+        AssertIO(Grapheme2Size == 16);
         return TestPassed;
     }
     
     bool Test_UTF8_EncodeDecode(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestPassed                = No;
-        if (Insecure != NULL) {
-            uint64_t  NumCodePoints    = InsecurePRNG_CreateInteger(Insecure, 16);
-            ImmutableString_UTF32 GeneratedString  = UTF32_GenerateString(Insecure, NumCodePoints);
-            UTF8     *Generated8       = UTF8_Encode(GeneratedString);
-            ImmutableString_UTF32 Decoded8         = UTF8_Decode(Generated8);
-            TestPassed                 = UTF32_Compare(GeneratedString, Decoded8);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
-        }
+        uint64_t  NumCodePoints    = InsecurePRNG_CreateInteger(Insecure, 16);
+        ImmutableString_UTF32 GeneratedString  = UTF32_GenerateString(Insecure, NumCodePoints);
+        UTF8     *Generated8       = UTF8_Encode(GeneratedString);
+        ImmutableString_UTF32 Decoded8         = UTF8_Decode(Generated8);
+        TestPassed                 = UTF32_Compare(GeneratedString, Decoded8);
         return TestPassed;
     }
 
@@ -58,23 +54,21 @@ extern "C" {
     };
     
     bool Test_UTF16_EncodeDecode(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestPassed = Yes;
-        if (Insecure != NULL) {
-            uint64_t  NumCodePoints               = InsecurePRNG_CreateInteger(Insecure, 16);
-            ImmutableString_UTF32 GeneratedString = UTF32_GenerateString(Insecure, NumCodePoints);
-            ImmutableString_UTF16 Generated16     = UTF16_Encode(GeneratedString);
-            ImmutableString_UTF32 Decoded16       = UTF16_Decode(Generated16);
-            TestPassed                            = UTF32_Compare(GeneratedString, Decoded16);
-            UTF32_Deinit(GeneratedString);
-            UTF16_Deinit(Generated16);
-            UTF32_Deinit(Decoded16);
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
-        }
+        uint64_t  NumCodePoints               = InsecurePRNG_CreateInteger(Insecure, 16);
+        ImmutableString_UTF32 GeneratedString = UTF32_GenerateString(Insecure, NumCodePoints);
+        ImmutableString_UTF16 Generated16     = UTF16_Encode(GeneratedString);
+        ImmutableString_UTF32 Decoded16       = UTF16_Decode(Generated16);
+        TestPassed                            = UTF32_Compare(GeneratedString, Decoded16);
+        UTF32_Deinit(GeneratedString);
+        UTF16_Deinit(Generated16);
+        UTF32_Deinit(Decoded16);
         return TestPassed;
     }
     
     bool Test_UTF8_Insert(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestPassed = No;
         ImmutableString_UTF8 Original = UTF8String("Original");
         ImmutableString_UTF8 Insertee = UTF8String("Insert");
@@ -85,18 +79,17 @@ extern "C" {
     }
     
     bool Test_UTF8_Properties(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool      TestPassed     = Yes;
         ImmutableString_UTF8 TestString8    = UTF8String("Size: 7");
         ImmutableString_UTF32 TestString32   = UTF8_Decode(TestString8);
         uint64_t  TestStringSize = UTF32_GetStringSizeInCodePoints(TestString32);
-        if (TestStringSize != 7) {
-            TestPassed           = No;
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String \"%s\" is supposed to be 7 CodePoints long, but is actually %zu"), TestString8, TestStringSize);
-        }
+        AssertIO(TestStringSize == 7);
         return TestPassed;
     }
     
     bool Test_SubstituteSubString(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestPassed = No;
         
         ImmutableString_UTF32 Replacement = UTF32String("987654321");
@@ -107,6 +100,7 @@ extern "C" {
     }
     
     bool Test_UTF8_StitchSubString(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestPassed                         = No;
         ImmutableString_UTF8 BananaBread        = UTF8_StitchSubString(UTF8String("Banana NUT Bread"), 8, 4);
         TestPassed                              = UTF8_Compare(BananaBread, UTF8String("Banana Bread"));
@@ -114,17 +108,20 @@ extern "C" {
     }
 
     bool Test_UTF8_StringSet(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestPassed                    = No;
         ImmutableStringSet_UTF8 StringSet  = UTF8StringSet(UTF8String("One"), UTF8String("Two"), UTF8String("Three"), UTF8String("Four"));
         return TestPassed;
     }
     
     bool Test_UTF8_Reverse(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }
     
     bool Test_UTF8_Clone(InsecurePRNG *Insecure) {
+        AssertIO(Insecure != NULL);
         bool TestSuitePassed = No;
         return TestSuitePassed;
     }

@@ -1,4 +1,6 @@
 #include "../../../include/TextIO/FormatIO.h"   /* Included for our declarations */
+
+#include "../../../include/AssertIO.h"          /* Included for Assertions */
 #include "../../../include/TextIO/StringIO.h"   /* Included for StringIO */
 #include "../../../include/TestIO.h"            /* Included for testing */
 #include "../../../include/CryptographyIO.h"    /* Included for CryptographyIO */
@@ -15,11 +17,10 @@ extern "C" {
         bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
         bool  SubString2     = UTF8_Compare(DeformatTest1[1], UTF8String("1234"));
         bool  SubString3     = UTF8_Compare(DeformatTest1[2], UTF8String("Positional"));
-        if (SubString1 == No || SubString2 == No || SubString3 == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SubString doesn't match"));
-        } else {
-            TestPassed       = Yes;
-        }
+
+        AssertIO(SubString1 == true);
+        AssertIO(SubString2 == true);
+        AssertIO(SubString3 == true);
         return TestPassed;
 
         TestCase TestCase_Deformat8 = {
@@ -48,7 +49,7 @@ extern "C" {
          */
 
         bool TestPassed  = false;
-        ImmutableString_UTF32 String32_1   = UTF32String("%U32s");
+        ImmutableString_UTF32 String32_1   = UTF32String("%u32s");
         ImmutableString_UTF32 String32_2   = UTF32String("wat");
         ImmutableString_UTF32 TestU32      = UTF32_Format(String32_1, String32_2);
         if (UTF32_Compare(TestU32, String32_2)) {
@@ -57,7 +58,7 @@ extern "C" {
             printf("%s\n", UTF8String("Test1 Failed"));
         }
       
-        ImmutableString_UTF16 String16_1   = UTF16String("%U16s");
+        ImmutableString_UTF16 String16_1   = UTF16String("%u16s");
         ImmutableString_UTF16 String16_2   = UTF16String("wat");
         ImmutableString_UTF16 TestU16      = UTF16_Format(String16_1, String16_2);
         if (UTF16_Compare(TestU16, String16_2)) {
@@ -95,11 +96,7 @@ extern "C" {
 
         UTF8 *DoubleSpecifier                  = UTF8_Format(UTF8String("%d:%d"), 1, 2);
         bool  DoubleSpecifierTest              = UTF8_Compare(DoubleSpecifier, UTF8String("1:2"));
-        if (DoubleSpecifierTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("DoubleSpecifierTest Failed"));
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("DoubleSpecifierTest Passed"));
-        }
+        AssertIO(DoubleSpecifierTest == true);
 
         // Test UTF32_SubstituteSubString
 
@@ -116,46 +113,26 @@ extern "C" {
 
        ImmutableString_UTF8 DuplicatePosition2Dad            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent1, HLBRhyme1Ending, HLBRhyme2Ending); // %1$ = 3, %2$ = 3, %3$ = 2, Dupes = 5
         bool  DuplicatePosition2Test1          = UTF8_Compare(DuplicatePosition2Dad, HushLittleBabyResult1);
-        if (DuplicatePosition2Test1 == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Rhyme Positional Test Failed"));
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Rhyme Positional Test Passed"));
-        }
+        AssertIO(DuplicatePosition2Test1 == true);
 
         ImmutableString_UTF8 DuplicatePosition2Mom            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent2, HLBRhyme1Ending, HLBRhyme2Ending);
         bool  DuplicatePosition2Test2          = UTF8_Compare(DuplicatePosition2Mom, HushLittleBabyResult2);
-        if (DuplicatePosition2Test2 == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Rhyme Positional Test Failed"));
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Rhyme Positional Test Passed"));
-        }
-
+        AssertIO(DuplicatePosition2Test2 == true);
 
         UTF8 *DuplicatePosition                = UTF8_Format(UTF8String("%2$s %2$s in the %1$s %1$s!!"), UTF8String("butt"), UTF8String("wat"));
         bool  DuplicatePositionTest            = UTF8_Compare(DuplicatePosition, UTF8String("wat wat in the butt butt"));
-        if (DuplicatePositionTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("OctalTest Failed"));
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("OctalTest Passed"));
-        }
+        AssertIO(DuplicatePositionTest == true);
+
 
         uint8_t OctalValue                     = 014; // 12, 0xC
         UTF8   *Octal                          = UTF8_Format(UTF8String("%03o"), OctalValue);
         bool    OctalTest                      = UTF8_Compare(Octal, UTF8String("014"));
-        if (OctalTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("OctalTest Failed"));
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("OctalTest Passed"));
-        }
+        AssertIO(OctalTest == true);
 
         UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$u, Equal: %2$u, Type: %3$s"), 3, 1234, UTF8String("Positional"));
         bool  Positional1Test                  = UTF8_Compare(Positional1, UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         // "NumArgs: 3, Equal: 1234, Type: Positional"
-        if (Positional1Test == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Positional1Test Failed"));
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Positional1Test Passed"));
-        }
+        AssertIO(Positional1Test == true);
 
         /*
          "NumArgs: %1$llu, Equal: %llu, Type: %3$s"  StringSize: 40
@@ -178,71 +155,49 @@ extern "C" {
         /*
          UTF8 *Positional2                      = UTF8_Format(UTF8String("%2$s: NumArgs: %1$llu, Type: %2$s"), 2, UTF8String("Positional"));
          bool  Positional2Test                  = UTF8_Compare(Positional2, UTF8String("Positional: NumArgs: 2, Type: Positional"));
-         if (Positional2Test == No) {
-         Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Positional2Test Failed"));
-         }
+         AssertIO(Positional2Test == true);
          */
 
         UTF8 *Positional3                      = UTF8_Format(UTF8String("NumArgs: %2$d, %1$s EXTEND THE STRING"), UTF8String("Positional"), 2);
         bool  Positional3Test                  = UTF8_Compare(Positional3, UTF8String("NumArgs: 2, Positional EXTEND THE STRING"));
-        if (Positional3Test == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Positional3Test Failed"));
-        }
+        AssertIO(Positional3Test == true);
 
         UTF8 *PositionPrecision                = UTF8_Format(UTF8String("%.*f"), 2, 0.33333333);
         bool PositionPrecisionTest             = UTF8_Compare(PositionPrecision, UTF8String("0.33"));
-        if (PositionPrecisionTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("PositionPrecisionTest Failed"));
-        }
+        AssertIO(PositionPrecisionTest == true);
 
         UTF8 *StringPrecision                  = UTF8_Format(UTF8String("%.3s"), UTF8String("FooBar"));
         bool StringPrecisionTest               = UTF8_Compare(StringPrecision, UTF8String("Foo"));
-        if (StringPrecisionTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringPreicisonTest Failed"));
-        }
+        AssertIO(StringPrecisionTest == true);
 
         UTF8 *Padding                          = UTF8_Format(UTF8String("%10.5i"), 9);
         bool  PaddingTest                      = UTF8_Compare(Padding, UTF8String("     00009"));
-        if (PaddingTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("PaddingTest Failed"));
-        }
+        AssertIO(PaddingTest == true);
 
         UTF8 *SpaceAlign                       = UTF8_Format(UTF8String("% d"), 4);
         bool SpaceAlignTest                    = UTF8_Compare(SpaceAlign, UTF8String(" 4"));
-        if (SpaceAlignTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SpaceAlignTest Failed"));
-        }
+        AssertIO(SpaceAlignTest == true);
 
         UTF8 *ZeroLeftAlign                    = UTF8_Format(UTF8String("%05d"), 4);
         bool ZeroLeftAlignTest                 = UTF8_Compare(ZeroLeftAlign, UTF8String("00004"));
-        if (ZeroLeftAlignTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ZeroLeftAlignTest Failed"));
-        }
+        AssertIO(ZeroLeftAlignTest == true);
 
         UTF8 *Percent                          = UTF8_Format(UTF8String("%%"));
         bool PercentTest                       = UTF8_Compare(Percent, UTF8String("%"));
-        if (PercentTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("PercentTest Failed"));
-        }
+        AssertIO(PercentTest == true);
 
         UTF8 *Smaller                          = UTF8_Format(UTF8String("%d"), 123);
         bool SmallerTest                       = UTF8_Compare(Smaller, UTF8String("123"));
-        if (SmallerTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SmallerTest Failed"));
-        }
+        AssertIO(SmallerTest == true);
 
         UTF8 *Equal                            = UTF8_Format(UTF8String("%d"), 1094);
         bool EqualTest                         = UTF8_Compare(Equal, UTF8String("1094"));
-        if (EqualTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("EqualTest Failed"));
-        }
+        AssertIO(EqualTest == true);
 
         // Equal and Smaller fail, but Longer works, and Smaller works sometimes?
         UTF8 *Longer                           = UTF8_Format(UTF8String("%d"), 99999);
         bool LongerTest                        = UTF8_Compare(Longer, UTF8String("99999"));
-        if (LongerTest == No) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("LongerTest Failed"));
-        }
+        AssertIO(LongerTest == true);
         return TestPassed;
 
         TestCase TestCase_Format8 = {

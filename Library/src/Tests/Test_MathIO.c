@@ -1,4 +1,6 @@
 #include "../../include/MathIO.h"                 /* Included for our declarations */
+
+#include "../../include/AssertIO.h"               /* Included for Assertions */
 #include "../../include/TestIO.h"                 /* Included for testing */
 #include "../../include/include/CryptographyIO.h"
 
@@ -46,19 +48,15 @@ extern "C" {
         int64_t  Value     = InsecurePRNG_CreateInteger(Insecure, NumBits);
         uint8_t  LogCeil   = Logarithm(10, -Value) - 1;
         uint8_t  NumDigits = NumDigitsInInteger(10, -Value);
-        
-        if (LogCeil != NumDigits) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %u is incorrect"), NumBits);
-        }
+
+        AssertIO(LogCeil == NumDigits);
     }
     
     void Test_Logarithm(InsecurePRNG *Insecure) {
         uint8_t  NumBits = InsecurePRNG_CreateInteger(Insecure, 6);
         int64_t  Value   = InsecurePRNG_CreateInteger(Insecure, NumBits);
         uint8_t  LogCeil = Logarithm(2, Value);
-        if (LogCeil != NumBits) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %hhu is incorrect"), NumBits);
-        }
+        AssertIO(LogCeil == NumBits);
     }
     
     void Test_MinMax(InsecurePRNG *Insecure) {
@@ -68,10 +66,7 @@ extern "C" {
         
         int64_t Minimum1 = Minimum(Integer1, Integer2);
         int64_t Maximum1 = Maximum(Integer1, Integer2);
-        
-        if (Minimum1 > Maximum1) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Minimum/Maximum failed!"));
-        }
+        AssertIO(Minimum1 <= Maximum1);
     }
     
     void Test_Decimals(InsecurePRNG *Insecure) {

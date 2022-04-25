@@ -1,4 +1,6 @@
 #include "../../include/BufferIO.h"         /* Included for our declarations */
+
+#include "../../include/AssertIO.h"         /* Included for Assertions */
 #include "../../include/TestIO.h"           /* Included for testing */
 #include "../../include/MathIO.h"
 #include "../../include/CryptographyIO.h"
@@ -54,15 +56,9 @@ extern "C" {
         uint8_t NearNear2 = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
         uint8_t NearNear3 = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
 
-        if (NearNear1 == Field1 && NearNear2 == Field2 && NearNear3 == Field3) {
-            TestPassed    = Yes;
-        } else if (NearNear1 != Field1) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearNear1 is incorrect: %d"), NearNear1);
-        } else if (NearNear2 != Field2) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearNear2 is incorrect: %d"), NearNear2);
-        } else if (NearNear3 != Field3) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearNear3 is incorrect: %d"), NearNear3);
-        }
+        AssertIO(NearNear1 == Field1);
+        AssertIO(NearNear2 == Field2);
+        AssertIO(NearNear3 == Field3);
 
         BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsFarthest, FieldSize1, Field1);
         BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsFarthest, FieldSize2, Field2);
@@ -72,15 +68,9 @@ extern "C" {
         uint8_t NearFar2  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
         uint8_t NearFar3  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
 
-        if (NearFar1 == Field1 && NearFar2 == Field2 && NearFar3 == Field3) {
-            TestPassed    = Yes;
-        } else if (NearFar1 != Field1) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearFar1 is incorrect: %d"), NearFar1);
-        } else if (NearFar2 != Field2) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearFar2 is incorrect: %d"), NearFar2);
-        } else if (NearFar3 != Field3) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearFar3 is incorrect: %d"), NearFar3);
-        }
+        AssertIO(NearFar1 == Field1);
+        AssertIO(NearFar2 == Field2);
+        AssertIO(NearFar3 == Field3);
 
         BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, FieldSize1, Field1);
         BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, FieldSize2, Field2);
@@ -90,15 +80,9 @@ extern "C" {
         uint8_t FarNear2  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
         uint8_t FarNear3  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
 
-        if (FarNear1 == Field1 && FarNear2 == Field2 && NearFar3 == FarNear3) {
-            TestPassed    = Yes;
-        } else if (FarNear1 != Field1) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FarNear1 is incorrect: %d"), FarNear1);
-        } else if (FarNear2 != Field2) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FarNear2 is incorrect: %d"), FarNear2);
-        } else if (FarNear3 != Field3) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FarNear3 is incorrect: %d"), FarNear3);
-        }
+        AssertIO(FarNear1 == Field1);
+        AssertIO(FarNear2 == Field2);
+        AssertIO(FarNear3 == Field3);
 
         BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, FieldSize1, Field1);
         BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, FieldSize2, Field2);
@@ -108,15 +92,9 @@ extern "C" {
         uint8_t FarFar2   = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
         uint8_t FarFar3   = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
 
-        if (FarFar1 == Field1 && FarFar2 == Field2 && FarFar3 == Field3) {
-            TestPassed    = Yes;
-        } else if (FarFar1 != Field1) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FarFar1 is incorrect: %d"), FarFar1);
-        } else if (FarFar2 != Field2) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FarFar2 is incorrect: %d"), FarFar2);
-        } else if (FarFar3 != Field3) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FarFar3 is incorrect: %d"), FarFar3);
-        }
+        AssertIO(FarFar1 == Field1);
+        AssertIO(FarFar2 == Field2);
+        AssertIO(FarFar3 == Field3);
 
         return TestPassed;
     }
@@ -161,10 +139,7 @@ extern "C" {
             BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Write, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Write));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Write);
-            if (ReadInteger != RandomInteger) {
-                TestPassed = No;
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %zu does not match WrittenInteger: %zu"), ReadInteger, RandomInteger);
-            }
+            AssertIO(ReadInteger == RandomInteger);
             BitBuffer_Erase(BitB, 0);
         }
         /*
@@ -186,9 +161,7 @@ extern "C" {
             BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract);
-            if (ReadInteger != RandomInteger) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %zu does not match WrittenInteger: %zu"), ReadInteger, RandomInteger);
-            }
+            AssertIO(ReadInteger == RandomInteger);
             BitBuffer_Erase(BitB, 0);
         }
 
@@ -207,9 +180,7 @@ extern "C" {
             BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract);
-            if (ReadInteger != RandomInteger) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %zu does not match WrittenInteger: %zu"), ReadInteger, RandomInteger);
-            }
+            AssertIO(ReadInteger == RandomInteger);
             BitBuffer_Erase(BitB, 0);
         }
 
@@ -226,7 +197,7 @@ extern "C" {
         bool NearFarPassed           = Test_ReadWriteBitsNearFar(Insecure);
         bool FarNearPassed           = Test_ReadWriteBitsFarNear(Insecure);
         uint8_t AllTestsPassed       = (NearNearPassed + FarFarPassed + NearFarPassed + FarNearPassed) == 4;
-        return AllTestsPassed == true ? EXIT_SUCCESS : EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

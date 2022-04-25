@@ -13,7 +13,7 @@ extern "C" {
         if (NumSpecifiers > 0) {
             va_list Arguments;
             va_start(Arguments, ExpressionString);
-            ExpressionVA = UTF8_Format(ExpressionVA, Arguments);
+            ExpressionVA = UTF8_Format(ExpressionString, Arguments);
             va_end(Arguments);
         }
         UTF8 *Formatted = UTF8_Format(UTF8String("Assertion '%s' in %s::%s Failed%s"), ExpressionVA, FileName, FunctionName, TextIO_NewLine8);

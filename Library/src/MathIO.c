@@ -1,5 +1,6 @@
 #include "../include/MathIO.h"       /* Included for our declarations */
-#include "../include/AssertIO.h"     /* Included for AssertIO */
+
+#include "../include/AssertIO.h"     /* Included for Assertions */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
