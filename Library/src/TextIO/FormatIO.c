@@ -549,11 +549,11 @@ extern "C" {
                 case U'c':
                     Specifiers->Specifiers[Specifier].BaseType                    = BaseType_CodeUnit;
                     if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].FormatStart) {
-                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U32"))) {
+                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u32"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
                             break;
-                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U16"))) {
+                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u16"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
                             break;
@@ -583,11 +583,11 @@ extern "C" {
                 case U'C':
                     Specifiers->Specifiers[Specifier].BaseType                    = BaseType_String;
                     if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].FormatStart) {
-                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U32"))) {
+                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u32"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
                             break;
-                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U16"))) {
+                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u16"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
                             break;
@@ -617,11 +617,11 @@ extern "C" {
                 case U's':
                     Specifiers->Specifiers[Specifier].BaseType                    = BaseType_String;
                     if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].FormatStart) {
-                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U32"))) {
+                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u32"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
                             break;
-                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U16"))) {
+                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u16"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
                             break;
@@ -651,11 +651,11 @@ extern "C" {
                 case U'S':
                     Specifiers->Specifiers[Specifier].BaseType                    = BaseType_String;
                     if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].FormatStart) {
-                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U32"))) {
+                        if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u32"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF32;
                             break;
-                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("U16"))) {
+                        } else if (UTF32_Compare(&Format[CodePoint - 3], UTF32String("u16"))) {
                             Specifiers->Specifiers[Specifier].FormatModifierStart = CodePoint - 3;
                             Specifiers->Specifiers[Specifier].ModifierType       |= ModifierType_UTF16;
                             break;
@@ -1449,7 +1449,7 @@ extern "C" {
 
              ----
 
-             %U32s is for type specific formatters
+             %u32s is for type specific formatters
              */
             FormatIO_BaseTypes     BaseType = Specifiers->Specifiers[Specifier].BaseType;
             FormatIO_ModifierTypes Modifier = Specifiers->Specifiers[Specifier].ModifierType;

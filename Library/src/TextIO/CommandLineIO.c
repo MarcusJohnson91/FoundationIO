@@ -245,7 +245,7 @@ extern "C" {
             size_t   TerminalWidth       = CommandLineIO_GetTerminalWidth() / 2;
             UTF8    *Indicator           = UTF8_Init(TerminalWidth);
             UTF8_Set(Indicator, '-', TerminalWidth);
-            UTF8    *FormattedString     = UTF8_Format(UTF8String("%s[%U32s %llu/%llu %llu]%s%s"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, TextIO_NewLine8);
+            UTF8    *FormattedString     = UTF8_Format(UTF8String("%s[%u32s %llu/%llu %llu]%s%s"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, TextIO_NewLine8);
             UTF8_File_WriteString(stdout, FormattedString);
             free(Indicator);
         }
@@ -277,11 +277,11 @@ extern "C" {
 
         for (size_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
             CommandLineIO_SwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
-            GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%U32s: %U32s%U32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, TextIO_NewLine32);
+            GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%u32s: %u32s%u32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, TextIO_NewLine32);
 
             if (CurrentSwitchType == SwitchType_Parent && CLI->Switches[Switch].NumChildren > 0) {
                 for (size_t Child = 0ULL; Child < CLI->Switches[Switch].NumChildren; Child++) {
-                    GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%U32s: %U32s%U32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, TextIO_NewLine32);
+                    GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%u32s: %u32s%u32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, TextIO_NewLine32);
                 }
             }
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -306,12 +306,12 @@ extern "C" {
         AssertIO(CLI->LicenseType != LicenseType_Unspecified);
         UTF32 *License = NULL;
         if (CLI->LicenseType == LicenseType_Permissive || CLI->LicenseType == LicenseType_Copyleft) {
-            License = UTF32_Format(UTF32String("Released under the \"%U32s\" license, you can see the details of this license at: %U32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : TextIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
+            License = UTF32_Format(UTF32String("Released under the \"%u32s\" license, you can see the details of this license at: %u32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : TextIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
         } else if (CLI->LicenseType == LicenseType_Proprietary) {
-            License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%U32s%U32s%U32s"), TextIO_NewLine32, TextIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
+            License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%u32s%u32s%u32s"), TextIO_NewLine32, TextIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : TextIO_InvisibleString32);
         }
 
-        UTF32 *Banner32 = UTF32_Format(UTF32String("%U32s, v. %U32s by %U32s © %U32s, %U32s, %U32s"),
+        UTF32 *Banner32 = UTF32_Format(UTF32String("%u32s, v. %u32s by %u32s © %u32s, %u32s, %u32s"),
                                        CLI->ProgramName        != NULL ? CLI->ProgramName        : TextIO_InvisibleString32,
                                        CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : TextIO_InvisibleString32,
                                        CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : TextIO_InvisibleString32,
@@ -339,14 +339,10 @@ extern "C" {
         uint8_t  ArgumentStringPrefixSize = 0;
         size_t   ArgumentStringSize       = UTF32_GetStringSizeInCodePoints(ArgumentString);
         AssertIO(ArgumentStringSize >= 2);
-        if (ArgumentStringSize >= 2) {
-            if (ArgumentString[0] == UTF32Character('-') && ArgumentString[1] == UTF32Character('-')) {
-                ArgumentStringPrefixSize  = 2;
-            } else if (ArgumentString[0] == UTF32Character('/') || ArgumentString[0] == UTF32Character('\\') || ArgumentString[0] == UTF32Character('-')) {
-                ArgumentStringPrefixSize  = 1;
-            }
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ArgumentString is not an Argument string"));
+        if (ArgumentString[0] == UTF32Character('-') && ArgumentString[1] == UTF32Character('-')) {
+            ArgumentStringPrefixSize  = 2;
+        } else if (ArgumentString[0] == UTF32Character('/') || ArgumentString[0] == UTF32Character('\\') || ArgumentString[0] == UTF32Character('-')) {
+            ArgumentStringPrefixSize  = 1;
         }
         size_t ArgumentSwitchSize      = ArgumentStringSize - ArgumentStringPrefixSize;
         ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFold(ArgumentString), ArgumentStringPrefixSize, ArgumentSwitchSize);
@@ -677,11 +673,11 @@ extern "C" {
         UTF32 *IntegerB  = UTF32_Integer2String(Base_Integer | Base_Radix10, Blue);
         DigitSize       += 8;
         if ((ColorType & ColorType_Foreground) == ColorType_Foreground) {
-            UTF32 *Formatted = UTF32_Format(UTF32String("%U32c[38;2;%U32s;%U32s;%U32s;m"), U'\x1B', IntegerR, IntegerG, IntegerB);
+            UTF32 *Formatted = UTF32_Format(UTF32String("%u32c[38;2;%u32s;%u32s;%u32s;m"), U'\x1B', IntegerR, IntegerG, IntegerB);
             Colorized        = UTF32_Insert(String, Formatted, 0);
             UTF32_Deinit(Formatted);
         } else if ((ColorType & ColorType_Background) == ColorType_Background) {
-            UTF32 *Formatted = UTF32_Format(UTF32String("%U32c[48;2;%U32s;%U32s;%U32s:m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
+            UTF32 *Formatted = UTF32_Format(UTF32String("%u32c[48;2;%u32s;%u32s;%u32s:m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
             Colorized        = UTF32_Insert(String, Formatted, 0);
             UTF32_Deinit(Formatted);
         }
