@@ -232,6 +232,7 @@ extern "C" {
 #pragma gcc diagnostic push
 #pragma gcc diagnostic ignored "-Wnarrowing"
 #pragma gcc diagnostic ignored "-Wshorten-64-to-32"
+#pragma gcc diagnostic ignored "-Wconversion"
 #endif /* PlatformIO_Compiler */
 
     /*!
@@ -312,6 +313,22 @@ extern "C" {
      @return                                       Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes.
      */
     uint8_t       *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType);
+
+    /*
+     Ok, so fuck CRCs let's get this dumb shit fuckin done.
+
+     width=16 poly=0x1021 init=0xffff refin=false refout=false xorout=0xffff check=0xd64e residue=0x1d0f name="CRC-16/GENIBUS"
+     */
+
+    typedef struct CRCOptions {
+        uint64_t Preset; // value to initailize the CRC state machine with.
+        uint64_t Polynomial;
+        uint64_t XOROutput;
+        uint64_t Residue; // The value of the CRC if it worked correctly
+        uint8_t  SizeInBits;
+        bool     ReflectInput;
+        bool     ReflectOutput;
+    } CRCOptions;
 
     /*!
      @abstract                                     Calculates CRC32 from BitBuffer starting at Offset ending at Offset + NumBytes
