@@ -7,6 +7,7 @@
 
 #if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
 #include <time.h>                       /* Included for timespec_get */
+#include <signal.h>                     /* Included for sigaction */
 #endif
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
@@ -252,6 +253,56 @@ extern "C" {
             String[CodePoint] = UTF32_GenerateCodePoint(Insecure);
         }
         return String;
+    }
+
+    /*
+     Fuzzing:
+     */
+
+    typedef struct Fuzzer_Guard {
+        size_t OffsetInBits;
+        size_t SizeInBits;
+    } Fuzzer_Guard;
+
+    typedef struct TestIO_Fuzzer {
+        size_t       Iteration; // So we modify more and more as time goes on
+        size_t       NumGuards;
+        Fuzzer_Guard Guards[];
+    } TestIO_Fuzzer;
+
+    static bool TestIO_Fuzzer_Dump(TestIO_Fuzzer *Fuzz, void *Array2Fuzz, const size_t NumElements, const size_t ElementSize) {
+        AssertIO(Fuzz != NULL);
+    }
+
+    TestIO_Fuzzer *TestIO_Fuzzer_Init(const int argc, const char *argv) {
+        TestIO_Fuzzer *Fuzz = calloc(1, sizeof(TestIO_Fuzzer));
+        AssertIO(Fuzz != NULL);
+        /*
+         We should probably define or at least call the signal handler here...
+         */
+        /*sigaction(int, const struct sigaction *restrict, struct sigaction *restrict)*/
+        return Fuzz;
+    }
+
+    void TestIO_Fuzzer_Fuzz(TestIO_Fuzzer *Fuzz, void *Array2Fuzz, const size_t NumElements, const size_t ElementSize) {
+        AssertIO(Fuzz != NULL);
+        AssertIO(Array2Fuzz != NULL);
+        AssertIO(NumElements >= 1);
+        AssertIO(ElementSize >= 1);
+
+        /*
+         We need to load up the guarded addresses.
+
+         Honestly I fel like just creating an iterator would be best to igure out the modifiable addresses
+         */
+
+        /*
+         Simple algoithm: Modify Array2Fuzz, except the guarded sections.
+
+         (how do we decide how many bits should be fuzzed? maybe the longer fuzzing goes the more we should change?)
+
+         Also, we might need to provide a callback interface so that checksums and whatnot can be recomputed, hell maybe this is a better approach, nah there's still chunk markers and stuff that shouldn't be modified by the mutater.
+         */
     }
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
