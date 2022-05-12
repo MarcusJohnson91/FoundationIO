@@ -439,6 +439,9 @@
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
 #define _GNU_SOURCE /* Needed for syscalls like getrandom */
+#define __USE_TIME_BITS64
+#define __USE_LARGEFILE64
+
 #endif /* Linux */
 
 #include <stdarg.h>     /* Included for va_list, va_copy */
