@@ -57,7 +57,7 @@ extern "C" {
         return GUUID;
     }
     
-    bool GUUID_Compare(GUUIDTypes Type2Compare, const uint8_t *const GUUID1, const uint8_t *const GUUID2) {
+    bool GUUID_Compare(GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
         AssertIO(Type2Compare != GUUIDType_Unspecified);
         AssertIO(GUUID1 != NULL);
         AssertIO(GUUID2 != NULL);

@@ -16,7 +16,7 @@
 #define FoundationIO_TestIO_H
 
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
-#include "RegistrationIO.h"
+#include "RegistrationIO.h"     /* Included for creating binary sections */
 
 #include <setjmp.h>
 
