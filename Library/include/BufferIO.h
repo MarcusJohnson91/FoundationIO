@@ -49,25 +49,29 @@ extern "C" {
     /*!
      @enum        BufferIO_ByteOrders
      @constant    ByteOrder_Unspecified            Invalid/Native for Strings.
-     @constant    ByteOrder_LSByteIsNearest        The least significant byte is the closest to the current offset; previously LSByte.
-     @constant    ByteOrder_LSByteIsFarthest       The least significant byte is the farthest from the current offset; previously MSByte.
+     @rename      ByteOrder_LSByteIsNearest        is now ByteOrder_MSByteIsRight aka LSByte aka LSByteFirst aka little endian.
+     @rename      ByteOrder_LSByteIsFarthest       is now ByteOrder_MSByteIsLeft  aka MSByte aka MSByteFirst aka big endian.
+     @constant    ByteOrder_MSByteIsRight          The least significant byte is the closest to the current offset.
+     @constant    ByteOrder_MSByteIsLeft           The least significant byte is the farthest from the current offset.
      */
     typedef enum BufferIO_ByteOrders {
                   ByteOrder_Unspecified            = 0,
-                  ByteOrder_LSByteIsNearest        = 1,
-                  ByteOrder_LSByteIsFarthest       = 2,
+                  ByteOrder_MSByteIsRight          = 1,
+                  ByteOrder_MSByteIsLeft           = 2,
     } BufferIO_ByteOrders;
 
     /*!
      @enum         BufferIO_BitOrders
      @constant     BitOrder_Unspecified            Invalid bit order.
+     @rename       BitOrder_LSBitIsNearest         is now BitOrder_MSBitIsRight aka LSByte aka LSByteFirst aka little endian.
+     @rename       BitOrder_LSBitIsFarthest        is now BitOrder_MSBitIsLeft  aka MSByte aka MSByteFirst aka big endian.
      @constant     BitOrder_LSBitIsNearest         The least significant byte is the closest to the current offset; previously LSBit.
-     @constant     BitOrder_LSBitIsFarthest        The least significant byte is the farthest from the current offset; previously MSBit.
+     @constant     BitOrder_MSBitIsLeft           The least significant byte is the farthest from the current offset; previously MSBit.
      */
     typedef enum BufferIO_BitOrders {
                    BitOrder_Unspecified            = 0,
-                   BitOrder_LSBitIsNearest         = 1,
-                   BitOrder_LSBitIsFarthest        = 2,
+                   BitOrder_MSBitIsRight           = 1,
+                   BitOrder_MSBitIsLeft            = 2,
     } BufferIO_BitOrders;
 
     /*!

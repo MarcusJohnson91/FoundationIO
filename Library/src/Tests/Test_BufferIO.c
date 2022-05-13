@@ -48,49 +48,49 @@ extern "C" {
         bool TestPassed   = No;
         BitBuffer *BitB   = BitBuffer_Init(8);
 
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize1, Field1);
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2, Field2); // BitB->Buffer[0] should = 0xB9
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3, Field3);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize1, Field1);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize2, Field2); // BitB->Buffer[0] should = 0xB9
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize3, Field3);
 
-        uint8_t NearNear1 = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize1);
-        uint8_t NearNear2 = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
-        uint8_t NearNear3 = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
+        uint8_t NearNear1 = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize1);
+        uint8_t NearNear2 = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize2);
+        uint8_t NearNear3 = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize3);
 
         AssertIO(NearNear1 == Field1);
         AssertIO(NearNear2 == Field2);
         AssertIO(NearNear3 == Field3);
 
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsFarthest, FieldSize1, Field1);
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsFarthest, FieldSize2, Field2);
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsFarthest, FieldSize3, Field3);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsLeft, FieldSize1, Field1);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsLeft, FieldSize2, Field2);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsLeft, FieldSize3, Field3);
 
-        uint8_t NearFar1  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize1);
-        uint8_t NearFar2  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
-        uint8_t NearFar3  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
+        uint8_t NearFar1  = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize1);
+        uint8_t NearFar2  = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize2);
+        uint8_t NearFar3  = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize3);
 
         AssertIO(NearFar1 == Field1);
         AssertIO(NearFar2 == Field2);
         AssertIO(NearFar3 == Field3);
 
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, FieldSize1, Field1);
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, FieldSize2, Field2);
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, FieldSize3, Field3);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsRight, FieldSize1, Field1);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsRight, FieldSize2, Field2);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsRight, FieldSize3, Field3);
 
-        uint8_t FarNear1  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize1);
-        uint8_t FarNear2  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
-        uint8_t FarNear3  = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
+        uint8_t FarNear1  = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize1);
+        uint8_t FarNear2  = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize2);
+        uint8_t FarNear3  = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize3);
 
         AssertIO(FarNear1 == Field1);
         AssertIO(FarNear2 == Field2);
         AssertIO(FarNear3 == Field3);
 
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, FieldSize1, Field1);
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, FieldSize2, Field2);
-        BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, FieldSize3, Field3);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsLeft, FieldSize1, Field1);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsLeft, FieldSize2, Field2);
+        BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsLeft, FieldSize3, Field3);
 
-        uint8_t FarFar1   = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize1);
-        uint8_t FarFar2   = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
-        uint8_t FarFar3   = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
+        uint8_t FarFar1   = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize1);
+        uint8_t FarFar2   = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize2);
+        uint8_t FarFar3   = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, FieldSize3);
 
         AssertIO(FarFar1 == Field1);
         AssertIO(FarFar2 == Field2);
@@ -108,9 +108,9 @@ extern "C" {
             uint8_t    NumBits2Extract = InsecurePRNG_CreateInteger(Insecure, 6);
             int64_t    RandomInteger   = InsecurePRNG_CreateInteger(Insecure, NumBits2Extract);
             
-            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
+            BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
-            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract);
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, NumBits2Extract);
             if (ReadInteger != RandomInteger) {
                 TestPassed = No;
             }
@@ -136,9 +136,9 @@ extern "C" {
 #define NumBits2Write 64
 #define RandomInteger 0x0807060504030201
              */
-            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Write, RandomInteger);
+            BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsLeft, NumBits2Write, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Write));
-            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Write);
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsLeft, NumBits2Write);
             AssertIO(ReadInteger == RandomInteger);
             BitBuffer_Erase(BitB, 0);
         }
@@ -158,9 +158,9 @@ extern "C" {
             uint8_t    NumBits2Extract = InsecurePRNG_CreateInteger(Insecure, 3); // 6
             int64_t    RandomInteger   = InsecurePRNG_CreateInteger(Insecure, NumBits2Extract);
 
-            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
+            BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
-            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract);
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsRight, BitOrder_MSBitIsRight, NumBits2Extract);
             AssertIO(ReadInteger == RandomInteger);
             BitBuffer_Erase(BitB, 0);
         }
@@ -177,9 +177,9 @@ extern "C" {
             uint8_t    NumBits2Extract = InsecurePRNG_CreateInteger(Insecure, 3);
             int64_t    RandomInteger   = InsecurePRNG_CreateInteger(Insecure, NumBits2Extract); // 2^3 = 8, 8 possible values
 
-            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
+            BitBuffer_WriteBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsRight, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
-            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract);
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsRight, NumBits2Extract);
             AssertIO(ReadInteger == RandomInteger);
             BitBuffer_Erase(BitB, 0);
         }

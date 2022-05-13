@@ -454,7 +454,7 @@ extern "C" {
         UTF32 *BitBufferString = NULL;
 
         BitBuffer_Seek(BitB, BitB->BitOffset - Length);
-        size_t Data      = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, Length);
+        size_t Data      = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsLeft, Length);
         BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %X, NumBits: %zu, BitOffset: %zu, Buffer: %zu"), &BitB, BitB->NumBits, BitB->BitOffset, Data);
         return BitBufferString;
     }
@@ -472,16 +472,16 @@ extern "C" {
         AssertIO(NumBits <= 64);
 
         uint64_t Extracted = 0;
-        if (ByteOrder == ByteOrder_LSByteIsNearest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        if (ByteOrder == ByteOrder_MSByteIsRight) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 Extracted           = BitBuffer_Extract_NearByte_NearBit(BitB, NumBits);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 Extracted           = BitBuffer_Extract_NearByte_FarBit(BitB, NumBits);
             }
-        } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        } else if (ByteOrder == ByteOrder_MSByteIsLeft) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 Extracted           = BitBuffer_Extract_FarByte_NearBit(BitB, NumBits);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 Extracted           = BitBuffer_Extract_FarByte_FarBit(BitB, NumBits);
             }
         }
@@ -496,16 +496,16 @@ extern "C" {
         AssertIO(NumBits <= 64);
 
         uint64_t Extracted = 0ULL;
-        if (ByteOrder == ByteOrder_LSByteIsNearest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        if (ByteOrder == ByteOrder_MSByteIsRight) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 Extracted = BitBuffer_Extract_NearByte_NearBit(BitB, NumBits);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 Extracted = BitBuffer_Extract_NearByte_FarBit(BitB, NumBits);
             }
-        } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        } else if (ByteOrder == ByteOrder_MSByteIsLeft) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 Extracted = BitBuffer_Extract_FarByte_NearBit(BitB, NumBits);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 Extracted = BitBuffer_Extract_FarByte_FarBit(BitB, NumBits);
             }
         }
@@ -537,16 +537,16 @@ extern "C" {
         }
         uint8_t CurrentBit = StopBit ^ 1;
         while (CurrentBit != StopBit) {
-            if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitOrder_LSBitIsNearest) {
+            if (ByteOrder == ByteOrder_MSByteIsRight) {
+                if (BitOrder == BitOrder_MSBitIsRight) {
                     Extracted = BitBuffer_Extract_NearByte_NearBit(BitB, 1);
-                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+                } else if (BitOrder == BitOrder_MSBitIsLeft) {
                     Extracted = BitBuffer_Extract_NearByte_FarBit(BitB, 1);
                 }
-            } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitOrder_LSBitIsNearest) {
+            } else if (ByteOrder == ByteOrder_MSByteIsLeft) {
+                if (BitOrder == BitOrder_MSBitIsRight) {
                     Extracted = BitBuffer_Extract_FarByte_NearBit(BitB, 1);
-                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+                } else if (BitOrder == BitOrder_MSBitIsLeft) {
                     Extracted = BitBuffer_Extract_FarByte_FarBit(BitB, 1);
                 }
             }
@@ -665,7 +665,7 @@ extern "C" {
         uint32_t Output = -1;
 
         for (size_t Byte = OffsetInBits; Byte < NumBytes - 1; Byte++) {
-            uint8_t  Data       = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, 8);
+            uint8_t  Data       = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsRight, 8);
             Output             ^= Data;
             for (uint8_t Bit = 0; Bit < 8; Bit++) {
                 if (Output & 1) {
@@ -687,7 +687,7 @@ extern "C" {
         uint16_t B = 0;
 
         for (size_t Byte = OffsetInBits; Byte < NumBytes - 1; Byte++) {
-            uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, 8);
+            uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_MSByteIsLeft, BitOrder_MSBitIsRight, 8);
             A = (A + Value) % 65521;
             B = (B + A)     % 65521;
         }
@@ -702,16 +702,16 @@ extern "C" {
         AssertIO(BitOrder != BitOrder_Unspecified);
         AssertIO(NumBits2Write > 0);
 
-        if (ByteOrder == ByteOrder_LSByteIsNearest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        if (ByteOrder == ByteOrder_MSByteIsRight) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 BitBuffer_Append_NearByte_NearBit(BitB, NumBits2Write, Bits2Write);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 BitBuffer_Append_NearByte_FarBit(BitB, NumBits2Write, Bits2Write);
             }
-        } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        } else if (ByteOrder == ByteOrder_MSByteIsLeft) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 BitBuffer_Append_FarByte_NearBit(BitB, NumBits2Write, Bits2Write);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 BitBuffer_Append_FarByte_FarBit(BitB, NumBits2Write, Bits2Write);
             }
         }
@@ -730,19 +730,19 @@ extern "C" {
             Field2Write -= 1;
         }
 
-        if (ByteOrder == ByteOrder_LSByteIsNearest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        if (ByteOrder == ByteOrder_MSByteIsRight) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 BitBuffer_Append_FarByte_FarBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                 BitBuffer_Append_FarByte_FarBit(BitB, 1, EndBit);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 BitBuffer_Append_FarByte_NearBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                 BitBuffer_Append_FarByte_NearBit(BitB, 1, EndBit);
             }
-        } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-            if (BitOrder == BitOrder_LSBitIsNearest) {
+        } else if (ByteOrder == ByteOrder_MSByteIsLeft) {
+            if (BitOrder == BitOrder_MSBitIsRight) {
                 BitBuffer_Append_NearByte_FarBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                 BitBuffer_Append_NearByte_FarBit(BitB, 1, EndBit);
-            } else if (BitOrder == BitOrder_LSBitIsFarthest) {
+            } else if (BitOrder == BitOrder_MSBitIsLeft) {
                 BitBuffer_Append_NearByte_NearBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                 BitBuffer_Append_NearByte_NearBit(BitB, 1, EndBit);
             }
