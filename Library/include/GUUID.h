@@ -49,13 +49,13 @@ extern "C" {
      @typedef      BinaryGUUID
      @abstract                                     A binary GUUID is just the raw data without dashes.
      */
-    typedef        uint8_t                         BinaryGUUID[BinaryGUUID_Size];
+    typedef        const uint8_t                   BinaryGUUID[BinaryGUUID_Size];
 
     /*!
      @typedef      GUUIDString
      @abstract                                     A GUUID string is the GUUID with dashes and a NULL terminator
      */
-    typedef        uint8_t                         GUUIDString[GUUIDString_Size + TextIO_NULLTerminatorSize];
+    typedef        const uint8_t                   GUUIDString[GUUIDString_Size + TextIO_NULLTerminatorSize];
 
     /*!
      @abstract                                     Generates a random GUUID.
@@ -71,6 +71,22 @@ extern "C" {
      @return                                       Returns Yes if GUUID1 and GUUID2 match, No otherwise.
      */
     bool           GUUID_Compare(GUUIDTypes GUUIDType, uint8_t *GUUID1, uint8_t *GUUID2);
+
+    /*!
+     @abstract                                     Compares GUUIDs for equivalence.
+     @param        GUUID1                          Pointer to a GUUID to be compared.
+     @param        GUUID2                          Pointer to a GUUID to be compared.
+     @return                                       Returns true if GUUID1 and GUUID2 match, false otherwise.
+     */
+    bool           BinaryGUUID_Compare(BinaryGUUID GUUID1, BinaryGUUID GUUID2);
+
+    /*!
+     @abstract                                     Compares GUUIDs for equivalence.
+     @param        GUUID1                          Pointer to a GUUID to be compared.
+     @param        GUUID2                          Pointer to a GUUID to be compared.
+     @return                                       Returns true if GUUID1 and GUUID2 match, false otherwise.
+     */
+    bool           GUUIDString_Compare(GUUIDString GUUID1, GUUIDString GUUID2);
 
     /*!
      @abstract                                     Converts a GUUID from one representation to another (String/Binary) || (UUID/GUID).

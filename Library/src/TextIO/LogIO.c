@@ -23,7 +23,7 @@ extern "C" {
         Log_LogFile = File;
     }
     
-    void Log_OpenLogFilePath(ImmutableString_UTF8 Path) {
+    static void Log_OpenLogFilePath(ImmutableString_UTF8 Path) {
         AssertIO(Path != NULL);
 
         UTF8 *FoldedPath = UTF8_CaseFold(Path);
@@ -60,19 +60,19 @@ extern "C" {
         UTF8 *SecurityName8 = NULL;
         ImmutableString_UTF8 WarnString = Severities[Severity - 1];
         if (Log_ProgramName8 != NULL) {
-            size_t   Size      = snprintf(NULL, 0, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
-            SecurityName8      = UTF8_Init(Size);
+            int Size           = snprintf(NULL, 0, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
+            SecurityName8      = UTF8_Init((size_t) Size);
             snprintf((char*) SecurityName8, Size, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
         } else {
-            size_t   Size      = snprintf(NULL, 0, "%s in %s: ", WarnString, FunctionName);
-            SecurityName8      = UTF8_Init(Size);
+            int Size           = snprintf(NULL, 0, "%s in %s: ", WarnString, FunctionName);
+            SecurityName8      = UTF8_Init((size_t) Size);
             snprintf((char*) SecurityName8, Size, "%s in %s: ", WarnString, FunctionName);
         }
 
         va_list Arguments;
         va_start(Arguments, Description);
         int Size2           = vsnprintf(NULL, 0, (char*) Description, Arguments);
-        UTF8 *FormattedArgs = UTF8_Init(Size2);
+        UTF8 *FormattedArgs = UTF8_Init((size_t) Size2);
         AssertIO(FormattedArgs != NULL);
         vsnprintf((char*) FormattedArgs, Size2, (char*) Description, Arguments);
         va_end(Arguments);
@@ -80,7 +80,7 @@ extern "C" {
         // Now we need to combine the parts
         UTF8 *Combined   = NULL;
         int SizeCombined = snprintf(NULL, 0, "%s %s", SecurityName8, FormattedArgs);
-        Combined         = UTF8_Init(SizeCombined);
+        Combined         = UTF8_Init((size_t) SizeCombined);
         AssertIO(Combined != NULL);
         snprintf((char*) Combined, SizeCombined, "%s %s", SecurityName8, FormattedArgs);
         

@@ -174,7 +174,7 @@ extern "C" {
             .aio_sigevent                = {
                 .sigev_notify            = 0,
                 .sigev_signo             = 0,
-                .sigev_value             = 0,
+                .sigev_value             = {0},
                 .sigev_notify_function   = 0,
                 .sigev_notify_attributes = 0,
             },

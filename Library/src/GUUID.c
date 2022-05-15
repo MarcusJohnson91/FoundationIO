@@ -72,6 +72,30 @@ extern "C" {
         }
         return GUUIDsMatch;
     }
+
+    bool BinaryGUUID_Compare(BinaryGUUID GUUID1, BinaryGUUID GUUID2) {
+        AssertIO(GUUID1 != NULL);
+        AssertIO(GUUID2 != NULL);
+        AssertIO(GUUID1 != GUUID2);
+        for (uint8_t Byte = 0; Byte < BinaryGUUID_Size; Byte++) {
+            if (GUUID1[Byte] != GUUID2[Byte]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool GUUIDString_Compare(GUUIDString GUUID1, GUUIDString GUUID2) {
+        AssertIO(GUUID1 != NULL);
+        AssertIO(GUUID2 != NULL);
+        AssertIO(GUUID1 != GUUID2);
+        for (uint8_t Byte = 0; Byte < GUUIDString_Size; Byte++) {
+            if (GUUID1[Byte] != GUUID2[Byte]) {
+                return false;
+            }
+        }
+        return true;
+    }
     
     uint8_t *GUUID_Convert(GUUIDTypes InputType, GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
         AssertIO(InputType != GUUIDType_Unspecified);
