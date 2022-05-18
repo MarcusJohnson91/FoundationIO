@@ -499,6 +499,14 @@
 #endif /* Language */
 #endif /* PlatformIO_Unused */
 
+#ifndef             PlatformIO_GetArraySize
+#define             PlatformIO_GetArraySize(Array) (sizeof(Array)/sizeof(Array[0]))
+#endif /* PlatformIO_GetArraySize */
+
+#ifndef             PlatformIO_GetStringSize
+#define             PlatformIO_GetStringSize(String) (PlatformIO_GetArraySize(String) - sizeof(String[0]))
+#endif /* PlatformIO_GetArraySize */
+
 #ifndef             PlatformIO_Concat
 #define             PlatformIO_Concat1(A, B) A##B
 #define             PlatformIO_Concat(A, B)  PlatformIO_Concat1(A, B)
