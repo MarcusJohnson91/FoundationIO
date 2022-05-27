@@ -563,7 +563,7 @@ extern "C" {
     size_t BitBuffer_GetUTF8StringSize(BitBuffer *BitB) {
         AssertIO(BitB != NULL);
 
-        size_t StringSize               = 0ULL;
+        size_t StringSize           = 0ULL;
         size_t OriginalOffset       = BitBuffer_GetPosition(BitB);
         size_t Extracted            = 1;
         while (Extracted != TextIO_NULLTerminator) {
