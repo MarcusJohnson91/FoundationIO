@@ -118,7 +118,7 @@ extern "C" {
         }
 
         while (NumBits > 0) {
-            uint8_t  Start                  = 256 - Insecure->NumBitsRemaining;
+            uint8_t  Start                  = Insecure->NumBitsRemaining - 256;
             uint8_t  End                    = (Start + NumBits) % 64;
             uint8_t  NumBitsAvailableInWord = 64 - ((End - Start) % 64);
             uint8_t  Shift                  = (64 - (Start + NumBitsAvailableInWord));
@@ -132,14 +132,14 @@ extern "C" {
         return Value;
     }
 
-    int64_t InsecurePRNG_CreateInteger(InsecurePRNG *Insecure, uint8_t IntegerSizeInBits) {
+    uint64_t InsecurePRNG_CreateInteger(InsecurePRNG *Insecure, uint8_t IntegerSizeInBits) {
         AssertIO(Insecure != NULL);
         AssertIO(IntegerSizeInBits <= 64);
 
         return InsecurePRNG_ExtractBits(Insecure, IntegerSizeInBits); // SignExtend the Value before returning it
     }
 
-    int64_t InsecurePRNG_CreateIntegerInRange(InsecurePRNG *Insecure, int64_t Min, int64_t Max) {
+    uint64_t InsecurePRNG_CreateIntegerInRange(InsecurePRNG *Insecure, int64_t Min, int64_t Max) {
         AssertIO(Insecure != NULL);
 
         int64_t Value = 0;

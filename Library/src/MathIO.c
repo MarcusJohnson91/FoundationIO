@@ -24,15 +24,15 @@ extern "C" {
     }
     
     bool IsNegative16(const int16_t Integer) {
-        return (Integer & 0x8000) >> 15;
+        return Integer >> 15;
     }
     
     bool IsNegative32(const int32_t Integer) {
-        return (Integer & 0x80000000) >> 31;
+        return Integer >> 31;
     }
     
     bool IsNegative64(const int64_t Integer) {
-        return (Integer & 0x8000000000000000) >> 63;
+        return Integer >> 63;
     }
     
     bool IsOdd(const int64_t Integer) {
@@ -485,7 +485,7 @@ __attribute__((no_sanitize("undefined")))
  */
     uint64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value) {
         uint64_t Rotated = 0ULL;
-        AssertIO(RotationType != RotationType_Unspecified && "RotationType_Unspecified is invalid");
+        AssertIO(RotationType != RotationType_Unspecified);
         if (RotationType == RotationType_Left) {
             Rotated     = (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
         } else if (RotationType == RotationType_Right) {

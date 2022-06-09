@@ -552,7 +552,7 @@ typedef                   const UTF32                         *MutableStringSet_
      @param               StartInCodeUnits                  Where should the string start?
      @param               EndInCodeUnits                    Where should the string end?
      */
-    TextIO_Slice          TextIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits);
+    TextIO_Slice          TextIO_Slice_Set(size_t StartInCodeUnits, size_t EndInCodeUnits);
 
     /*!
      @abstract                                              Where does this slice start?

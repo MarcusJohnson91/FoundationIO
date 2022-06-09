@@ -273,23 +273,23 @@ extern "C" {
     /* File Operations */
     static UTF8 *UTF8_CreateModeString(AsyncIO_FileModes Mode) {
         UTF8 *ModeString = NULL;
-        if ((Mode & FileMode_Read) == FileMode_Read) {
-            if ((Mode & FileMode_Binary) == FileMode_Binary) {
+        if PlatformIO_Is(Mode, FileMode_Read) {
+            if PlatformIO_Is(Mode, FileMode_Binary) {
                 ModeString = UTF8String("rb");
-            } else if ((Mode & FileMode_Text) == FileMode_Text) {
+            } else if PlatformIO_Is(Mode, FileMode_Text) {
                 ModeString = UTF8String("r");
             }
-        } else if ((Mode & FileMode_Write) == FileMode_Write) {
-            if ((Mode & FileMode_Append) == FileMode_Append) {
-                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+        } else if PlatformIO_Is(Mode, FileMode_Write) {
+            if PlatformIO_Is(Mode, FileMode_Append) {
+                if PlatformIO_Is(Mode, FileMode_Binary) {
                     ModeString = UTF8String("ab");
-                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                } else if PlatformIO_Is(Mode, FileMode_Text) {
                     ModeString = UTF8String("a");
                 }
             } else {
-                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                if PlatformIO_Is(Mode, FileMode_Binary) {
                     ModeString = UTF8String("wb");
-                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                } else if PlatformIO_Is(Mode, FileMode_Text) {
                     ModeString = UTF8String("w");
                 }
             }
@@ -299,23 +299,23 @@ extern "C" {
     
     static UTF16 *UTF16_CreateModeString(AsyncIO_FileModes Mode) {
         UTF16 *ModeString = NULL;
-        if ((Mode & FileMode_Read) == FileMode_Read) {
-            if ((Mode & FileMode_Binary) == FileMode_Binary) {
+        if PlatformIO_Is(Mode, FileMode_Read) {
+            if PlatformIO_Is(Mode, FileMode_Binary) {
                 ModeString = UTF16String("rb");
-            } else if ((Mode & FileMode_Text) == FileMode_Text) {
+            } else if PlatformIO_Is(Mode, FileMode_Text) {
                 ModeString = UTF16String("r");
             }
-        } else if ((Mode & FileMode_Write) == FileMode_Write) {
-            if ((Mode & FileMode_Append) == FileMode_Append) {
-                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+        } else if PlatformIO_Is(Mode, FileMode_Write) {
+            if PlatformIO_Is(Mode, FileMode_Append) {
+                if PlatformIO_Is(Mode, FileMode_Binary) {
                     ModeString = UTF16String("ab");
-                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                } else if PlatformIO_Is(Mode, FileMode_Text) {
                     ModeString = UTF16String("a");
                 }
             } else {
-                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                if PlatformIO_Is(Mode, FileMode_Binary) {
                     ModeString = UTF16String("wb");
-                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                } else if PlatformIO_Is(Mode, FileMode_Text) {
                     ModeString = UTF16String("w");
                 }
             }
@@ -496,20 +496,20 @@ extern "C" {
         AssertIO(File2Seek != NULL);
 
         bool SuccessIsZero      = 1;
-        if ((SeekType & SeekType_Beginning) == SeekType_Beginning) {
+        if PlatformIO_Is(SeekType, SeekType_Beginning) {
             // TODO: Maybe we should make sure that SeekSize fits within the file
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             SuccessIsZero       = fseeko(PlatformIO_Cast(FILE*, File2Seek), PlatformIO_Cast(off_t, SeekSizeInBytes), SEEK_SET);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_SET);
 #endif
-        } else if ((SeekType & SeekType_Current) == SeekType_Current) {
+        } else if PlatformIO_Is(SeekType, SeekType_Current) {
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             SuccessIsZero       = fseeko(PlatformIO_Cast(FILE*, File2Seek), PlatformIO_Cast(off_t, SeekSizeInBytes), SEEK_CUR);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_CUR);
 #endif
-        } else if ((SeekType & SeekType_End) == SeekType_End) {
+        } else if PlatformIO_Is(SeekType, SeekType_End) {
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
             SuccessIsZero       = fseeko(PlatformIO_Cast(FILE*, File2Seek), PlatformIO_Cast(off_t, SeekSizeInBytes), SEEK_END);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)

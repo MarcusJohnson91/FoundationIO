@@ -326,7 +326,7 @@
 #endif /* CompilerVersion */
 
 #ifndef            PlatformIO_Is
-#define            PlatformIO_Is(Macro2Check, Value2Check) ((Macro2Check & Value2Check) == Value2Check)
+#define            PlatformIO_Is(Value2Check, Constant2Compare) ((Value2Check & Constant2Compare) == Constant2Compare)
 #endif /* PlatformIO_Is */
 
 #ifndef             PlatformIO_ExecutableFormat

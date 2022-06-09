@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-    TextIO_Slice TextIO_Slice_Init(size_t StartInCodeUnits, size_t EndInCodeUnits) {
+    TextIO_Slice TextIO_Slice_Set(size_t StartInCodeUnits, size_t EndInCodeUnits) {
         AssertIO(EndInCodeUnits > StartInCodeUnits);
         TextIO_Slice Slice;
         Slice.StartInCodeUnits = StartInCodeUnits;

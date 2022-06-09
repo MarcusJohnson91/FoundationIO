@@ -2676,7 +2676,7 @@ extern "C" {
     /* TextIOTables Operations */
     
     int64_t UTF8_String2Integer(TextIO_Bases Base, ImmutableString_UTF8 String) { // Replaces atoi, atol, strtol, strtoul,
-        AssertIO((Base & Base_Integer) == Base_Integer);
+        AssertIO(PlatformIO_Is(Base, Base_Integer));
         AssertIO(String != NULL);
         int64_t Value = 0LL;
         UTF32 *String32 = UTF8_Decode(String);
@@ -2686,7 +2686,7 @@ extern "C" {
     }
     
     int64_t UTF16_String2Integer(TextIO_Bases Base, ImmutableString_UTF16 String) {
-        AssertIO((Base & Base_Integer) == Base_Integer);
+        AssertIO(PlatformIO_Is(Base, Base_Integer));
         AssertIO(String != NULL);
         int64_t Value = 0LL;
         UTF32 *String32 = UTF16_Decode(String);
@@ -2697,24 +2697,24 @@ extern "C" {
     
     // Integer2String should accept any integer base from the lookup table and shift the value until it can't anymore
     int64_t UTF32_String2Integer(TextIO_Bases Base, ImmutableString_UTF32 String) {
-        AssertIO((Base & Base_Integer) == Base_Integer);
+        AssertIO(PlatformIO_Is(Base, Base_Integer));
         AssertIO(String != NULL);
         size_t   CodePoint = 0;
         int8_t   Sign      = 1;
         int64_t  Value     = 0LL;
-        if ((Base & Base_Radix2) == Base_Radix2) {
+        if PlatformIO_Is(Base, Base_Radix2) {
             while (String[CodePoint] != TextIO_NULLTerminator && (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('1'))) {
                 Value    <<= 1;
                 Value     += String[CodePoint] - 0x30;
                 CodePoint += 1;
             }
-        } else if ((Base & Base_Radix8) == Base_Radix8) {
+        } else if PlatformIO_Is(Base, Base_Radix8) {
             while (String[CodePoint] != TextIO_NULLTerminator && (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('7'))) {
                 Value     *= 8;
                 Value     += String[CodePoint] - 0x30;
                 CodePoint += 1;
             }
-        } else if ((Base & Base_Radix10) == Base_Radix10) {
+        } else if PlatformIO_Is(Base, Base_Radix10) {
             while (String[CodePoint] != TextIO_NULLTerminator && ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (CodePoint == 0 && String[CodePoint] == UTF32Character('-')))) {
                 if (CodePoint == 0 && String[CodePoint] == UTF32Character('-')) { // FIXME: Sign discovery needs work
                     Sign        = -1;
@@ -2724,8 +2724,8 @@ extern "C" {
                 }
                 CodePoint          += 1;
             }
-        } else if ((Base & Base_Radix16) == Base_Radix16) {
-            if ((Base & Base_Uppercase) == Base_Uppercase) {
+        } else if PlatformIO_Is(Base, Base_Radix16) {
+            if PlatformIO_Is(Base, Base_Uppercase) {
                 while (String[CodePoint] != TextIO_NULLTerminator && ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('A') && String[CodePoint] <= UTF32Character('F')))) {
                     if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
                         Value <<= 4;
@@ -2736,7 +2736,7 @@ extern "C" {
                     }
                     CodePoint  += 1;
                 }
-            } else if ((Base & Base_Lowercase) == Base_Lowercase) {
+            } else if PlatformIO_Is(Base, Base_Lowercase) {
                 while (String[CodePoint] != TextIO_NULLTerminator && ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f')))) {
                     if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
                         Value <<= 4;
@@ -2754,7 +2754,7 @@ extern "C" {
     }
     
     UTF8 *UTF8_Integer2String(TextIO_Bases Base, int64_t Integer2Convert) {
-        AssertIO((Base & Base_Integer) == Base_Integer);
+        AssertIO(PlatformIO_Is(Base, Base_Integer));
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
         UTF8  *IntegerString8  = UTF8_Encode((ImmutableString_UTF32) IntegerString32);
         UTF32_Deinit(IntegerString32);
@@ -2762,7 +2762,7 @@ extern "C" {
     }
     
     UTF16 *UTF16_Integer2String(TextIO_Bases Base, int64_t Integer2Convert) {
-        AssertIO((Base & Base_Integer) == Base_Integer);
+        AssertIO(PlatformIO_Is(Base, Base_Integer));
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
         UTF16 *IntegerString16 = UTF16_Encode((ImmutableString_UTF32) IntegerString32);
         UTF32_Deinit(IntegerString32);
@@ -2770,7 +2770,7 @@ extern "C" {
     }
     
     UTF32 *UTF32_Integer2String(TextIO_Bases Base, int64_t Integer2Convert) {
-        AssertIO((Base & Base_Integer) == Base_Integer);
+        AssertIO(PlatformIO_Is(Base, Base_Integer));
         UTF32   *String               = NULL;
         int64_t  Sign                 = 0LL;
         uint64_t Num                  = AbsoluteI(Integer2Convert);
@@ -2781,51 +2781,49 @@ extern "C" {
             Sign                      = -1;
             NumDigits                +=  1;
         }
-        
-        if ((Base & Base_Integer) == Base_Integer) {
-            if ((Base & Base_Radix2) == Base_Radix2) {
-                Radix                 = 2;
-            } else if ((Base & Base_Radix8) == Base_Radix8) {
-                Radix                 = 8;
-            } else if ((Base & Base_Radix10) == Base_Radix10) {
-                Radix                 = 10;
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                Radix                 = 16;
-            }
-            
-            NumDigits                    += NumDigitsInInteger(Radix, Integer2Convert);
-            
-            String                        = UTF32_Init(NumDigits);
-            AssertIO(String != NULL);
 
-            for (size_t CodePoint = NumDigits; CodePoint > 0; CodePoint--) {
-                uint8_t Digit                 = Num % Radix;
-                Num                          /= Radix;
-                if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix2) == Base_Radix2) {
-                    String[CodePoint - 1]     = IntegerTableBase2[Digit];
-                } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix8) == Base_Radix8) {
-                    String[CodePoint - 1]     = IntegerTableBase8[Digit];
-                } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix10) == Base_Radix10) {
-                    if (Sign == -1 && CodePoint == 1) {
-                        String[CodePoint - 1] = UTF32Character('-');
-                    } else {
-                        String[CodePoint - 1] = IntegerTableBase10[Digit];
-                    }
-                } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix16) == Base_Radix16) {
-                    if ((Base & Base_Uppercase) == Base_Uppercase) {
-                        String[CodePoint - 1] = IntegerTableBase16Uppercase[Digit];
-                    } else if ((Base & Base_Lowercase) == Base_Lowercase) {
-                        String[CodePoint - 1] = IntegerTableBase16Lowercase[Digit];
-                    }
-                    Radix                     = 16;
+        if PlatformIO_Is(Base, Base_Radix2) {
+            Radix                 = 2;
+        } else if PlatformIO_Is(Base, Base_Radix8) {
+            Radix                 = 8;
+        } else if PlatformIO_Is(Base, Base_Radix10) {
+            Radix                 = 10;
+        } else if PlatformIO_Is(Base, Base_Radix16) {
+            Radix                 = 16;
+        }
+
+        NumDigits                    += NumDigitsInInteger(Radix, Integer2Convert);
+
+        String                        = UTF32_Init(NumDigits);
+        AssertIO(String != NULL);
+
+        for (size_t CodePoint = NumDigits; CodePoint > 0; CodePoint--) {
+            uint8_t Digit                 = Num % Radix;
+            Num                          /= Radix;
+            if PlatformIO_Is(Base, Base_Radix2) {
+                String[CodePoint - 1]     = IntegerTableBase2[Digit];
+            } else if PlatformIO_Is(Base, Base_Radix8) {
+                String[CodePoint - 1]     = IntegerTableBase8[Digit];
+            } else if PlatformIO_Is(Base, Base_Radix10) {
+                if (Sign == -1 && CodePoint == 1) {
+                    String[CodePoint - 1] = UTF32Character('-');
+                } else {
+                    String[CodePoint - 1] = IntegerTableBase10[Digit];
                 }
+            } else if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
+                    String[CodePoint - 1] = IntegerTableBase16Uppercase[Digit];
+                } else if PlatformIO_Is(Base, Base_Lowercase) {
+                    String[CodePoint - 1] = IntegerTableBase16Lowercase[Digit];
+                }
+                Radix                     = 16;
             }
         }
         return String;
     }
 
     double UTF8_String2Decimal(TextIO_Bases Base, ImmutableString_UTF8 String) {
-        AssertIO((Base & Base_Decimal) == Base_Decimal);
+        AssertIO(PlatformIO_Is(Base, Base_Decimal));
         double Decimal = 0.0;
         UTF32 *String32 = UTF8_Decode(String);
         Decimal         = UTF32_String2Decimal(Base, String32);
@@ -2834,7 +2832,7 @@ extern "C" {
     }
 
     double UTF16_String2Decimal(TextIO_Bases Base, ImmutableString_UTF16 String) {
-        AssertIO((Base & Base_Decimal) == Base_Decimal);
+        AssertIO(PlatformIO_Is(Base, Base_Decimal));
         double Decimal = 0.0;
         UTF32 *String32 = UTF16_Decode(String);
         Decimal         = UTF32_String2Decimal(Base, String32);
@@ -2843,7 +2841,7 @@ extern "C" {
     }
 
     double UTF32_String2Decimal(TextIO_Bases Base, ImmutableString_UTF32 String) { // Replaces strtod, strtof, strold, atof, and atof_l
-        AssertIO((Base & Base_Decimal) == Base_Decimal);
+        AssertIO(PlatformIO_Is(Base, Base_Decimal));
         double   Value         = 0.0;
         bool     IsNegative    = No;
         size_t CodePoint   = 0ULL;
@@ -2866,7 +2864,7 @@ extern "C" {
     }
 
     UTF8 *UTF8_Decimal2String(TextIO_Bases Base, double Decimal) {
-        AssertIO((Base & Base_Decimal) == Base_Decimal);
+        AssertIO(PlatformIO_Is(Base, Base_Decimal));
         UTF32 *String32 = UTF32_Decimal2String(Decimal, Base);
         UTF8  *String8  = UTF8_Encode(String32);
         UTF32_Deinit(String32);
@@ -2874,7 +2872,7 @@ extern "C" {
     }
 
     UTF16 *UTF16_Decimal2String(TextIO_Bases Base, double Decimal) {
-        AssertIO((Base & Base_Decimal) == Base_Decimal);
+        AssertIO(PlatformIO_Is(Base, Base_Decimal));
         UTF32 *String32 = UTF32_Decimal2String(Decimal, Base);
         UTF16 *String16 = UTF16_Encode(String32);
         UTF32_Deinit(String32);
@@ -2882,65 +2880,63 @@ extern "C" {
     }
 
     static UTF32 *Decimal2String_UTF32(TextIO_Bases Base, double Decimal, size_t MinimumWidth, size_t Precision) {
-        AssertIO((Base & Base_Decimal) == Base_Decimal);
+        AssertIO(PlatformIO_Is(Base, Base_Decimal));
         UTF32 *String = NULL;
-        if ((Base & Base_Decimal) == Base_Decimal) {
-            uint8_t StringSize        = 0;
-            int8_t  Sign              = ExtractSign(Decimal);
-            int32_t Exponent          = ExtractExponent(Decimal);
-            int64_t Mantissa          = ExtractMantissa(Decimal);
-            uint8_t NumExponentDigits = NumDigitsInInteger(10, Exponent);
-            uint8_t NumMantissaDigits = NumDigitsInInteger(10, Mantissa);
+        uint8_t StringSize        = 0;
+        int8_t  Sign              = ExtractSign(Decimal);
+        int32_t Exponent          = ExtractExponent(Decimal);
+        int64_t Mantissa          = ExtractMantissa(Decimal);
+        uint8_t NumExponentDigits = NumDigitsInInteger(10, Exponent);
+        uint8_t NumMantissaDigits = NumDigitsInInteger(10, Mantissa);
 
-            /*
-             Is there a way to calculate the number of digits needed for correct round tripping?
+        /*
+         Is there a way to calculate the number of digits needed for correct round tripping?
 
-             if we could find that, we could bypass all of the other nonsense and just create a correct number right off the bat.
-             */
+         if we could find that, we could bypass all of the other nonsense and just create a correct number right off the bat.
+         */
 
-            if ((Base & Base_Shortest) == Base_Shortest) {
+        if PlatformIO_Is(Base, Base_Shortest) {
+            if (MinimumWidth == 0 && Precision == 0) {
+                // Ryu
+            } else {
+                // Do something stranger
+            }
+        } else if PlatformIO_Is(Base, Base_Scientific) {
+            if (MinimumWidth == 0 && Precision == 0) {
+                // Ryu
+            } else {
+                // Do something stranger
+            }
+        } else if PlatformIO_Is(Base, Base_Radix10) {
+            if (MinimumWidth == 0 && Precision == 0) {
+                // Ryu
+            } else {
+                // Do something stranger
+            }
+        } else if PlatformIO_Is(Base, Base_Radix16) {
+            StringSize += 2;
+            AssertIO(PlatformIO_Is(Base, Base_Uppercase) || PlatformIO_Is(Base, Base_Lowercase));
+            if PlatformIO_Is(Base, Base_Uppercase) {
                 if (MinimumWidth == 0 && Precision == 0) {
                     // Ryu
-                } else {
-                    // Do something stranger
-                }
-            } else if ((Base & Base_Scientific) == Base_Scientific) {
-                if (MinimumWidth == 0 && Precision == 0) {
-                    // Ryu
-                } else {
-                    // Do something stranger
-                }
-            } else if ((Base & Base_Radix10) == Base_Radix10) {
-                if (MinimumWidth == 0 && Precision == 0) {
-                    // Ryu
-                } else {
-                    // Do something stranger
-                }
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                StringSize += 2;
-                AssertIO(PlatformIO_Is(Base, Base_Uppercase) || PlatformIO_Is(Base, Base_Lowercase));
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
-                    if (MinimumWidth == 0 && Precision == 0) {
-                        // Ryu
-                        if (Sign == -1) {
-                            // Prefix a hyphen
-                            StringSize += 1;
-                        }
-                        // Prefix 0X
-                        // WriteExponent
-                        // Write period
-                        // Write Hexadecimal Mantissa
-                        // Write P for Power
-                        // Write
-                    } else {
-                        // Do something stranger
+                    if (Sign == -1) {
+                        // Prefix a hyphen
+                        StringSize += 1;
                     }
-                } else if ((Base & Base_Lowercase) == Base_Lowercase) {
-                    if (MinimumWidth == 0 && Precision == 0) {
-                        // Ryu
-                    } else {
-                        // Do something stranger
-                    }
+                    // Prefix 0X
+                    // WriteExponent
+                    // Write period
+                    // Write Hexadecimal Mantissa
+                    // Write P for Power
+                    // Write
+                } else {
+                    // Do something stranger
+                }
+            } else if PlatformIO_Is(Base, Base_Lowercase) {
+                if (MinimumWidth == 0 && Precision == 0) {
+                    // Ryu
+                } else {
+                    // Do something stranger
                 }
             }
         }
@@ -2994,17 +2990,17 @@ extern "C" {
         uint8_t NumDigitsExponent = 0;
         uint8_t NumDigitsMantissa = 0;
         uint8_t Radix             = 0;
-        if ((Base & Base_Decimal) == Base_Decimal && (Base & Base_Radix2) == Base_Radix2) {
+        if PlatformIO_Is(Base, Base_Radix2) {
             Radix                 = 2;
             StringSize           += 1;
-        } else if ((Base & Base_Decimal) == Base_Decimal && (Base & Base_Radix8) == Base_Radix8) {
+        } else if PlatformIO_Is(Base, Base_Radix8) {
             Radix                 = 8;
-        } else if ((Base & Base_Decimal) == Base_Decimal && (Base & Base_Radix10) == Base_Radix10) {
+        } else if PlatformIO_Is(Base, Base_Radix10) {
             Radix                 = 10;
             if (Sign == -1) {
                 StringSize       += 1;
             }
-        } else if ((Base & Base_Decimal) == Base_Decimal && (Base & Base_Radix16) == Base_Radix16) {
+        } else if PlatformIO_Is(Base, Base_Radix16) {
             Radix                 = 16;
             StringSize           += 7; // FIXME: ???
         }
@@ -3033,38 +3029,42 @@ extern "C" {
                     OutputString[StringSize + NumDigitsExponent + MantissaCodePoint]  = Mantissa / 10;
                 }
             }
-            if ((Base & Base_Radix16) == Base_Radix16 && (Base & Base_Uppercase) == Base_Uppercase) {
-                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = UTF32Character('A');
-                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('P');
-            } else if ((Base & Base_Radix16) == Base_Radix16 && (Base & Base_Lowercase) == Base_Lowercase) {
-                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = UTF32Character('a');
-                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('p');
-            } else if ((Base & Base_Scientific) == Base_Scientific && (Base & Base_Uppercase) == Base_Uppercase) {
-                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = UTF32Character('E');
-                // Write the sign, if the number is positive, write a +, otherwise write a -
-                if (Sign == -1) {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('-');
-                } else {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('+');
+            if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = UTF32Character('A');
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('P');
+                } else if PlatformIO_Is(Base, Base_Lowercase) {
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = UTF32Character('a');
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('p');
                 }
-                // Write the Exponent
-                uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
-                UTF32 *ExponentString              = UTF32_Integer2String(Exponent, Base_Integer | Base_Radix10);
-                for (size_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
-                }
-            } else if ((Base & Base_Scientific) == Base_Scientific && (Base & Base_Lowercase) == Base_Lowercase) {
-                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('e');
-                if (Sign == -1) {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('-');
-                } else {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('+');
-                }
-                // Write the Exponent
-                uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
-                UTF32 *ExponentString              = UTF32_Integer2String(Exponent, Base_Integer | Base_Radix10);
-                for (size_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
+            } else if PlatformIO_Is(Base, Base_Scientific) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = UTF32Character('E');
+                    // Write the sign, if the number is positive, write a +, otherwise write a -
+                    if (Sign == -1) {
+                        OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('-');
+                    } else {
+                        OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('+');
+                    }
+                    // Write the Exponent
+                    uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
+                    UTF32 *ExponentString              = UTF32_Integer2String(Exponent, Base_Integer | Base_Radix10);
+                    for (size_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
+                        OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
+                    }
+                } PlatformIO_Is(Base, Base_Lowercase) {
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('e');
+                    if (Sign == -1) {
+                        OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('-');
+                    } else {
+                        OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('+');
+                    }
+                    // Write the Exponent
+                    uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
+                    UTF32 *ExponentString              = UTF32_Integer2String(Exponent, Base_Integer | Base_Radix10);
+                    for (size_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
+                        OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
+                    }
                 }
             }
         }
@@ -3374,37 +3374,37 @@ extern "C" {
         size_t NumDigits      = 0ULL;
         size_t CodePoint  = 0;
 
-        if ((Base & Base_Integer) == Base_Integer) {
-            if ((Base & Base_Radix2) == Base_Radix2) {
+        if PlatformIO_Is(Base, Base_Integer) {
+            if PlatformIO_Is(Base, Base_Radix2) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= '0' && String[CodePoint] <= '1') {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix8) == Base_Radix8) {
+            } else if PlatformIO_Is(Base, Base_Radix8) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= '0' && String[CodePoint] <= '7') {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix10) == Base_Radix10) {
+            } else if PlatformIO_Is(Base, Base_Radix10) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= '0' && String[CodePoint] <= '9') {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
+            } else if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'A' && String[CodePoint] <= 'F')) {
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                } else if PlatformIO_Is(Base, Base_Lowercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'a' && String[CodePoint] <= 'f')) {
                             NumDigits     += 1;
@@ -3413,41 +3413,41 @@ extern "C" {
                     }
                 }
             }
-        } else if ((Base & Base_Decimal) == Base_Decimal) {
-            if ((Base & Base_Radix10) == Base_Radix10) {
+        } else if PlatformIO_Is(Base, Base_Decimal) {
+            if PlatformIO_Is(Base, Base_Radix10) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.')) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Scientific) == Base_Scientific || (Base & Base_Shortest) == Base_Shortest) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
-                    while (String[CodePoint] != TextIO_NULLTerminator) {
-                        if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.' || String[CodePoint] == 'E')) { // Todo: Make sure the Exponent is preceded by a digit
-                            NumDigits     += 1;
-                        }
-                        CodePoint         += 1;
-                    }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
-                    while (String[CodePoint] != TextIO_NULLTerminator) {
-                        if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.' || String[CodePoint] == 'e')) { // Todo: Make sure the Exponent is preceded by a digit
-                            NumDigits     += 1;
-                        }
-                        CodePoint         += 1;
-                    }
-                }
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
+            } else if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'A' && String[CodePoint] <= 'F') || String[CodePoint] <= 'P' || String[CodePoint] <= 'X') {
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                } else if PlatformIO_Is(Base, Base_Lowercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'a' && String[CodePoint] <= 'f') || String[CodePoint] <= 'p' || String[CodePoint] <= 'x') {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                }
+            } else { // Scientific/Shortest
+                if PlatformIO_Is(Base, Base_Uppercase) {
+                    while (String[CodePoint] != TextIO_NULLTerminator) {
+                        if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.' || String[CodePoint] == 'E')) { // Todo: Make sure the Exponent is preceded by a digit
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if PlatformIO_Is(Base, Base_Lowercase) {
+                    while (String[CodePoint] != TextIO_NULLTerminator) {
+                        if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.' || String[CodePoint] == 'e')) { // Todo: Make sure the Exponent is preceded by a digit
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
@@ -3464,37 +3464,37 @@ extern "C" {
         size_t NumDigits      = 0ULL;
         size_t CodePoint  = 0;
 
-        if ((Base & Base_Integer) == Base_Integer) {
-            if ((Base & Base_Radix2) == Base_Radix2) {
+        if PlatformIO_Is(Base, Base_Integer) {
+            if PlatformIO_Is(Base, Base_Radix2) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('1')) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix8) == Base_Radix8) {
+            } else if PlatformIO_Is(Base, Base_Radix8) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('7')) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix10) == Base_Radix10) {
+            } else if PlatformIO_Is(Base, Base_Radix10) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
+            } else if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('A') && String[CodePoint] <= UTF16Character('F'))) {
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                } else if (PlatformIO_Is(Base, Base_Lowercase)) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('a') && String[CodePoint] <= UTF16Character('f'))) {
                             NumDigits     += 1;
@@ -3503,41 +3503,41 @@ extern "C" {
                     }
                 }
             }
-        } else if ((Base & Base_Decimal) == Base_Decimal) {
-            if ((Base & Base_Radix10) == Base_Radix10) {
+        } else if PlatformIO_Is(Base, Base_Decimal) {
+            if PlatformIO_Is(Base, Base_Radix10) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.'))) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Scientific) == Base_Scientific || (Base & Base_Shortest) == Base_Shortest) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
-                    while (String[CodePoint] != TextIO_NULLTerminator) {
-                        if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.') || String[CodePoint] == UTF16Character('E'))) { // Todo: Make sure the Exponent is preceded by a digit
-                            NumDigits     += 1;
-                        }
-                        CodePoint         += 1;
-                    }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
-                    while (String[CodePoint] != TextIO_NULLTerminator) {
-                        if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.') || String[CodePoint] == UTF16Character('e'))) { // Todo: Make sure the Exponent is preceded by a digit
-                            NumDigits     += 1;
-                        }
-                        CodePoint         += 1;
-                    }
-                }
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
+            } else if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('A') && String[CodePoint] <= UTF16Character('F')) || String[CodePoint] <= UTF16Character('P') || String[CodePoint] <= UTF16Character('X')) {
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                } else if (PlatformIO_Is(Base, Base_Lowercase)) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('a') && String[CodePoint] <= UTF16Character('f')) || String[CodePoint] <= UTF16Character('p') || String[CodePoint] <= UTF16Character('x')) {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                }
+            } else { // Scientific/Shortest
+                if PlatformIO_Is(Base, Base_Uppercase) {
+                    while (String[CodePoint] != TextIO_NULLTerminator) {
+                        if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.') || String[CodePoint] == UTF16Character('E'))) { // Todo: Make sure the Exponent is preceded by a digit
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if (PlatformIO_Is(Base, Base_Lowercase)) {
+                    while (String[CodePoint] != TextIO_NULLTerminator) {
+                        if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.') || String[CodePoint] == UTF16Character('e'))) { // Todo: Make sure the Exponent is preceded by a digit
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
@@ -3554,37 +3554,37 @@ extern "C" {
         size_t NumDigits      = 0ULL;
         size_t CodePoint  = 0;
 
-        if ((Base & Base_Integer) == Base_Integer) {
-            if ((Base & Base_Radix2) == Base_Radix2) {
+        if PlatformIO_Is(Base, Base_Integer) {
+            if PlatformIO_Is(Base, Base_Radix2) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('1')) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix8) == Base_Radix8) {
+            } else if PlatformIO_Is(Base, Base_Radix8) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('7')) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix10) == Base_Radix10) {
+            } else if PlatformIO_Is(Base, Base_Radix10) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
+            } else if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('A') && String[CodePoint] <= UTF32Character('F'))) {
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                } else if (PlatformIO_Is(Base, Base_Lowercase)) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f'))) {
                             NumDigits     += 1;
@@ -3593,41 +3593,41 @@ extern "C" {
                     }
                 }
             }
-        } else if ((Base & Base_Decimal) == Base_Decimal) {
-            if ((Base & Base_Radix10) == Base_Radix10) {
+        } else if PlatformIO_Is(Base, Base_Decimal) {
+            if PlatformIO_Is(Base, Base_Radix10) {
                 while (String[CodePoint] != TextIO_NULLTerminator) {
                     if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.'))) {
                         NumDigits     += 1;
                     }
                     CodePoint         += 1;
                 }
-            } else if ((Base & Base_Scientific) == Base_Scientific || (Base & Base_Shortest) == Base_Shortest) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
-                    while (String[CodePoint] != TextIO_NULLTerminator) {
-                        if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.') || String[CodePoint] == UTF32Character('E'))) { // Todo: Make sure the Exponent is preceded by a digit
-                            NumDigits     += 1;
-                        }
-                        CodePoint         += 1;
-                    }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
-                    while (String[CodePoint] != TextIO_NULLTerminator) {
-                        if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.') || String[CodePoint] == UTF32Character('e'))) { // Todo: Make sure the Exponent is preceded by a digit
-                            NumDigits     += 1;
-                        }
-                        CodePoint         += 1;
-                    }
-                }
-            } else if ((Base & Base_Radix16) == Base_Radix16) {
-                if ((Base & Base_Uppercase) == Base_Uppercase) {
+            } else if PlatformIO_Is(Base, Base_Radix16) {
+                if PlatformIO_Is(Base, Base_Uppercase) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('A') && String[CodePoint] <= UTF32Character('F')) || String[CodePoint] <= UTF32Character('P') || String[CodePoint] <= UTF32Character('X')) {
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
-                } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                } else if (PlatformIO_Is(Base, Base_Lowercase)) {
                     while (String[CodePoint] != TextIO_NULLTerminator) {
                         if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f')) || String[CodePoint] <= UTF32Character('p') || String[CodePoint] <= UTF32Character('x')) {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                }
+            } else { // Scientific/Shortest
+                if PlatformIO_Is(Base, Base_Uppercase) {
+                    while (String[CodePoint] != TextIO_NULLTerminator) {
+                        if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.') || String[CodePoint] == UTF32Character('E'))) { // Todo: Make sure the Exponent is preceded by a digit
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if (PlatformIO_Is(Base, Base_Lowercase)) {
+                    while (String[CodePoint] != TextIO_NULLTerminator) {
+                        if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.') || String[CodePoint] == UTF32Character('e'))) { // Todo: Make sure the Exponent is preceded by a digit
                             NumDigits     += 1;
                         }
                         CodePoint         += 1;
