@@ -116,46 +116,133 @@ extern "C" {
     
     UTF8 *UTF8_Init(size_t NumCodeUnits) {
         AssertIO(NumCodeUnits > 0);
-        UTF8 *String            = NULL;
-        size_t StringSize   = NumCodeUnits + TextIO_NULLTerminatorSize;
+        UTF8 *String        = NULL;
+        size_t StringSize   = sizeof(size_t) + NumCodeUnits + TextIO_NULLTerminatorSize;
         String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
         AssertIO(String != NULL);
-#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-        BufferIO_MemorySet8(String, UTF8_Debug_Text_8, NumCodeUnits);
+        static_assert(sizeof(size_t) == 4 || sizeof(size_t) == 8, "size_t is not 4 or 8 bytes!");
+        if (sizeof(size_t) == 4) {
+            uint8_t Unpacked[4];
+            UnpackInteger32To8(NumCodeUnits, Unpacked);
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            // Let's always write the value little endian first
+            String[0] = Unpacked[3];
+            String[1] = Unpacked[2];
+            String[2] = Unpacked[1];
+            String[3] = Unpacked[0];
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            String[0] = Unpacked[0];
+            String[1] = Unpacked[1];
+            String[2] = Unpacked[2];
+            String[3] = Unpacked[3];
 #endif
-        return String;
+        } else if (sizeof(size_t) == 8) {
+            uint8_t Unpacked[8];
+            UnpackInteger64To8(NumCodeUnits, Unpacked);
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            String[0] = Unpacked[7];
+            String[1] = Unpacked[6];
+            String[2] = Unpacked[5];
+            String[3] = Unpacked[4];
+            String[4] = Unpacked[3];
+            String[5] = Unpacked[2];
+            String[6] = Unpacked[1];
+            String[7] = Unpacked[0];
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            String[0] = Unpacked[0];
+            String[1] = Unpacked[1];
+            String[2] = Unpacked[2];
+            String[3] = Unpacked[3];
+            String[4] = Unpacked[4];
+            String[5] = Unpacked[5];
+            String[6] = Unpacked[6];
+            String[7] = Unpacked[7];
+#endif
+        }
+#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
+        BufferIO_MemorySet8(&String[sizeof(size_t)], UTF8_Debug_Text_8, NumCodeUnits);
+#endif
+        return &String[sizeof(size_t)];
     }
     
     UTF16 *UTF16_Init(size_t NumCodeUnits) {
         AssertIO(NumCodeUnits >= 1);
-        UTF16 *String           = NULL;
-        size_t StringSize   = NumCodeUnits + TextIO_NULLTerminatorSize;
+        UTF16 *String       = NULL;
+        size_t StringSize   = (sizeof(size_t) / sizeof(UTF16)) + NumCodeUnits + TextIO_NULLTerminatorSize;
         String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
+
+        static_assert(sizeof(size_t) == 4 || sizeof(size_t) == 8, "size_t is not 4 or 8 bytes!");
+        if (sizeof(size_t) == 4) {
+            uint16_t Unpacked[2];
+            UnpackInteger32To16(NumCodeUnits, Unpacked);
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            String[0] = Unpacked[1];
+            String[1] = Unpacked[0];
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            String[0] = Unpacked[0];
+            String[1] = Unpacked[1];
+#endif
+        } else if (sizeof(size_t) == 8) {
+            uint16_t Unpacked[4];
+            UnpackInteger64To16(NumCodeUnits, Unpacked);
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            String[0] = Unpacked[3];
+            String[1] = Unpacked[2];
+            String[2] = Unpacked[1];
+            String[3] = Unpacked[0];
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            String[0] = Unpacked[0];
+            String[1] = Unpacked[1];
+            String[2] = Unpacked[2];
+            String[3] = Unpacked[3];
+#endif
+        }
+
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-#if   (PlatformIO_ByteOrder == PlatformIO_TargetByteOrderIsBE)
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
         BufferIO_MemorySet16(String, UTF16_Debug_Text_16BE, StringSize);
-#elif (PlatformIO_ByteOrder == PlatformIO_TargetByteOrderIsLE)
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
         BufferIO_MemorySet16(String, UTF16_Debug_Text_16LE, StringSize);
 #endif /* ByteOrder */
 #endif /* Debug */
         AssertIO(String != NULL);
-        return String;
+        return &String[(sizeof(size_t) / sizeof(UTF16))];
     }
     
     UTF32 *UTF32_Init(size_t NumCodePoints) {
         AssertIO(NumCodePoints >= 1);
-        UTF32 *String           = NULL;
-        size_t StringSize   = NumCodePoints + TextIO_NULLTerminatorSize;
+        UTF32 *String       = NULL;
+        size_t StringSize   = (sizeof(size_t) / sizeof(UTF16)) + NumCodePoints + TextIO_NULLTerminatorSize;
         String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
         AssertIO(String != NULL);
+
+        static_assert(sizeof(size_t) == 4 || sizeof(size_t) == 8, "size_t is not 4 or 8 bytes!");
+        if (sizeof(size_t) == 4) {
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            String[0] = NumCodePoints;
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            String[0] = NumCodePoints;
+#endif
+        } else if (sizeof(size_t) == 8) {
+            uint32_t Unpacked[2];
+            UnpackInteger64To32(NumCodePoints, Unpacked);
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
+            String[0] = Unpacked[1];
+            String[1] = Unpacked[0];
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
+            String[0] = Unpacked[0];
+            String[1] = Unpacked[1];
+#endif
+        }
+
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-#if   (PlatformIO_ByteOrder == PlatformIO_TargetByteOrderIsBE)
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
         BufferIO_MemorySet32(String, UTF32_Debug_Text_32BE, StringSize);
-#elif (PlatformIO_ByteOrder == PlatformIO_TargetByteOrderIsLE)
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
         BufferIO_MemorySet32(String, UTF32_Debug_Text_32LE, StringSize);
 #endif /* ByteOrder */
 #endif /* Debug */
-        return String;
+        return &String[(sizeof(size_t) / sizeof(UTF32))];
     }
 
     uint64_t UTF8_Hash(UTF8 *String) {
@@ -445,16 +532,18 @@ extern "C" {
     
     size_t UTF8_GetStringSizeInCodeUnits(ImmutableString_UTF8 String) {
         AssertIO(String != NULL);
-        size_t StringSizeInCodeUnits   = 0;
+        size_t StringSizeInCodeUnits = String[-sizeof(size_t)];
+        /*
         while (String[StringSizeInCodeUnits] != TextIO_NULLTerminator) {
             StringSizeInCodeUnits += 1;
         }
+         */
         return StringSizeInCodeUnits;
     }
     
     size_t UTF16_GetStringSizeInCodeUnits(ImmutableString_UTF16 String) {
         AssertIO(String != NULL);
-        size_t StringSizeInCodeUnits   = 0;
+        size_t StringSizeInCodeUnits = String[-(sizeof(size_t) / sizeof(UTF16))];
         while (String[StringSizeInCodeUnits] != TextIO_NULLTerminator) {
             StringSizeInCodeUnits += 1;
         }
@@ -463,7 +552,7 @@ extern "C" {
     
     static size_t UTF32_GetStringSizeInUTF8CodeUnits(ImmutableString_UTF32 String) {
         AssertIO(String != NULL);
-        size_t UTF8CodeUnits          = 0;
+        size_t UTF8CodeUnits      = 0;
         size_t CodePoint          = 0;
         while (String[CodePoint] != TextIO_NULLTerminator) {
             UTF8CodeUnits        += UTF32_GetCodePointSizeInUTF8CodeUnits(String[CodePoint]);
@@ -485,11 +574,11 @@ extern "C" {
     
     size_t UTF8_GetStringSizeInCodePoints(ImmutableString_UTF8 String) {
         AssertIO(String != NULL);
-        size_t StringSizeInCodePoints   = 0;
-        size_t CodeUnit             = 0;
+        size_t StringSizeInCodePoints = 0;
+        size_t CodeUnit               = 0;
         while (String[CodeUnit] != TextIO_NULLTerminator) {
-            StringSizeInCodePoints += 1;
-            CodeUnit               += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+            StringSizeInCodePoints   += 1;
+            CodeUnit                 += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
         }
         return StringSizeInCodePoints;
     }
@@ -507,7 +596,7 @@ extern "C" {
     
     size_t UTF32_GetStringSizeInCodePoints(ImmutableString_UTF32 String) {
         AssertIO(String != NULL);
-        size_t NumCodePoints   = 0;
+        size_t NumCodePoints = String[-(sizeof(size_t) / sizeof(UTF32))];
         while (String[NumCodePoints] != TextIO_NULLTerminator) {
             NumCodePoints += 1;
         }
@@ -931,6 +1020,26 @@ extern "C" {
             }
         }
         return Boolean;
+    }
+
+    /*!
+     @abstract The point of this function is to make a strign safe, to make sure that like Trojan Source isn't possible, etc.
+     @abstract2 This function IS NOT meant to fix look-alike codepoints masquerading as others, for that see UTF32_
+     */
+    void UTF32_SanitizeBIDI() {
+        // So, we need to know when and where BIDI directionality codepoints should and shouldn't be present.
+
+        /*
+         the goal here is to balance BIDI characters; in ordr to do that we need to know where right to left characters are.
+
+         Which means we need a new table in TextIOTables to list either the ranges of character types, or better yet, just a list of all characters that can be read right-to-left or down-to-up.
+
+         Until an example is found that actually needs them, this function will just count the number of BIDI characters in a string and if nessessary will replace them with nothing.
+         */
+    }
+
+    void UTF32_ReplaceLookalikes() {
+
     }
     
     bool UTF8_IsUNCPath(ImmutableString_UTF8 String) {
@@ -3052,7 +3161,7 @@ extern "C" {
                     for (size_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
                         OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
                     }
-                } PlatformIO_Is(Base, Base_Lowercase) {
+                } else if PlatformIO_Is(Base, Base_Lowercase) {
                     OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('e');
                     if (Sign == -1) {
                         OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('-');
@@ -3817,17 +3926,17 @@ extern "C" {
 
     void UTF8_Deinit(UTF8 *String) {
         AssertIO(String != NULL);
-        free(String);
+        free(String[-sizeof(size_t)]);
     }
 
     void UTF16_Deinit(UTF16 *String) {
         AssertIO(String != NULL);
-        free(String);
+        free(String[-(sizeof(size_t) / sizeof(UTF16))]);
     }
 
     void UTF32_Deinit(UTF32 *String) {
         AssertIO(String != NULL);
-        free(String);
+        free(String[-(sizeof(size_t) / sizeof(UTF32))]);
     }
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
