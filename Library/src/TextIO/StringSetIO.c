@@ -36,9 +36,9 @@ extern "C" {
         StringSet         = (UTF16**) calloc(NumStrings + TextIO_NULLTerminatorSize, sizeof(UTF16*));
         AssertIO(StringSet != NULL);
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-#if   (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsBE)
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
         BufferIO_MemorySet16(*StringSet, UTF16_Debug_Text_16BE, NumStrings + TextIO_NULLTerminatorSize);
-#elif (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsLE)
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
         BufferIO_MemorySet16(*StringSet, UTF16_Debug_Text_16LE, NumStrings + TextIO_NULLTerminatorSize);
 #endif /* ByteOrder */
 #endif /* BuildType */
@@ -51,9 +51,9 @@ extern "C" {
         StringSet     = (UTF32**) calloc(NumStrings + TextIO_NULLTerminatorSize, sizeof(UTF32*));
         AssertIO(StringSet != NULL);
 #if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
-#if   (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsBE)
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
         BufferIO_MemorySet16(*StringSet, UTF32_Debug_Text_32BE, NumStrings + TextIO_NULLTerminatorSize);
-#elif (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsLE)
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
         BufferIO_MemorySet16(*StringSet, UTF32_Debug_Text_32LE, NumStrings + TextIO_NULLTerminatorSize);
 #endif /* ByteOrder */
 #endif /* BuildType */

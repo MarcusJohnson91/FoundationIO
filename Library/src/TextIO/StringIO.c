@@ -1284,9 +1284,9 @@ extern "C" {
             StringWithBOM         = UTF32_Init(StringSize + UnicodeBOMSizeInCodePoints);
             AssertIO(StringWithBOM != NULL);
             if (BOM2Add == StringIO_BOM_Native) {
-#if   (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsLE)
+#if   (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsLE)
                 ByteOrder     = UTF32BOM_LE;
-#elif (PlatformIO_TargetByteOrder == PlatformIO_TargetByteOrderIsBE)
+#elif (PlatformIO_ByteOrder == PlatformIO_ByteOrderIsBE)
                 ByteOrder     = UTF32BOM_BE;
 #endif
             } else if (BOM2Add == StringIO_BOM_Little) {
