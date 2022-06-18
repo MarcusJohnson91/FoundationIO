@@ -49,29 +49,29 @@ extern "C" {
     /*!
      @enum        BufferIO_ByteOrders
      @constant    ByteOrder_Unspecified            Invalid/Native for Strings.
-     @rename      ByteOrder_LSByteIsNearest        is now ByteOrder_MSByteIsRight aka LSByte aka LSByteFirst aka little endian.
-     @rename      ByteOrder_LSByteIsFarthest       is now ByteOrder_MSByteIsLeft  aka MSByte aka MSByteFirst aka big endian.
-     @constant    ByteOrder_MSByteIsRight          The least significant byte is the closest to the current offset.
-     @constant    ByteOrder_MSByteIsLeft           The least significant byte is the farthest from the current offset.
+     @rename      ByteOrder_LSByteIsNearest        Is now ByteOrder_Right2Left aka LSByte aka LSByteFirst aka little endian.
+     @rename      ByteOrder_LSByteIsFarthest       Is now ByteOrder_Left2Right  aka MSByte aka MSByteFirst aka big endian.
+     @constant    ByteOrder_Right2Left             The least significant byte is the closest to the current offset.
+     @constant    ByteOrder_Left2Right             The least significant byte is the farthest from the current offset.
      */
     typedef enum BufferIO_ByteOrders {
-                  ByteOrder_Unspecified            = 0,
-                  ByteOrder_MSByteIsRight          = 1,
-                  ByteOrder_MSByteIsLeft           = 2,
+                  ByteOrder_Unspecified          = 0,
+                  ByteOrder_Right2Left           = 1,
+                  ByteOrder_Left2Right           = 2,
     } BufferIO_ByteOrders;
 
     /*!
      @enum         BufferIO_BitOrders
      @constant     BitOrder_Unspecified            Invalid bit order.
-     @rename       BitOrder_LSBitIsNearest         is now BitOrder_MSBitIsRight aka LSByte aka LSByteFirst aka little endian.
-     @rename       BitOrder_LSBitIsFarthest        is now BitOrder_MSBitIsLeft  aka MSByte aka MSByteFirst aka big endian.
+     @rename       BitOrder_LSBitIsNearest         Is now BitOrder_Right2Left aka LSByte aka LSByteFirst aka little endian.
+     @rename       BitOrder_LSBitIsFarthest        Is now BitOrder_Left2Right  aka MSByte aka MSByteFirst aka big endian.
      @constant     BitOrder_LSBitIsNearest         The least significant byte is the closest to the current offset; previously LSBit.
-     @constant     BitOrder_MSBitIsLeft           The least significant byte is the farthest from the current offset; previously MSBit.
+     @constant     BitOrder_Left2Right             The least significant byte is the farthest from the current offset; previously MSBit.
      */
     typedef enum BufferIO_BitOrders {
                    BitOrder_Unspecified            = 0,
-                   BitOrder_MSBitIsRight           = 1,
-                   BitOrder_MSBitIsLeft            = 2,
+                   BitOrder_Right2Left             = 1,
+                   BitOrder_Left2Right             = 2,
     } BufferIO_BitOrders;
 
     /*!
