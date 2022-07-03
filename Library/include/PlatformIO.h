@@ -524,6 +524,16 @@
 extern "C" {
 #endif
 
+    typedef enum PlatformIOTypes {
+        PlatformIOType_Unspecified  = 0,
+        PlatformIOType_Unsigned     = 1,
+        PlatformIOType_Signed       = 2,
+        PlatformIOType_Integer8     = 4,
+        PlatformIOType_Integer16    = 8,
+        PlatformIOType_Integer32    = 16,
+        PlatformIOType_Integer64    = 32,
+    } PlatformIOTypes;
+
     /*!
      @abstract      Gets the total amount of memory in the system.
      */
