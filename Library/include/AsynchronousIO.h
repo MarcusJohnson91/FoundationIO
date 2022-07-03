@@ -92,7 +92,7 @@ extern "C" {
 
     /*!
      @enum        AsyncIO_PathTypes
-     @constant    PathType_Unknown                      Invalid PathType.
+     @constant    PathType_Unspecified                  Invalid PathType.
      @constant    PathType_File                         The PathType is a File.
      @constant    PathType_Directory                    The PathType is a Folder, it can contain other files.
      @constant    PathType_Link_Soft                    The PathType is a Softlink/Symbolic Link; It points to another file.
@@ -103,7 +103,7 @@ extern "C" {
      @constant    PathType_Special_Block                The PathType is a Block Device.
      */
     typedef enum AsyncIO_PathTypes {
-                  PathType_Unknown                      = 0,
+                  PathType_Unspecified                  = 0,
                   PathType_File                         = 1,
                   PathType_Directory                    = 2,
                   PathType_Link_Soft                    = 4,

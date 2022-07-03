@@ -324,7 +324,7 @@ extern "C" {
     }
     
     typedef enum FileIO_Permissions {
-        Permissions_Unknown        = 0,
+        Permissions_Unspecified    = 0,
         Permissions_Owner_Read     = 1,
         Permissions_Owner_Write    = 2,
         Permissions_Owner_Execute  = 4,
