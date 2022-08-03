@@ -24,9 +24,9 @@ extern "C" {
         void               *Buffer; // if there is a buffer, it's contents will be here
         uint64_t            BufferSize;   // Size of the FILE
         uint64_t            BufferOffset; // Offset into the Buffer
-        AsyncIO_Descriptor  FileNum; // File Descriptor
+        AsynchronousIO_Descriptor  FileNum; // File Descriptor
         TextIO_StringTypes  Type; // Orientation
-        AsyncIO_FileModes   Mode; // like was the file opened for reading/writing, etc
+        AsynchronousIO_FileModes   Mode; // like was the file opened for reading/writing, etc
     } FileIO_FILE;
     
     UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
@@ -246,7 +246,7 @@ extern "C" {
             // We gotta change the type
         } else {
             // It's already that type,just flush the buffer and say yes
-            AsyncIOStream_Write(File->FileNum, File->Buffer, File->Type, File->BufferSize - File->BufferOffset);
+            AsynchronousIOStream_Write(File->FileNum, File->Buffer, File->Type, File->BufferSize - File->BufferOffset);
         }
         return DidItWork;
     }
@@ -271,7 +271,7 @@ extern "C" {
     }
     
     /* File Operations */
-    static UTF8 *UTF8_CreateModeString(AsyncIO_FileModes Mode) {
+    static UTF8 *UTF8_CreateModeString(AsynchronousIO_FileModes Mode) {
         UTF8 *ModeString = NULL;
         if PlatformIO_Is(Mode, FileMode_Read) {
             if PlatformIO_Is(Mode, FileMode_Binary) {
@@ -297,7 +297,7 @@ extern "C" {
         return ModeString;
     }
     
-    static UTF16 *UTF16_CreateModeString(AsyncIO_FileModes Mode) {
+    static UTF16 *UTF16_CreateModeString(AsynchronousIO_FileModes Mode) {
         UTF16 *ModeString = NULL;
         if PlatformIO_Is(Mode, FileMode_Read) {
             if PlatformIO_Is(Mode, FileMode_Binary) {
@@ -492,7 +492,7 @@ extern "C" {
         return ElementsRead;
     }
     
-    bool FileIO_Seek(FILE *File2Seek, ssize_t SeekSizeInBytes, AsyncIO_SeekTypes SeekType) {
+    bool FileIO_Seek(FILE *File2Seek, ssize_t SeekSizeInBytes, AsynchronousIO_SeekTypes SeekType) {
         AssertIO(File2Seek != NULL);
 
         bool SuccessIsZero      = 1;

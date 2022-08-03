@@ -72,7 +72,7 @@ extern "C" {
      @param             Stream                          The stream
      @param             StringType                      What width should the Stream use
      */
-    bool                FileIO_SetFileOrientation(AsyncIOStream *Stream, TextIO_StringTypes StringType);
+    bool                FileIO_SetFileOrientation(AsynchronousIOStream *Stream, TextIO_StringTypes StringType);
 
     /*!
      @abstract                                          Detects the Unicode encoding the File has been opened for
@@ -82,10 +82,10 @@ extern "C" {
 
     /*!
      @abstract                                          Gets the size of the Stream
-     @param             AsyncIOStream                   FileIO_Input or FileIO_Output
+     @param             AsynchronousIOStream                   FileIO_Input or FileIO_Output
      @return                                            Returns the size of the file
      */
-    size_t              FileIO_GetSize(PlatformIO_Immutable(void *) AsyncIOStream);
+    size_t              FileIO_GetSize(PlatformIO_Immutable(void *) AsynchronousIOStream);
     
     /*!
      @abstract                                          Gets the size of the elements in the Stream
@@ -94,7 +94,7 @@ extern "C" {
      @param             Stream                          FileIO_Input or FileIO_Output
      @return                                            Returns the size of the file's elements
      */
-    uint8_t             FileIO_GetEncodingSize(AsyncIOStream *Stream);
+    uint8_t             FileIO_GetEncodingSize(AsynchronousIOStream *Stream);
 
     /*!
      @abstract                                          Reads data from a file.
@@ -113,7 +113,7 @@ extern "C" {
      @param             SeekType                        The kind of seeking to do.
      @return                                            Returns true if sucessful.
      */
-    bool                FileIO_Seek(FILE *File2Seek, ssize_t SeekSizeInBytes, AsyncIO_SeekTypes SeekType);
+    bool                FileIO_Seek(FILE *File2Seek, ssize_t SeekSizeInBytes, AsynchronousIO_SeekTypes SeekType);
 
     /*!
      @abstract                                          Writes data to a file.

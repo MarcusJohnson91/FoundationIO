@@ -41,27 +41,27 @@
 extern "C" {
 #endif
 
-    typedef struct AsyncIOStream {
-        size_t              StreamPosition;
-        ssize_t             StreamSize;
-        AsyncIO_Descriptor  StreamID;
-        AsyncIO_StreamTypes StreamType;
-    } AsyncIOStream;
+    typedef struct AsynchronousIOStream {
+        size_t                         StreamPosition;
+        ssize_t                        StreamSize;
+        AsynchronousIO_Descriptor      StreamID;
+        AsynchronousIO_DescriptorTypes DescriptorType;
+    } AsynchronousIOStream;
 
-    /* AsyncIOStream */
-    AsyncIOStream *AsyncIOStream_Init(void) {
-        AsyncIOStream *Stream = calloc(1, sizeof(AsyncIOStream));
+    /* AsynchronousIOStream */
+    AsynchronousIOStream *AsynchronousIOStream_Init(void) {
+        AsynchronousIOStream *Stream = calloc(1, sizeof(AsynchronousIOStream));
         return Stream;
     }
 
-    AsyncIO_Descriptor AsyncIOStream_GetDescriptor(AsyncIOStream *Stream) {
+    AsynchronousIO_Descriptor AsynchronousIOStream_GetDescriptor(AsynchronousIOStream *Stream) {
         return Stream->StreamID;
     }
 
-    static void AsyncIOStream_FindSize(AsyncIOStream *Stream) {
+    static void AsynchronousIOStream_FindSize(AsynchronousIOStream *Stream) {
         AssertIO(Stream != NULL);
         AssertIO(Stream->StreamSize > 0);
-        AssertIO(PlatformIO_Is(Stream->StreamType, StreamType_File));
+        AssertIO(PlatformIO_Is(Stream->DescriptorType, DescriptorType_File));
 
         ssize_t OriginalPosition  = lseek(Stream->StreamID, 0, SEEK_CUR);
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
@@ -73,40 +73,40 @@ extern "C" {
 #endif /* PlatformIO_TargetOS */
     }
 
-    size_t AsyncIOStream_GetSize(AsyncIOStream *Stream) {
+    size_t AsynchronousIOStream_GetSize(AsynchronousIOStream *Stream) {
         AssertIO(Stream != NULL);
 
         if (Stream->StreamSize <= 0) {
-            AsyncIOStream_FindSize(Stream);
+            AsynchronousIOStream_FindSize(Stream);
         }
         return Stream->StreamSize;
     }
 
-    size_t AsyncIOStream_GetPosition(AsyncIOStream *Stream) {
+    size_t AsynchronousIOStream_GetPosition(AsynchronousIOStream *Stream) {
         AssertIO(Stream != NULL);
 
         return Stream->StreamPosition;
     }
 
-    size_t AsyncIOStream_GetBytesRemaining(AsyncIOStream *Stream) {
+    size_t AsynchronousIOStream_GetBytesRemaining(AsynchronousIOStream *Stream) {
         AssertIO(Stream != NULL);
 
         return Stream->StreamSize - Stream->StreamPosition;
     }
 
-    void AsyncIOStream_SetDescriptor(AsyncIOStream *Stream, AsyncIO_Descriptor Descriptor) {
+    void AsynchronousIOStream_SetDescriptor(AsynchronousIOStream *Stream, AsynchronousIO_Descriptor Descriptor) {
         AssertIO(Stream != NULL);
 
         Stream->StreamID = Descriptor;
     }
 
-    void AsyncIOStream_SetPosition(AsyncIOStream *Stream, size_t Position) {
+    void AsynchronousIOStream_SetPosition(AsynchronousIOStream *Stream, size_t Position) {
         AssertIO(Stream != NULL);
 
         Stream->StreamPosition = Position;
     }
 
-    bool AsyncIOStream_OpenPathUTF8(AsyncIOStream *Stream, ImmutableString_UTF8 Path8, AsyncIO_FileModes Mode) {
+    bool AsynchronousIOStream_OpenPathUTF8(AsynchronousIOStream *Stream, ImmutableString_UTF8 Path8, AsynchronousIO_FileModes Mode) {
         AssertIO(Stream != NULL);
         AssertIO(Path8 != NULL);
         AssertIO(Mode != FileMode_Unspecified);
@@ -131,7 +131,7 @@ extern "C" {
         return OpenedSucessfully;
     }
 
-    bool AsyncIOStream_OpenPathUTF16(AsyncIOStream *Stream, ImmutableString_UTF16 Path16, AsyncIO_FileModes Mode) {
+    bool AsynchronousIOStream_OpenPathUTF16(AsynchronousIOStream *Stream, ImmutableString_UTF16 Path16, AsynchronousIO_FileModes Mode) {
         AssertIO(Stream != NULL);
         AssertIO(Path16 != NULL);
         AssertIO(Mode != FileMode_Unspecified);
@@ -156,7 +156,7 @@ extern "C" {
         return OpenedSucessfully;
     }
 
-    size_t AsyncIOStream_Read(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements) {
+    size_t AsynchronousIOStream_Read(AsynchronousIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements) {
         AssertIO(Stream != NULL);
         AssertIO(Array != NULL);
         AssertIO(ElementSize > 0);
@@ -186,7 +186,7 @@ extern "C" {
         return NumElementsRead;
     }
 
-    size_t AsyncIOStream_Write(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements) {
+    size_t AsynchronousIOStream_Write(AsynchronousIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements) {
         AssertIO(Stream != NULL);
         AssertIO(Array != NULL);
         AssertIO(ElementSize > 0);
@@ -204,7 +204,7 @@ extern "C" {
             .aio_sigevent                = {
                 .sigev_notify            = 0,
                 .sigev_signo             = 0,
-                .sigev_value             = 0,
+                .sigev_value             = {0},
                 .sigev_notify_function   = 0,
                 .sigev_notify_attributes = 0,
             },
@@ -216,11 +216,11 @@ extern "C" {
         return NumElementsWritten;
     }
 
-    bool AsyncIOStream_Deinit(AsyncIOStream *Stream) {
+    bool AsynchronousIOStream_Deinit(AsynchronousIOStream *Stream) {
         AssertIO(Stream != NULL);
 
         bool ClosedSucessfully = No;
-        Stream->StreamType     = StreamType_Unspecified;
+        Stream->DescriptorType = DescriptorType_Unspecified;
         Stream->StreamSize     = 0ULL;
         Stream->StreamPosition = 0ULL;
         close(Stream->StreamID);

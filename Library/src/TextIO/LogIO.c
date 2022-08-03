@@ -10,7 +10,7 @@ extern "C" {
 #endif
     
     static FILE          *Log_LogFile       = NULL;
-    static AsyncIOStream *Async_LogFile     = NULL;
+    static AsynchronousIOStream *Async_LogFile     = NULL;
     static UTF8          *Log_ProgramName8  = NULL;
     
     void Log_SetProgramName(UTF8 *ProgramName) {
@@ -27,7 +27,7 @@ extern "C" {
         AssertIO(Path != NULL);
 
         UTF8 *FoldedPath = UTF8_CaseFold(Path);
-        Async_LogFile    = AsyncIOStream_Init();
+        Async_LogFile    = AsynchronousIOStream_Init();
 
         if (UTF8_Compare(FoldedPath, UTF8String("stdin")) ||
             UTF8_Compare(FoldedPath, UTF8String("zero")) ||

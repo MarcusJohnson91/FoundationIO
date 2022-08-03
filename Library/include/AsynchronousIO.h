@@ -22,21 +22,21 @@ extern "C" {
      */
     
     /*!
-     @enum         AsyncIO_StreamTypes
-     @constant     StreamType_Unspecified               Invalid type
-     @constant     StreamType_File                      Stream is a File
-     @constant     StreamType_Socket                    Stream is a Socket
-     @constant     StreamType_Pipe                      Stream is a Pipe
+     @enum         AsynchronousIO_DescriptorTypes
+     @constant     DescriptorType_Unspecified           Invalid type
+     @constant     DescriptorType_File                  Stream is a File
+     @constant     DescriptorType_Socket                Stream is a Socket
+     @constant     DescriptorType_Pipe                  Stream is a Pipe
      */
-    typedef enum AsyncIO_StreamTypes {
-                   StreamType_Unspecified               = 0,
-                   StreamType_File                      = 1,
-                   StreamType_Socket                    = 2,
-                   StreamType_Pipe                      = 4,
-    } AsyncIO_StreamTypes;
+    typedef enum AsynchronousIO_DescriptorTypes {
+                   DescriptorType_Unspecified           = 0,
+                   DescriptorType_File                  = 1,
+                   DescriptorType_Socket                = 2,
+                   DescriptorType_Pipe                  = 4,
+    } AsynchronousIO_DescriptorTypes;
 
     /*!
-     @enum         AsyncIO_FileModes
+     @enum         AsynchronousIO_FileModes
      @constant     FileMode_Unspecified                 Invalid mode
      @constant     FileMode_Read                        Read the data in a file
      @constant     FileMode_Write                       Delete the contents of the file and write new data
@@ -45,7 +45,7 @@ extern "C" {
      @constant     FileMode_Text                        Processes newlines and other text specific stuff
      @constant     FileMode_Binary                      Raw access as opposed to FileMode_Text
      */
-    typedef enum AsyncIO_FileModes {
+    typedef enum AsynchronousIO_FileModes {
                    FileMode_Unspecified                 = 0,
                    FileMode_Read                        = 1,
                    FileMode_Write                       = 2,
@@ -53,45 +53,45 @@ extern "C" {
                    FileMode_Append                      = 8,
                    FileMode_Text                        = 16,
                    FileMode_Binary                      = 32,
-    } AsyncIO_FileModes;
+    } AsynchronousIO_FileModes;
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
-        constexpr inline AsyncIO_FileModes operator | (AsyncIO_FileModes A, AsyncIO_FileModes B) {
-            return static_cast<AsyncIO_FileModes>(static_cast<uint8_t>(A) | static_cast<uint8_t>(B));
+        constexpr inline AsynchronousIO_FileModes operator | (AsynchronousIO_FileModes A, AsynchronousIO_FileModes B) {
+            return static_cast<AsynchronousIO_FileModes>(static_cast<uint8_t>(A) | static_cast<uint8_t>(B));
         }
 
-        constexpr inline AsyncIO_FileModes operator & (AsyncIO_FileModes A, AsyncIO_FileModes B) {
-            return static_cast<AsyncIO_FileModes>(static_cast<uint8_t>(A) & static_cast<uint8_t>(B));
+        constexpr inline AsynchronousIO_FileModes operator & (AsynchronousIO_FileModes A, AsynchronousIO_FileModes B) {
+            return static_cast<AsynchronousIO_FileModes>(static_cast<uint8_t>(A) & static_cast<uint8_t>(B));
         }
 
-        constexpr inline AsyncIO_FileModes operator |= (AsyncIO_FileModes A, AsyncIO_FileModes B) {
+        constexpr inline AsynchronousIO_FileModes operator |= (AsynchronousIO_FileModes A, AsynchronousIO_FileModes B) {
             uint8_t A1 = static_cast<uint8_t>(A);
             uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<AsyncIO_FileModes>(A1 | B1);
+            return static_cast<AsynchronousIO_FileModes>(A1 | B1);
         }
 
-        constexpr inline AsyncIO_FileModes operator &= (AsyncIO_FileModes A, AsyncIO_FileModes B) {
+        constexpr inline AsynchronousIO_FileModes operator &= (AsynchronousIO_FileModes A, AsynchronousIO_FileModes B) {
             uint8_t A1 = static_cast<uint8_t>(A);
             uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<AsyncIO_FileModes>(A1 & B1);
+            return static_cast<AsynchronousIO_FileModes>(A1 & B1);
         }
     }
 #endif /* PlatformIO_Language */
     
     /*!
-     @enum        AsyncIO_SeekTypes
+     @enum        AsynchronousIO_SeekTypes
      @constant    SeekType_Beginning                    Seek from the beginning of the file.
      @constant    SeekType_Current                      Seek from the current position of the file.
      @constant    SeekType_End                          Seek from the end of the file.
      */
-    typedef enum AsyncIO_SeekTypes {
+    typedef enum AsynchronousIO_SeekTypes {
                   SeekType_Beginning                    = 0,
                   SeekType_Current                      = 1,
                   SeekType_End                          = 2,
-    } AsyncIO_SeekTypes;
+    } AsynchronousIO_SeekTypes;
 
     /*!
-     @enum        AsyncIO_PathTypes
+     @enum        AsynchronousIO_PathTypes
      @constant    PathType_Unspecified                  Invalid PathType.
      @constant    PathType_File                         The PathType is a File.
      @constant    PathType_Directory                    The PathType is a Folder, it can contain other files.
@@ -102,7 +102,7 @@ extern "C" {
      @constant    PathType_Special_IPCPipe              The PathType is a IPC Block Device; used fr Inter-Process Communication.
      @constant    PathType_Special_Block                The PathType is a Block Device.
      */
-    typedef enum AsyncIO_PathTypes {
+    typedef enum AsynchronousIO_PathTypes {
                   PathType_Unspecified                  = 0,
                   PathType_File                         = 1,
                   PathType_Directory                    = 2,
@@ -112,48 +112,48 @@ extern "C" {
                   PathType_Special_Char                 = 32,
                   PathType_Special_IPCPipe              = 64,
                   PathType_Special_Block                = 128,
-    } AsyncIO_PathTypes;
+    } AsynchronousIO_PathTypes;
 
     /*!
-     @typedef           AsyncIOStream
+     @typedef           AsynchronousIOStream
      @abstract                                          Contains File/Socket descriptors for file management.
      */
-    typedef struct      AsyncIOStream                   AsyncIOStream;
+    typedef struct      AsynchronousIOStream                   AsynchronousIOStream;
 
     /*!
-     @typedef           AsyncIO_Descriptor
+     @typedef           AsynchronousIO_Descriptor
      @abstract                                          Index to File/Socket pointers for writing from a BitBuffer.
      */
-    typedef             int                             AsyncIO_Descriptor;
+    typedef             int                             AsynchronousIO_Descriptor;
 
-    AsyncIOStream      *AsyncIOStream_Init(void);
+    AsynchronousIOStream      *AsynchronousIOStream_Init(void);
 
     /*!
-     @abstract                                          Gets AsyncIOStream's FileDescriptor
-     @param             Stream                          The AsyncIOStream to get the Descriptor from
+     @abstract                                          Gets AsynchronousIOStream's FileDescriptor
+     @param             Stream                          The AsynchronousIOStream to get the Descriptor from
      */
-    AsyncIO_Descriptor  AsyncIOStream_GetDescriptor(AsyncIOStream *Stream);
+    AsynchronousIO_Descriptor  AsynchronousIOStream_GetDescriptor(AsynchronousIOStream *Stream);
 
     /*!
-     @abstract                                          Sets AsyncIOStream's FileDescriptor.
-     @param             Stream                          The AsyncIOStream to set the File to.
-     @param             FileID                          The File to set as AsyncIOStream's file.
+     @abstract                                          Sets AsynchronousIOStream's FileDescriptor.
+     @param             Stream                          The AsynchronousIOStream to set the File to.
+     @param             FileID                          The File to set as AsynchronousIOStream's file.
      */
-    void                AsyncIOStream_SetDescriptor(AsyncIOStream *Stream, AsyncIO_Descriptor FileID);
+    void                AsynchronousIOStream_SetDescriptor(AsynchronousIOStream *Stream, AsynchronousIO_Descriptor FileID);
 
     /*!
-     @abstract                                          Gets the size of the AsyncIOStream file.
-     @param             Stream                          AsyncIOStream Pointer.
+     @abstract                                          Gets the size of the AsynchronousIOStream file.
+     @param             Stream                          AsynchronousIOStream Pointer.
      @return                                            Returns the value in BitI->FileSize if it exists.
      */
-    size_t              AsyncIOStream_GetSize(AsyncIOStream *Stream);
+    size_t              AsynchronousIOStream_GetSize(AsynchronousIOStream *Stream);
 
     /*!
-     @abstract                                          Gets the position of the AsyncIOStream file from the start.
-     @param             Stream                          AsyncIOStream Pointer.
+     @abstract                                          Gets the position of the AsynchronousIOStream file from the start.
+     @param             Stream                          AsynchronousIOStream Pointer.
      @return                                            Returns the position of the file in bytes from the beginning
      */
-    size_t              AsyncIOStream_GetPosition(AsyncIOStream *Stream);
+    size_t              AsynchronousIOStream_GetPosition(AsynchronousIOStream *Stream);
 
     /*!
      @abstract                                          Gets the number of bytes remaining
@@ -161,25 +161,25 @@ extern "C" {
      @param             Stream                          The stream in question
      @return                                            Returns the number of bytes remaining
      */
-    size_t              AsyncIOStream_GetBytesRemaining(AsyncIOStream *Stream);
-    /* AsyncIOStream */
+    size_t              AsynchronousIOStream_GetBytesRemaining(AsynchronousIOStream *Stream);
+    /* AsynchronousIOStream */
     
     /* BitBuffer */
     /*!
      @abstract                                          Opens a UTF8 encoded path and assigns it to Stream
-     @param             Stream                          A fresh instance of AsyncIOStream
+     @param             Stream                          A fresh instance of AsynchronousIOStream
      @param             Path8                           The UTF-8 encoded string to open
      @param             FileMode                        The configuration to use when Opening
      */
-    bool                AsyncIOStream_OpenPathUTF8(AsyncIOStream *Stream, ImmutableString_UTF8 Path8, AsyncIO_FileModes FileMode);
+    bool                AsynchronousIOStream_OpenPathUTF8(AsynchronousIOStream *Stream, ImmutableString_UTF8 Path8, AsynchronousIO_FileModes FileMode);
     
     /*!
      @abstract                                          Opens a UTF16 encoded path and assigns it to Stream
-     @param             Stream                          A fresh instance of AsyncIOStream
+     @param             Stream                          A fresh instance of AsynchronousIOStream
      @param             Path16                          The UTF-16 encoded string to open
      @param             FileMode                        The configuration to use when Opening
      */
-    bool                AsyncIOStream_OpenPathUTF16(AsyncIOStream *Stream, ImmutableString_UTF16 Path16, AsyncIO_FileModes FileMode);
+    bool                AsynchronousIOStream_OpenPathUTF16(AsynchronousIOStream *Stream, ImmutableString_UTF16 Path16, AsynchronousIO_FileModes FileMode);
     
     /*!
      @abstract                                          Reads data from Stream to Array
@@ -190,7 +190,7 @@ extern "C" {
      @param             NumElements                     The number of ElementSize elements to read
      @return                                            Returns the number of bytes actually read
      */
-    size_t              AsyncIOStream_Read(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements);
+    size_t              AsynchronousIOStream_Read(AsynchronousIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements);
     
     /*!
      @abstract                                          Writes data from Array to Stream
@@ -201,14 +201,14 @@ extern "C" {
      @param             NumElements                     The number of ElementSize elements to write
      @return                                            Returns the number of bytes actually written
      */
-    size_t              AsyncIOStream_Write(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements);
+    size_t              AsynchronousIOStream_Write(AsynchronousIOStream *Stream, void *Array, uint8_t ElementSize, size_t NumElements);
     
     /*!
      @abstract                                          Closes the Descriptor, after flushing any unwritten data
      @param             Stream                          The Stream to close
      @return                                            Returns true if the Descriptor was sucessfully (flushed, if necessary) and closed
      */
-    bool                AsyncIOStream_Deinit(AsyncIOStream *Stream);
+    bool                AsynchronousIOStream_Deinit(AsynchronousIOStream *Stream);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

@@ -8,13 +8,13 @@ extern "C" {
 
     bool Test_FileOpenWriteReadClose8(InsecurePRNG *Insecure) {
         bool TestPassed      = No;
-        AsyncIOStream *Write = AsyncIOStream_Init();
-        AsyncIOStream_OpenPathUTF8(Write, UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Write | FileMode_Binary);
-        AsyncIOStream_Write(Write, UTF8String("Wat"), 1, 4);
+        AsynchronousIOStream *Write = AsynchronousIOStream_Init();
+        AsynchronousIOStream_OpenPathUTF8(Write, UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Write | FileMode_Binary);
+        AsynchronousIOStream_Write(Write, UTF8String("Wat"), 1, 4);
         UTF8  String[4];
-        AsyncIOStream *Read  = AsyncIOStream_Init();
-        AsyncIOStream_OpenPathUTF8(Read, UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Read | FileMode_Binary);
-        AsyncIOStream_Read(Read, &String, 1, 3);
+        AsynchronousIOStream *Read  = AsynchronousIOStream_Init();
+        AsynchronousIOStream_OpenPathUTF8(Read, UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Read | FileMode_Binary);
+        AsynchronousIOStream_Read(Read, &String, 1, 3);
         if (String[0] == 'W' && String[1] == 'a' && String[2] == 't') {
             TestPassed  = Yes;
         }

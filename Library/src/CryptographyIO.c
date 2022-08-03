@@ -1,7 +1,7 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 
 #include "../include/AssertIO.h"          /* Included for Assertions */
-#include "../include/AsynchronousIO.h"    /* Included for AsyncIOStream_Init */
+#include "../include/AsynchronousIO.h"    /* Included for AsynchronousIOStream_Init */
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
 #include "../include/FileIO.h"            /* Included for File operations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */

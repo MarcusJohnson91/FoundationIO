@@ -1,7 +1,7 @@
 #include "../include/BufferIO.h"          /* Included for our declarations */
 
 #include "../include/AssertIO.h"          /* Included for Assertions */
-#include "../include/AsynchronousIO.h"    /* Included for AsyncIOStream */
+#include "../include/AsynchronousIO.h"    /* Included for AsynchronousIOStream */
 #include "../include/CryptographyIO.h"    /* Included for InsecurePRNG_CreateInteger */
 #include "../include/MathIO.h"            /* Included for Integer functions */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
@@ -13,8 +13,8 @@ extern "C" {
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
-        AsyncIOStream *Input;
-        AsyncIOStream *Output;
+        AsynchronousIOStream *Input;
+        AsynchronousIOStream *Output;
         uint8_t       *Buffer;
         size_t         BitOffset;
         size_t         NumBits;
@@ -31,14 +31,14 @@ extern "C" {
         return BitB;
     }
 
-    void BitBuffer_SetInputStream(BitBuffer *BitB, AsyncIOStream *Input) {
+    void BitBuffer_SetInputStream(BitBuffer *BitB, AsynchronousIOStream *Input) {
         AssertIO(BitB != NULL);
         AssertIO(Input != NULL);
 
         BitB->Input = Input;
     }
 
-    void BitBuffer_SetOutputStream(BitBuffer *BitB, AsyncIOStream *Output) {
+    void BitBuffer_SetOutputStream(BitBuffer *BitB, AsynchronousIOStream *Output) {
         AssertIO(BitB != NULL);
         AssertIO(Output != NULL);
 
@@ -148,8 +148,8 @@ extern "C" {
             };
             /*
              struct aiocb Async = {
-             .aio_fildes     = AsyncIOStream_GetDescriptor(BitB->Input),
-             .aio_offset     = AsyncIOStream_GetPosition(BitB->Input),
+             .aio_fildes     = AsynchronousIOStream_GetDescriptor(BitB->Input),
+             .aio_offset     = AsynchronousIOStream_GetPosition(BitB->Input),
              .aio_buf        = &BitB->Buffer[Bytes2Save],
              .aio_nbytes     = BufferSize - Bytes2Save,
              // aio_reqprio  = Request Priority
@@ -158,7 +158,7 @@ extern "C" {
              };
              aio_read(&Async);
              */
-            AsyncIOStream_Read(BitB->Input, BitB->Buffer, 1, Bits2Bytes(RoundingType_Down, BitB->NumBits));
+            AsynchronousIOStream_Read(BitB->Input, BitB->Buffer, 1, Bits2Bytes(RoundingType_Down, BitB->NumBits));
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
             // IO completion ports
 #endif
@@ -246,7 +246,7 @@ extern "C" {
                 Array[Byte]      = 0;
             }
         }
-        size_t BytesRead         = AsyncIOStream_Read(BitB->Input, Array, sizeof(Array[0]), Bytes2Read);
+        size_t BytesRead         = AsynchronousIOStream_Read(BitB->Input, Array, sizeof(Array[0]), Bytes2Read);
         AssertIO(BytesRead == Bytes2Read);
         BitBuffer_SetSize(BitB, BytesRead + ArrayOffset);
     }
@@ -259,7 +259,7 @@ extern "C" {
         uint8_t *Array           = BitBuffer_GetArray(BitB);
         size_t Bytes2Write       = Bits2Bytes(RoundingType_Down, BitBuffer_GetPosition(BitB));
         size_t Bits2Keep         = ArrayOffset % 8;
-        size_t BytesWritten      = AsyncIOStream_Write(BitB->Output, Array, sizeof(Array[0]), Bytes2Write);
+        size_t BytesWritten      = AsynchronousIOStream_Write(BitB->Output, Array, sizeof(Array[0]), Bytes2Write);
         AssertIO(BytesWritten == Bytes2Write);
         Array[0]             = 0;
         Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
