@@ -3,7 +3,7 @@
  @author          Marcus Johnson
  @copyright       2022+
  @version         1.0.0
- @brief           This header contains code assertions.
+ @brief           This header contains code for assertions.
  */
 
 #pragma once

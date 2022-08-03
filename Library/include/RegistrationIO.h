@@ -17,70 +17,6 @@
 extern "C" {
 #endif
 
-#ifndef RegistrationIO_Section_Create2
-#if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsMSVC)
-
-#define RegistrationIO_Section_Create2(SectionName) _Pragma("section("\"" #SectionName "\"", read)")
-
-#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang) || PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsGCC)
-#endif /* Compiler */
-#endif /* RegistrationIO_Section_Create2 */
-
-
-
-
-
-
-
-
-
-#ifndef RegistrationIO_Section_Append
-#if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsMSVC)
-#define RegistrationIO_Section_Append(SectionName) __declspec(allocate(#SectionName))
-#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang) || PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsGCC)
-#define RegistrationIO_Section_Append(SectionName) __attribute__((section(#SectionName)))
-#endif /* Compiler */
-#endif /* RegistrationIO_Section_Append */
-
-
-
-
-
-
-
-#ifndef RegistrationIO_Section_FindStart
-#if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsMSVC)
-
-#define RegistrationIO_Section_FindStart(SectionName) __declspec(allocate(#SectionName))
-
-#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang) || PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsGCC)
-#endif /* Compiler */
-#endif /* RegistrationIO_Section_Append */
-
-
-    /*
-     #pragma section(".init$a")
-     #pragma section(".init$u")
-     #pragma section(".init$z")
-
-     __declspec(allocate(".init$a")) int InitSectionStart = 0;
-     __declspec(allocate(".init$z")) int InitSectionEnd   = 0;
-
-     __declspec(allocate(".init$u")) int token1 = 0xdeadbeef;
-     __declspec(allocate(".init$u")) int token2 = 0xdeadc0de;
-
-     ----
-
-     #pragma section(".TestIO$a") // Start of the section
-     __declspec(allocate(".TestIO$a")) UTF8 *__start_TestIO = u8"TestIO_Start";
-
-     #pragma section(".TestIO$b") // Number of Suites
-     __declspec(allocate(".TestIO$b")) size_t __TestIO_NumSuites = TestIO_NumSuites;
-
-     #pragma section(".TestIO$z") // End of the section
-     __declspec(allocate(".TestIO$a")) UTF8 *__stop_TestIO = u8"TestIO_Stop";
-     */
-
 #ifndef RegistrationIO_Section_Create
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #define RegistrationIO_Section_Create(SectionName, SectionType)                         \
@@ -112,6 +48,59 @@ __attribute__((section(#SectionName), used)) static UTF8 RegistrationIO_Internal
 #endif /* Executable Format */
 #endif /* Compiler */
 #endif /* RegistrationIO_Section_Create */
+
+#ifndef RegistrationIO_Section_Append
+#if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsMSVC)
+#define RegistrationIO_Section_Append(SectionName) __declspec(allocate(#SectionName))
+#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang) || PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsGCC)
+#define RegistrationIO_Section_Append(SectionName) __attribute__((section(#SectionName)))
+#endif /* Compiler */
+#endif /* RegistrationIO_Section_Append */
+
+
+
+
+
+
+
+#ifndef RegistrationIO_Section_FindStart
+    /* Ok, so to find the section we have a system of named constants to look for; the system is RegistrationIO_Start_SectionName and RegistrationIO_Stop_SectionName; these two addresses allow us to compute the boundaries for the section and from there allow iterating over everything needed. */
+#if   PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsMSVC)
+#define RegistrationIO_Section_FindStart(SectionName) __declspec(allocate(#SectionName))
+    /*
+     We don't need to allocate anything; simply declare a variable that has already been created by th linker, the type is size_t type preferably saying the size
+
+     __start_#SectionName and __stop_#SectionName are the names in Clang/gcc, what about msvc?
+     */
+
+#elif PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsClang) || PlatformIO_Is(PlatformIO_Compiler, PlatformIO_CompilerIsGCC)
+#define RegistrationIO_Section_FindStart(SectionName) __start_#SectionName
+#endif /* Compiler */
+#endif /* RegistrationIO_Section_Append */
+
+
+    /*
+     #pragma section(".init$a")
+     #pragma section(".init$u")
+     #pragma section(".init$z")
+
+     __declspec(allocate(".init$a")) int InitSectionStart = 0;
+     __declspec(allocate(".init$z")) int InitSectionEnd   = 0;
+
+     __declspec(allocate(".init$u")) int token1 = 0xdeadbeef;
+     __declspec(allocate(".init$u")) int token2 = 0xdeadc0de;
+
+     ----
+
+     #pragma section(".TestIO$a") // Start of the section
+     __declspec(allocate(".TestIO$a")) UTF8 *__start_TestIO = u8"TestIO_Start";
+
+     #pragma section(".TestIO$b") // Number of Suites
+     __declspec(allocate(".TestIO$b")) size_t __TestIO_NumSuites = TestIO_NumSuites;
+
+     #pragma section(".TestIO$z") // End of the section
+     __declspec(allocate(".TestIO$a")) UTF8 *__stop_TestIO = u8"TestIO_Stop";
+     */
 
 #ifndef RegistrationIO_Section_GetAddress
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)

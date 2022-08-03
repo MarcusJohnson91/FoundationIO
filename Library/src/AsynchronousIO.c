@@ -43,7 +43,7 @@ extern "C" {
 
     typedef struct AsyncIOStream {
         size_t              StreamPosition;
-        size_t              StreamSize;
+        ssize_t             StreamSize;
         AsyncIO_Descriptor  StreamID;
         AsyncIO_StreamTypes StreamType;
     } AsyncIOStream;
@@ -61,9 +61,9 @@ extern "C" {
     static void AsyncIOStream_FindSize(AsyncIOStream *Stream) {
         AssertIO(Stream != NULL);
         AssertIO(Stream->StreamSize > 0);
-        AssertIO((Stream->StreamType & StreamType_File) == StreamType_File);
+        AssertIO(PlatformIO_Is(Stream->StreamType, StreamType_File));
 
-        size_t OriginalPosition   = lseek(Stream->StreamID, 0, SEEK_CUR);
+        ssize_t OriginalPosition  = lseek(Stream->StreamID, 0, SEEK_CUR);
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         Stream->StreamSize        = lseek(Stream->StreamID, 0, SEEK_END);
         lseek(Stream->StreamID, OriginalPosition, SEEK_SET);

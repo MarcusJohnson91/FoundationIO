@@ -1024,7 +1024,7 @@ extern "C" {
 
     /*!
      @abstract The point of this function is to make a strign safe, to make sure that like Trojan Source isn't possible, etc.
-     @abstract2 This function IS NOT meant to fix look-alike codepoints masquerading as others, for that see UTF32_
+     @discussion This function IS NOT meant to fix look-alike codepoints masquerading as others, for that see UTF32_
      */
     void UTF32_SanitizeBIDI() {
         // So, we need to know when and where BIDI directionality codepoints should and shouldn't be present.

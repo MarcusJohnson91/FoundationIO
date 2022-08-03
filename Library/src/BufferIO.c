@@ -42,7 +42,7 @@ extern "C" {
         AssertIO(BitB != NULL);
         AssertIO(Output != NULL);
 
-        BitB->Input = Output;
+        BitB->Output = Output;
     }
     
     size_t BitBuffer_GetSize(BitBuffer *BitB) {

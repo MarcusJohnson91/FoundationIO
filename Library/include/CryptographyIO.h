@@ -42,7 +42,7 @@ extern "C" {
      @param           IntegerSizeInBits     The number of bits for the integer to take up, between 1 and 64.
      @return                                Returns an integer matching those characteristics.
      */
-    int64_t           InsecurePRNG_CreateInteger(InsecurePRNG *Insecure, uint8_t IntegerSizeInBits);
+    uint64_t          InsecurePRNG_CreateInteger(InsecurePRNG *Insecure, uint8_t IntegerSizeInBits);
 
     /*!
      @abstract                              Generates an integer between MinValue and MaxValue, inclusive.
@@ -51,7 +51,7 @@ extern "C" {
      @param           MaxValue              The maximum valud value in the range, inclusive.
      @return                                Returns an integer matching those characteristics.
      */
-    int64_t           InsecurePRNG_CreateIntegerInRange(InsecurePRNG *Insecure, int64_t MinValue, int64_t MaxValue);
+    uint64_t          InsecurePRNG_CreateIntegerInRange(InsecurePRNG *Insecure, int64_t MinValue, int64_t MaxValue);
 
     /*!
      @abstract                              Generates a Decimal.

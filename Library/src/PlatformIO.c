@@ -36,6 +36,17 @@ extern "C" {
 #endif
         return TotalMemory;
     }
+
+    PlatformIO_Range Range_Init(size_t Start, size_t End) {
+        PlatformIO_Range Range;
+        Range.Start = Start;
+        Range.End = End;
+        return Range;
+    }
+
+    size_t Range_GetLength(PlatformIO_Range Range) {
+        return Range.End - Range.Start;
+    }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

@@ -439,7 +439,7 @@
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsLinux)
 #define _GNU_SOURCE /* Needed for syscalls like getrandom */
-#define __USE_TIME_BITS64
+//#define __USE_TIME_BITS64
 #define __USE_LARGEFILE64
 
 #endif /* Linux */
@@ -520,6 +520,16 @@
 #define             PlatformIO_Expand(...) __VA_ARGS__
 #endif /* PlatformIO_Expand */
 
+#ifndef             PlatformIO_Typeof
+#if (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#define             PlatformIO_Typeof(Value) __typeof__(Value)
+#endif /* Compiler */
+#endif /* PlatformIO_Typeof */
+
+#ifndef             PlatformIO_Generic
+#define             PlatformIO_Generic(Name, Value) PlatformIO_Typeof(Value) Name = Value;
+#endif /* PlatformIO_Generic */
+
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
@@ -538,6 +548,15 @@ extern "C" {
      @abstract      Gets the total amount of memory in the system.
      */
     size_t          PlatformIO_GetTotalMemoryInBytes(void);
+
+    typedef struct PlatformIO_Range {
+        size_t Start;
+        size_t End;
+    } PlatformIO_Range;
+
+    PlatformIO_Range Range_Init(size_t Start, size_t End);
+
+    size_t Range_GetLength(PlatformIO_Range Range);
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

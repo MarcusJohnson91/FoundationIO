@@ -437,7 +437,7 @@ extern "C" {
      @param      Exponent                         The value to calculate.
      @return                                      Returns the number of symbols required to store an integer.
      */
-    int64_t      Logarithm(const int64_t Base, const int64_t Exponent);
+    int64_t      Logarithm(const uint8_t Base, const int64_t Exponent);
     
     /*!
      @abstract                                    Byte swaps an integer.
@@ -616,6 +616,8 @@ extern "C" {
      @param       Returned                        Where to put the series of unpacked integers.
      */
     void          UnpackInteger64To32(uint64_t Value, uint32_t Returned[2]);
+
+    size_t        FloorPowerOfTwo(const size_t Value);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

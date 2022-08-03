@@ -105,7 +105,7 @@ extern "C" {
     int32_t FloorD(const double Decimal) {
         int32_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
-        int16_t  Exponent = ExtractExponentD(Decimal);
+        int32_t  Exponent = ExtractExponentD(Decimal);
         int64_t  Mantissa = ExtractMantissaD(Decimal);
         
         if (Mantissa == 0) {
@@ -141,7 +141,7 @@ extern "C" {
     int32_t CeilD(const double Decimal) {
         int32_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
-        int16_t  Exponent = ExtractExponentD(Decimal);
+        int32_t  Exponent = ExtractExponentD(Decimal);
         int64_t  Mantissa = ExtractMantissaD(Decimal);
         
         if (Mantissa == 0) {
@@ -172,7 +172,7 @@ extern "C" {
     int32_t RoundD(const double Decimal) {
         int32_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
-        int16_t  Exponent = ExtractExponentD(Decimal);
+        int32_t  Exponent = ExtractExponentD(Decimal);
         int64_t  Mantissa = ExtractMantissaD(Decimal);
         if (Mantissa >= 4096) {
             Result        = Exponent + 1;
@@ -229,7 +229,7 @@ extern "C" {
     
     bool DecimalIsNormalD(const double Decimal) {
         bool IsNormal = No;
-        int16_t Exponent = ExtractExponentD(Decimal);
+        int32_t Exponent = ExtractExponentD(Decimal);
         if (Exponent >= 1 && Exponent <= 0x7FE) {
             IsNormal  = Yes;
         }
@@ -394,7 +394,7 @@ extern "C" {
         return Value;
     }
     
-    int64_t Logarithm(const int64_t Base, const int64_t Exponent) {
+    int64_t Logarithm(const uint8_t Base, const int64_t Exponent) {
         int64_t  Result    = 0ULL;
         int64_t  Exponent2 = Exponent;
         if (Exponent2 != 0) {
@@ -557,6 +557,19 @@ __attribute__((no_sanitize("undefined")))
     void UnpackInteger64To32(uint64_t Value, uint32_t Returned[2]) {
         Returned[0] = (uint32_t) (Value >> 0);
         Returned[1] = (uint32_t) (Value >> 32);
+    }
+
+    size_t FloorPowerOfTwo(const size_t Value) {
+        size_t x = Value;
+        x = x | (x >> 1);
+        x = x | (x >> 2);
+        x = x | (x >> 4);
+        x = x | (x >> 8);
+        x = x | (x >> 16);
+#if __LP64__
+        x = x | (x >> 32);
+#endif
+        return x - (x >> 1);
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
