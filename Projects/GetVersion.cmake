@@ -1,7 +1,7 @@
 cmake_policy(SET CMP0056 NEW)
 cmake_policy(SET CMP0066 NEW)
 
-find_package(Git)
+find_package(Git REQUIRED)
 
 if(GIT_FOUND)
 function(GetVersionString VERSION_FILE OUTPUT_VERSION_STRING)
@@ -24,15 +24,11 @@ function(GetVersionString VERSION_FILE OUTPUT_VERSION_STRING)
         string(CONCAT Submodule_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../${GIT_ROOT_PATH}")
     endif(IS_DIRECTORY "../.git")
 
-    set(GIT_CMD "git describe")
-    set(GIT_ARGS "--abbrev=8 --always")
     set(GIT_VERSION "")
-    execute_process(COMMAND   git describe --abbrev=8 --always
-    WORKING_DIRECTORY ${Submodule_Dir}
-    OUTPUT_VARIABLE GIT_VERSION)
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe --abbrev=8 --always WORKING_DIRECTORY ${Submodule_Dir} OUTPUT_VARIABLE GIT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     set(Version_CommitID "")
-    string(TOUPPER ${GIT_VERSION} Version_CommitID)
+    string(TOUPPER "${GIT_VERSION}" Version_CommitID)
     string(CONCAT VERSION_STRING "${Version_Major}" "." "${Version_Minor}" "." "${Version_Patch}" ":" "${Version_CommitID}")
     set(${OUTPUT_VERSION_STRING} VERSION_STRING PARENT_SCOPE)
 endfunction()

@@ -2,22 +2,27 @@ prefix=${CMAKE_INSTALL_PREFIX}
 exec_prefix=${CMAKE_INSTALL_PREFIX}
 includedir=${CMAKE_INSTALL_PREFIX}/include
 libdir=${CMAKE_INSTALL_PREFIX}/lib
-Libs: -L${CMAKE_INSTALL_PREFIX}/lib -l:FoundationIO.@DynlibExt@
+Libs: -L${CMAKE_INSTALL_PREFIX}/lib -LFoundationIO.@LibraryExtension@
 Cflags: -I${CMAKE_INSTALL_PREFIX}/include
-Version: @VERSION_STRING@
+Version: @OUTPUT_VERSION_STRING@
 
 name:               FoundationIO
 description:        FoundationIO's purpose is to provide a consistent interface between platforms that is safer and easier to use.
+ArrayIO:            Array modification, used by the rest of FoundationIO.
+AssertIO:           Compile time assertions.
 AsynchronousIO:     Async reading and writing to file and socket descriptors.
 BufferIO:           Bitwise reading and writing to buffers.
 CryptographyIO:     en/de cryption algorithms as well as randomness generation.
 FileIO:             File and Path handling functions.
+GUUID:              UUID/GUID handling.
 MathIO:             Mathematical functions.
 NetworkIO:          TCPv6 and UDPv6 IP stack.
 PlatformIO:         Platform independence macros.
+RegistrationIO:     Creates sections in linked executables and libraries.
 TestIO:             Unit testing framework with automatic test registration, only available in Debug builds.
 TextIO:             The Unicode handling portion of FoundationIO, consists of:
     StringIO:       Generic string handling functions.
+    StringSetIO:    Array of strings.
     CommandLineIO:  Command line argument parsing and interface building.
     LocalizationIO: Culture aware Unicode handling, sorting, etc.
     FormatIO:       Unicode aware printf replacement.

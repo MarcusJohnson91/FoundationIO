@@ -11,18 +11,31 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" OR CMAKE_BUILD_TYPE STREQUAL "Debu
 add_definitions(-DPlatformIO_LoggingStatus=PlatformIO_EnableLogging)
 endif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" OR CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-if(EXISTS "../../Dependencies")
-set(FoundationIO_Root_Dir "..")
-elseif(NOT EXISTS "../../Dependencies")
-set(FoundationIO_Root_Dir "${CMAKE_CURRENT_SOURCE_DIR}/..")
-endif(EXISTS "../../Dependencies")
-
+set(FoundationIO_Projects_Dir  "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH INTERNAL FORCE)
+set(FoundationIO_Root_Dir      "${FoundationIO_Projects_Dir}/../" CACHE PATH INTERNAL FORCE)
 set(FoundationIO_Library_Dir   "${FoundationIO_Root_Dir}/Library" CACHE PATH INTERNAL FORCE)
 set(FoundationIO_Tests_Dir     "${FoundationIO_Library_Dir}/src/Tests" CACHE PATH INTERNAL FORCE)
 set(FoundationIO_TextIO_Tests  "${FoundationIO_Library_Dir}/src/TextIO/Tests" CACHE PATH INTERNAL FORCE)
 set(FoundationIO_Resources_Dir "${FoundationIO_Root_Dir}/Resources" CACHE PATH INTERNAL FORCE)
 set(FoundationIO_Build_Dir     "${FoundationIO_Root_Dir}/BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
-set(FoundationIO_Projects_Dir  "${FoundationIO_Root_Dir}/Projects")
+
+option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library? (.dylib/.dll/.so)" ON)
+
+if(BUILD_AS_SHARED_LIBRARY EQUAL TRUE)
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+        set(LibraryExtension "dylib")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+        set(LibraryExtension "dll")
+    else(CMAKE_HOST_SYSTEM_NAME NOT STREQUAL "Darwin" AND CMAKE_HOST_SYSTEM_NAME NOT STREQUAL "Windows")
+        set(LibraryExtension "so")
+    endif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+elseif(BUILD_AS_SHARED_LIBRARY EQUAL FALSE)
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+        set(LibraryExtension "lib")
+    elseif(CMAKE_HOST_SYSTEM_NAME NOT STREQUAL "Windows")
+        set(LibraryExtension "a")
+    endif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+endif(BUILD_AS_SHARED_LIBRARY EQUAL TRUE)
 
 if(IS_DIRECTORY "../.git")
 set(CMAKE_OUTPUT_DIRECTORY         "${FoundationIO_Build_Dir}")
@@ -31,7 +44,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${FoundationIO_Build_Dir}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${FoundationIO_Build_Dir}/bin")
 endif(IS_DIRECTORY "../.git")
 
-set(FoundationIO_VERSION      "")
+set(FoundationIO_VERSION "")
 include(${FoundationIO_Projects_Dir}/GetVersion.cmake)
 GetVersionString(${FoundationIO_Library_Dir}/FoundationIO.h FoundationIO_VERSION)
 
@@ -39,22 +52,19 @@ include(${FoundationIO_Projects_Dir}/BuildSettings.cmake)
 
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
     message("We're checking if TextIOTables.h should be updated, it will take between a few seconds and 5 minutes.")
-    execute_process(
-    COMMAND sh "${FoundationIO_Projects_Dir}/TextIOTables_Create.sh"
+    execute_process(COMMAND sh "${FoundationIO_Projects_Dir}/TextIOTables_Create.sh"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE TextIOTables_Create_Status 
     RESULTS_VARIABLE STDOUT
-    ERROR_VARIABLE STDERR
-)
+    ERROR_VARIABLE STDERR)
 endif(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
 
 if(IS_DIRECTORY "../.git")
 configure_file("${FoundationIO_Resources_Dir}/FoundationIO.pc.in" "${CMAKE_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc")
-else()
-configure_file("${FoundationIO_Resources_Dir}/FoundationIO.pc.in" "${CMAKE_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc")
 endif(IS_DIRECTORY "../.git")
 
 set(FoundationIO_SOURCE
+    "${FoundationIO_Library_Dir}/src/ArrayIO.c"
     "${FoundationIO_Library_Dir}/src/AssertIO.c"
     "${FoundationIO_Library_Dir}/src/AsynchronousIO.c"
     "${FoundationIO_Library_Dir}/src/BufferIO.c"
@@ -64,6 +74,7 @@ set(FoundationIO_SOURCE
     "${FoundationIO_Library_Dir}/src/MathIO.c"
     "${FoundationIO_Library_Dir}/src/NetworkIO.c"
     "${FoundationIO_Library_Dir}/src/PlatformIO.c"
+    "${FoundationIO_Library_Dir}/src/SortIO.c"
     "${FoundationIO_Library_Dir}/src/TestIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/CommandLineIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/FormatIO.c"
@@ -81,8 +92,6 @@ else()
     set(FOUNDATIONIO_SOURCE_WITH_TESTIO "${FoundationIO_SOURCE}")
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
-option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library? (.dylib/.dll/.so)" ON)
-
 if(BUILD_AS_SHARED_LIBRARY MATCHES ON)
     add_library(FoundationIO SHARED ${FOUNDATIONIO_SOURCE_WITH_TESTIO})
 elseif(BUILD_AS_SHARED_LIBRARY MATCHES OFF)
@@ -98,12 +107,13 @@ set_target_properties(FoundationIO PROPERTIES PREFIX "")
 target_include_directories(FoundationIO PUBLIC "${FoundationIO_Library_Dir}/include")
 target_include_directories(FoundationIO PUBLIC "${FoundationIO_Library_Dir}/include/TextIO")
 
-if(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
-    set(CMAKE_INSTALL_PREFIX "/usr/local/FoundationIO")
-    # and lets alias the library back to the normal /usr/local location
-elseif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_WIN32)
-    set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO")
-endif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
+if(IS_DIRECTORY "../.git")
+    if(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
+        set(CMAKE_INSTALL_PREFIX "/usr/local/FoundationIO")
+    elseif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_WIN32)
+        set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO")
+    endif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
+endif(IS_DIRECTORY "../.git")
 
 install(TARGETS FoundationIO                                        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 install(DIRECTORY "${FoundationIO_Build_Dir}/include"               DESTINATION "${CMAKE_INSTALL_PREFIX}/include" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
