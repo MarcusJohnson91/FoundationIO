@@ -508,7 +508,7 @@ typedef                   const UTF32                         *MutableStringSet_
 #define                   UTF8StringSet(...)                    {PlatformIO_Expand(__VA_ARGS__), UTF8String("\0")}
 #define                   UTF8Character(Literal)                PlatformIO_Cast(ImmutableChar_UTF8, u8##Literal)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define                   UTF8String(Literal)                   _Generic((Literal), char:(UTF8*) u8##Literal, char*:(UTF8*) u8##Literal, char[PlatformIO_GetStringSize(Literal)]:(UTF8*) u8##Literal, signed char:(UTF8*) u8##Literal, signed char*:(UTF8*) u8##Literal, signed char[PlatformIO_GetStringSize(Literal)]:(UTF8*) u8##Literal, unsigned char:(UTF8*) u8##Literal, unsigned char*:(UTF8*) u8##Literal, unsigned char[PlatformIO_GetStringSize(Literal)]:(UTF8*) u8##Literal, const char: (const UTF8*) u8##Literal, const char*: (const UTF8*) u8##Literal, const char[PlatformIO_GetStringSize(Literal)]:(UTF8*) u8##Literal, const signed char: (const UTF8*) u8##Literal, const signed char*: (const UTF8*) u8##Literal, const signed char[PlatformIO_GetStringSize(Literal)]: (const UTF8*) u8##Literal, const unsigned char: (const UTF8*) u8##Literal, const unsigned char*: (const UTF8*) u8##Literal, const unsigned char[PlatformIO_GetStringSize(Literal)]: (const UTF8*) u8##Literal)
+#define                   UTF8String(Literal) _Generic(Literal, char[PlatformIO_GetStringSizeInCodeUnits(Literal)]: u8##Literal, char8_t[PlatformIO_GetStringSizeInCodeUnits(Literal)]: u8##Literal, signed char[PlatformIO_GetStringSizeInCodeUnits(Literal)]: u8##Literal, const char[PlatformIO_GetStringSizeInCodeUnits(Literal)]: u8##Literal, const signed char[PlatformIO_GetStringSizeInCodeUnits(Literal)]: u8##Literal, const char8_t[PlatformIO_GetStringSizeInCodeUnits(Literal)]: u8##Literal, char *: (UTF8*) u8##Literal, signed char *: (UTF8*) u8##Literal, char8_t *: (UTF8*) u8##Literal, const char *: (const UTF8*) u8##Literal, const signed char *: (const UTF8*) u8##Literal, const char8_t *: (const UTF8*) u8##Literal)
 #define                   UTF8StringSet(...)                    {PlatformIO_Expand(__VA_ARGS__), UTF8String("\0")}
 #define                   UTF8Character(Literal)                _Generic((0,Literal), unsigned char:(UTF8) u8##Literal, signed char:(UTF8) u8##Literal, char:(UTF8) u8##Literal)
 #endif /* PlatformIO_Language */
@@ -584,11 +584,11 @@ typedef                   const UTF32                         *MutableStringSet_
         char8_t *Data;
     } TextIO_String32;
 
-    //_Generic((Literal), UTF8[]:PlatformIO_GetStringSize, UTF8*:UTF8_GetStringSizeInCodeUnits)
+    //_Generic((Literal), UTF8[]:PlatformIO_GetStringSizeInCodeUnits, UTF8*:UTF8_GetStringSizeInCodeUnits)
 
-#define String8Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSize(Literal), .Data = Literal}
-#define String16Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSize(Literal), .Data = Literal}
-#define String32Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSize(Literal), .Data = Literal}
+#define String8Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Data = Literal}
+#define String16Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Data = Literal}
+#define String32Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Data = Literal}
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

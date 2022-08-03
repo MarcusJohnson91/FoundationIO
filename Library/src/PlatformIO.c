@@ -20,7 +20,7 @@ extern "C" {
     size_t PlatformIO_GetTotalMemoryInBytes(void) {
         size_t TotalMemory = 0ULL;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
-        size_t PageSize      = sysconf(_SC_PAGE_SIZE);
+        size_t PageSize      = (size_t) sysconf(_SC_PAGE_SIZE);
         size_t NumPages;
         size_t len           = sizeof(NumPages);
         sysctlbyname("hw.memsize", &NumPages, &len, NULL, 0);
