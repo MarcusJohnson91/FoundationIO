@@ -1,5 +1,6 @@
-#include "../../../include/TextIO/StringSetIO.h"   /* Included for our declarations */
 #include "../../../include/TestIO.h"               /* Included for testing */
+#include "../../../include/TextIO/StringSetIO.h"   /* Included for our declarations */
+
 #include "../../../include/CryptographyIO.h"       /* Included for testing */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

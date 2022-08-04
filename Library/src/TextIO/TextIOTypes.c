@@ -1,7 +1,6 @@
 #include "../../include/TextIO/TextIOTypes.h"          /* Included for our declarations */
 
 #include "../../include/AssertIO.h"                    /* Included for Assertions */
-#include "../../include/TextIO/Private/TextIOTables.h" /* Included for the tables */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

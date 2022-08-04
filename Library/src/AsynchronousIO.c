@@ -35,7 +35,7 @@
 #if PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
 // use IO Completion Ports
 #include <IOAPI.h>
-#endif /* Linux/Windows */
+#endif /* Windows */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

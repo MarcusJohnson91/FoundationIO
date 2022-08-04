@@ -1,7 +1,7 @@
+#include "../../include/TestIO.h"           /* Included for testing */
 #include "../../include/BufferIO.h"         /* Included for our declarations */
 
 #include "../../include/AssertIO.h"         /* Included for Assertions */
-#include "../../include/TestIO.h"           /* Included for testing */
 #include "../../include/MathIO.h"
 #include "../../include/CryptographyIO.h"
 

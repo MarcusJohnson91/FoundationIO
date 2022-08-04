@@ -1,9 +1,9 @@
 #include "../include/PlatformIO.h"         /* Included for our declarations */
 
 #include "../include/AssertIO.h"           /* Included for Assertions */
-#include "../include/TextIO/TextIOTypes.h" /* Included for NewLine8 */
 #include "../include/TextIO/FormatIO.h"    /* Included for UTF8_Format */
 #include "../include/TextIO/StringIO.h"    /* Included for WriteLine8 */
+#include "../include/TextIO/TextIOTypes.h" /* Included for NewLine8 */
 
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsApple)
 #include <sys/sysctl.h>

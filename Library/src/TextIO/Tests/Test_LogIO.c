@@ -1,5 +1,5 @@
-#include "../../../include/TextIO/LogIO.h" /* Included for our declaations */
 #include "../../../include/TestIO.h"       /* Included for testing */
+#include "../../../include/TextIO/LogIO.h" /* Included for our declaations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
