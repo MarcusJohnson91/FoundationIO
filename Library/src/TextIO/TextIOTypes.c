@@ -6,20 +6,28 @@
 extern "C" {
 #endif
 
-    TextIO_Slice TextIO_Slice_Set(size_t StartInCodeUnits, size_t EndInCodeUnits) {
-        AssertIO(EndInCodeUnits > StartInCodeUnits);
-        TextIO_Slice Slice;
-        Slice.StartInCodeUnits = StartInCodeUnits;
-        Slice.EndInCodeUnits   = EndInCodeUnits;
-        return Slice;
-    }
+    typedef struct Unicode8 {
+        size_t  NumCodeUnits;
+        char8_t Array[];
+    } Unicode8;
 
-    size_t TextIO_Slice_GetStartInCodeUnits(TextIO_Slice Slice) {
-        return Slice.StartInCodeUnits;
-    }
+#define UTF8Constant(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Array = Literal}
 
-    size_t TextIO_Slice_GetEndInCodeUnits(TextIO_Slice Slice) {
-        return Slice.EndInCodeUnits;
+    Unicode8 Blah2 = UTF8Constant("Blah?");
+
+    bool Unicode8_Compare(Unicode8 String1, Unicode8 String2) {
+        bool StringsMatch = true;
+        if (String1.NumCodeUnits == String2.NumCodeUnits) {
+            for (size_t CodeUnit = 0; CodeUnit < String1.NumCodeUnits; CodeUnit++) {
+                if (String1.Array[CodeUnit] != String2.Array[CodeUnit]) {
+                    StringsMatch = false;
+                    break;
+                }
+            }
+        } else {
+            StringsMatch = false;
+        }
+        return StringsMatch;
     }
   
 

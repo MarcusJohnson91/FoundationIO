@@ -541,34 +541,6 @@ typedef                   const UTF32                         *MutableStringSet_
 #endif /* PlatformIO_Language */
 #endif /* TextIO_Unicodize32 */
 
-    typedef struct TextIO_Slice {
-        size_t StartInCodeUnits;
-        size_t EndInCodeUnits;
-    } TextIO_Slice;
-
-    /* TextIO_Slice Functions */
-    /*!
-     @abstract                                              Creates an instance of a TextIO_Slice.
-     @param               StartInCodeUnits                  Where should the string start?
-     @param               EndInCodeUnits                    Where should the string end?
-     */
-    TextIO_Slice          TextIO_Slice_Set(size_t StartInCodeUnits, size_t EndInCodeUnits);
-
-    /*!
-     @abstract                                              Where does this slice start?
-     @param               Slice                             The instance of the TextIO_Slice.
-     @return                                                The Start of the TextIO_Slice in CodeUnits.
-     */
-    size_t                TextIO_Slice_GetStartInCodeUnits(TextIO_Slice Slice);
-
-    /*!
-     @abstract                                              Where does this slice end?
-     @param               Slice                             The instance of the TextIO_Slice.
-     @return                                                The End of the TextIO_Slice in CodeUnits.
-     */
-    size_t                TextIO_Slice_GetEndInCodeUnits(TextIO_Slice Slice);
-    /* TextIO_Slice Functions */
-
     typedef struct TextIO_String8 {
         size_t   NumCodeUnits;
         char8_t *Data;
