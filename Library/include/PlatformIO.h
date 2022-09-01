@@ -520,21 +520,11 @@
 #define             PlatformIO_Expand(...) __VA_ARGS__
 #endif /* PlatformIO_Expand */
 
-#ifndef             PlatformIO_Typeof
-#if (PlatformIO_Compiler == PlatformIO_CompilerIsClang) || (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-#define             PlatformIO_Typeof(Value) __typeof__(Value)
-#endif /* Compiler */
-#endif /* PlatformIO_Typeof */
-
-#ifndef             PlatformIO_Generic
-#define             PlatformIO_Generic(Name, Value) PlatformIO_Typeof(Value) Name = Value;
-#endif /* PlatformIO_Generic */
-
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
-    typedef enum PlatformIOTypes {
+    typedef enum PlatformIOTypes : uint8_t {
         PlatformIOType_Unspecified  = 0,
         PlatformIOType_Unsigned     = 1,
         PlatformIOType_Signed       = 2,

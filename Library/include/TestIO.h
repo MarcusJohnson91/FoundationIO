@@ -70,7 +70,7 @@ extern "C" {
      @constant     TestState_Enabled              The test is enabled.
      @constant     TestState_Disabled             The test is disabled.
      */
-    typedef enum TestIO_TestStates {
+    typedef enum TestIO_TestStates : uint8_t {
         TestState_Unspecified          = 0,
         TestState_Enabled              = 1,
         TestState_Disabled             = 2,
@@ -83,7 +83,7 @@ extern "C" {
      @constant     Outcome_Passed                 The test passed.
      @constant     Outcome_Failed                 The test failed.
      */
-    typedef enum TestIO_TestOutcomes {
+    typedef enum TestIO_TestOutcomes : uint8_t {
         Outcome_Unspecified            = 0,
         Outcome_Passed                 = 1,
         Outcome_Failed                 = 2,

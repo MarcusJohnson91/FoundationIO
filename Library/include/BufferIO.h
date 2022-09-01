@@ -29,7 +29,7 @@ extern "C" {
      @constant     UnaryType_Whole                 Supports whole numbers (including zero).
      @constant     UnaryType_Truncated             Supports all the integers including zero and negatives (up to 2^63 anyway).
      */
-    typedef enum BufferIO_UnaryTypes {
+    typedef enum BufferIO_UnaryTypes : uint8_t {
                    UnaryType_Unspecified           = 0,
                    UnaryType_Natural               = 1,
                    UnaryType_Whole                 = 3,
@@ -41,7 +41,7 @@ extern "C" {
      @constant     UnaryTerminator_Zero            The stop bit is 0.
      @constant     UnaryTerminator_One             The stop bit is 1.
      */
-    typedef enum BufferIO_UnaryTerminators {
+    typedef enum BufferIO_UnaryTerminators : uint8_t {
                    UnaryTerminator_Zero            = 0,
                    UnaryTerminator_One             = 1,
     } BufferIO_UnaryTerminators;
@@ -54,7 +54,7 @@ extern "C" {
      @constant    ByteOrder_Right2Left             The least significant byte is the closest to the current offset.
      @constant    ByteOrder_Left2Right             The least significant byte is the farthest from the current offset.
      */
-    typedef enum BufferIO_ByteOrders {
+    typedef enum BufferIO_ByteOrders : uint8_t {
                   ByteOrder_Unspecified          = 0,
                   ByteOrder_Right2Left           = 1,
                   ByteOrder_Left2Right           = 2,
@@ -68,7 +68,7 @@ extern "C" {
      @constant     BitOrder_LSBitIsNearest         The least significant byte is the closest to the current offset; previously LSBit.
      @constant     BitOrder_Left2Right             The least significant byte is the farthest from the current offset; previously MSBit.
      */
-    typedef enum BufferIO_BitOrders {
+    typedef enum BufferIO_BitOrders : uint8_t {
                    BitOrder_Unspecified            = 0,
                    BitOrder_Right2Left             = 1,
                    BitOrder_Left2Right             = 2,
@@ -79,7 +79,8 @@ extern "C" {
      @constant     StringTerminator_NULL           Write the NULL Terminator.
      @constant     StringTerminator_Sized          Do not write the null terminaotr, there's a size field.
      */
-    typedef enum BufferIO_StringTerminators {
+    typedef enum BufferIO_StringTerminators : uint8_t {
+                   StringTerminator_Unspecified    = 0,
                    StringTerminator_NULL           = 1,
                    StringTerminator_Sized          = 2,
     } BufferIO_StringTerminators;

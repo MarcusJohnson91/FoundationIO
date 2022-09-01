@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-    typedef enum StringSetConstants {
+    typedef enum StringSetConstants : uint16_t {
         UTF8_Debug_Text_8       = 0x38,
         UTF16_Debug_Text_16BE   = 0x3136,
         UTF16_Debug_Text_16LE   = 0x3631,

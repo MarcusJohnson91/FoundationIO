@@ -10,7 +10,7 @@ extern "C" {
 #define Suite_CommandLineIO_RegisteredTests TestIO_NULLCase
 #define Suite_CommandLineIO_NumTests 0
     
-    typedef enum Switches {
+    typedef enum Switches : uint8_t {
         Input       = 0,
         Output      = 1,
         Help        = 2,

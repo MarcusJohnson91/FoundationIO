@@ -10,7 +10,7 @@ extern "C" {
      @enum         MathIO_Constants
      @abstract                                    Mathematical constants
      */
-    typedef enum MathIO_Constants {
+    typedef enum MathIO_Constants : uint16_t {
                    Decimal64Bias                  = 1023,
                    Decimal32Bias                  = 127,
                    Decimal64MantissaSize          = 52,

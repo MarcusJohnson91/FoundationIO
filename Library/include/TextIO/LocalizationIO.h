@@ -22,7 +22,7 @@ extern "C" {
      @abstract                                            What language is in use, for colation, sorting, etc.
      @constant     WrittenLanguage_Unspecified            Unspecified, falls back to locale.
      */
-    typedef enum LocalizationIO_WrittenLanguages {
+    typedef enum LocalizationIO_WrittenLanguages : uint16_t {
                    WrittenLanguage_Unspecified            = 0,
                    WrittenLanguage_English                = 1,
                    WrittenLanguage_Swedish                = 2,
@@ -86,7 +86,7 @@ extern "C" {
      @abstract                                            What language is in use, for colation, sorting, etc.
      @constant     SpokenLanguage_Unspecified             Unspecified, falls back to locale.
      */
-    typedef enum LocalizationIO_SpokenLanguages {
+    typedef enum LocalizationIO_SpokenLanguages : uint16_t {
                    SpokenLanguage_Unspecified             = 0,
                    SpokenLanguage_English                 = 1,
                    SpokenLanguage_Swedish                 = 2,
@@ -128,7 +128,7 @@ extern "C" {
      @constant   RegionID_ASCII                           a-z and A-Z are sorted in a traditional, C/POSIX way.
      What about C and POSIX tho?
      */
-    typedef enum LocalizationIO_RegionIDs {
+    typedef enum LocalizationIO_RegionIDs : uint16_t {
                    RegionID_Unspecified                   = 0,
                    RegionID_Unicode                       = 1,
                    RegionID_ASCII                         = 2,
@@ -155,7 +155,7 @@ extern "C" {
      @enum         LocalizationIO_DecimalSeperators
      @abstract                                            What decimal seperator is in use, for collation, sorting, etc.
      */
-    typedef enum LocalizationIO_DecimalSeperators {
+    typedef enum LocalizationIO_DecimalSeperators : uint8_t {
                    DecimalSeperator_Unspecified           = 0,
                    DecimalSeperator_Period                = 1,
                    DecimalSeperator_Comma                 = 2,
@@ -166,7 +166,7 @@ extern "C" {
      @enum         LocalizationIO_GroupSeperators
      @abstract                                            What group seperator is in use, for collation, sorting, etc.
      */
-    typedef enum LocalizationIO_GroupSeperators {
+    typedef enum LocalizationIO_GroupSeperators : uint8_t {
                    GroupSeperator_Unspecified             = 0,
                    GroupSeperator_Comma                   = 1,
                    GroupSeperator_Period                  = 2,

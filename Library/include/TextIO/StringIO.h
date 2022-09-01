@@ -42,7 +42,7 @@ extern "C" {
      @constant     UTF8MaxCodeUnitsInCodePoint           The maximum number of codeunits per codepoint.
      @constant     UTF16MaxCodeUnitsInCodePoint          The maximum number of codeunits per codepoint.
      */
-    typedef enum StringIOCommon {
+    typedef enum StringIOCommon : uint32_t {
                    UTF8CodeUnitSizeInBits                = 8,
                    UTF16CodeUnitSizeInBits               = 16,
                    UTF32CodeUnitSizeInBits               = 32,
@@ -77,7 +77,7 @@ extern "C" {
      @constant     CodePage_Unspecified                  Invalid conversion type.
      @constant     CodePage_ISO_8859_1                   ISO/IEC 8859-1 to/from Unicode.
      */
-    typedef enum StringIO_CodePages {
+    typedef enum StringIO_CodePages : uint32_t {
                    CodePage_Unspecified                  = 0,
                    CodePage_ISO_8859_1                   = 1,
     } StringIO_CodePages;
@@ -90,7 +90,7 @@ extern "C" {
      @constant     NormalizationForm_KompatibleDecompose NormalizationForm_CanonicalDecompose, plus Kompatibility decompositions.
      @constant     NormalizationForm_KompatibleCompose   NormalizationForm_CanonicalDecompose, plus Kompatibility compositions.
      */
-    typedef enum StringIO_NormalizationForms {
+    typedef enum StringIO_NormalizationForms : uint8_t {
                    NormalizationForm_Unspecified         = 0,
                    NormalizationForm_CanonicalDecompose  = 1,
                    NormalizationForm_CanonicalCompose    = 2,
@@ -106,7 +106,7 @@ extern "C" {
      @constant     StringIO_BOM_Little                   Use the little endian, Least-Significant-Byte first order.
      @constant     StringIO_BOM_Big                      Use the big endian, Most-Significant-Byte first order.
      */
-    typedef enum StringIO_BOMs {
+    typedef enum StringIO_BOMs : uint8_t {
                    StringIO_BOM_Unspecified              = 0,
                    StringIO_BOM_Native                   = 1,
                    StringIO_BOM_Little                   = 2,
@@ -120,7 +120,7 @@ extern "C" {
      @constant     TruncationType_All                    Trim at the beginning and end, removing all occurrences found there.
      @constant     TruncationType_Most1                  Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints
      */
-    typedef enum StringIO_TruncationTypes {
+    typedef enum StringIO_TruncationTypes : uint8_t {
                    TruncationType_Unspecified            = 0,
                    TruncationType_All                    = 1,
                    TruncationType_Most1                  = 2,
@@ -133,7 +133,7 @@ extern "C" {
      @constant     WhitespaceType_Insignificant          Ignore whitespace.
      @constant     WhitespaceType_Significant            Whitespace matters, don't ignore it.
      */
-    typedef enum StringIO_WhitespaceTypes {
+    typedef enum StringIO_WhitespaceTypes : uint8_t {
                    WhitespaceType_Unspecified            = 0,
                    WhitespaceType_Insignificant          = 1,
                    WhitespaceType_Significant            = 2,
@@ -153,7 +153,7 @@ extern "C" {
      @constant     LineBreakType_LineSeparator           Line Seperator aka 0x2028 '\u2028'
      @constant     LineBreakType_ParagraphSeparator      Paragraph Seperator aka 0x2029 '\u2029'
      */
-    typedef enum StringIO_LineBreakTypes {
+    typedef enum StringIO_LineBreakTypes : uint8_t {
                    LineBreakType_Unspecified             = 0,
                    LineBreakType_LineFeed                = 1,
                    LineBreakType_VerticalTab             = 2,
@@ -169,9 +169,9 @@ extern "C" {
     /*!
      @enum         CodePointClass
      @abstract                                           Should whitespace be ignored or not?
-     @constant     CodePointClass_Unspecified            Unknown TrimString command.
+     @constant     CodePointClass_Unspecified            Unspecified Codepoint class.
      */
-    typedef enum CodePointClass {
+    typedef enum CodePointClass : uint8_t {
         CodePointClass_Unspecified                       = 0,
         CodePointClass_CCCOverlay                        = 1,
         CodePointClass_CCCNukta                          = 7,

@@ -21,7 +21,7 @@ extern "C" {
      read CodeUnits from a string into a CodePoint, read CodePoints into Graphemes, then handle it all correctly.
      */
 
-    typedef enum StringIOConstants {
+    typedef enum StringIOConstants : uint16_t {
         UTF8Header_NumCodeUnits = 0xF8,
         UTF8Header_4CodeUnits   = 0xF0,
         UTF8Header_3CodeUnits   = 0xE0,

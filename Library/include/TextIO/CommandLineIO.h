@@ -49,7 +49,7 @@ extern "C" {
      @constant     SwitchType_Parent               This switch type denotes that it can not have any parents, it has 1 or more children.
      @constant     SwitchType_Child                This switch type denotes that it can not be a parent
      */
-    typedef enum CommandLineIO_SwitchTypes {
+    typedef enum CommandLineIO_SwitchTypes : uint8_t {
                    SwitchType_Unspecified          = 0,
                    SwitchType_Required             = 1,
                    SwitchType_Existential          = 1,
@@ -66,7 +66,7 @@ extern "C" {
      @constant     SwitchStatus_Optional           The Switch MAY be present.
      @constant     SwitchStatus_Incompatible       The Switch can only be present if none of it's incompatible Switch are present.
      */
-    typedef enum CommandLineIO_SwitchStatuses {
+    typedef enum CommandLineIO_SwitchStatuses : uint8_t {
                    SwitchStatus_Unspecified        = 0,
                    SwitchStatus_Required           = 1,
                    SwitchStatus_Optional           = 2,
@@ -83,7 +83,7 @@ extern "C" {
      @constant     SwitchArgument_Bool             String containing true, false, yes, no, 1, 0, with any capitalization.
      @constant     SwitchArgument_String           Generic string that the program's author will further process.
      */
-    typedef enum CommandLineIO_SwitchArguments {
+    typedef enum CommandLineIO_SwitchArguments : uint8_t {
                    SwitchArgument_Unspecified      = 0,
                    SwitchArgument_Path             = 1,
                    SwitchArgument_URL              = 2,
@@ -100,7 +100,7 @@ extern "C" {
      @constant     LicenseType_Proprietary         The Argument can not have any slaves.
      @constant     LicenseType_Copyleft            The Argument is a slave.
      */
-    typedef enum CommandLineIO_LicenseTypes {
+    typedef enum CommandLineIO_LicenseTypes : uint8_t {
                    LicenseType_Unspecified         = 0,
                    LicenseType_Permissive          = 1,
                    LicenseType_Proprietary         = 2,
@@ -116,7 +116,7 @@ extern "C" {
      @constant     ColorType_Bold                  Make this text bold.
      @constant     ColorType_Underlined            Make this text underlined.
      */
-    typedef enum CommandLineIO_ColorTypes {
+    typedef enum CommandLineIO_ColorTypes : uint8_t {
                    ColorType_Unspecified           = 0,
                    ColorType_Foreground            = 1,
                    ColorType_Background            = 2,

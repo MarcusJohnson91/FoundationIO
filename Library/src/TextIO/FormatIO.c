@@ -21,7 +21,7 @@ extern "C" {
      @constant     BaseType_Pointer               The specifier is a Pointer address.
      @constant     BaseType_RemoveN               The specifier is N, we remove it for interoperability.
      */
-    typedef enum FormatIO_BaseTypes {
+    typedef enum FormatIO_BaseTypes : uint8_t {
         BaseType_Unspecified           = 0,
         BaseType_Integer               = 1,
         BaseType_Decimal               = 2,
@@ -73,7 +73,7 @@ extern "C" {
      @constant     ModifierType_Signed            The modifier is a Signed Integer.
      @constant     ModifierType_Unsigned          The modifier is a Unsigned Integer.
      */
-    typedef enum FormatIO_ModifierTypes {
+    typedef enum FormatIO_ModifierTypes : uint16_t {
         ModifierType_Unspecified       = 0,
         ModifierType_UTF8              = 1,
         ModifierType_UTF16             = 2,
@@ -125,7 +125,7 @@ extern "C" {
      @constant     ModifierLength_PointerDiff     The length is Pointer Diff as in ptrdiff_t/uptrdiff_t.
      @constant     ModifierLength_IntMax          The length is IntMax as in intmax_t.
      */
-    typedef enum FormatIO_ModifierLengths {
+    typedef enum FormatIO_ModifierLengths : uint8_t {
         ModifierLength_Unspecified     = 0,
         ModifierLength_8Bit            = 1,
         ModifierLength_16Bit           = 2,
@@ -171,7 +171,7 @@ extern "C" {
      @constant     Flag_Pound_DecimalSuffix       The length is IntMax as in intmax_t.
      @constant     Flag_Apostrophe_ExponentGroup  The Integer or Decimals Exponent has grouping seperators applied.
      */
-    typedef enum FormatIO_Flags {
+    typedef enum FormatIO_Flags : uint8_t {
         Flag_Unspecified               = 0,
         Flag_Zero_Pad                  = 1,
         Flag_Space_Pad                 = 2,
@@ -189,7 +189,7 @@ extern "C" {
      @constant     MinWidth_Asterisk_NextArg      The minimum width is the next argument.
      @constant     MinWidth_Inline_Digits         The minimum width is in the format specifier.
      */
-    typedef enum FormatIO_MinWidths {
+    typedef enum FormatIO_MinWidths : uint8_t {
         MinWidth_Unspecified           = 0,
         MinWidth_Asterisk_NextArg      = 1,
         MinWidth_Inline_Digits         = 2,
@@ -202,7 +202,7 @@ extern "C" {
      @constant     Position_Asterisk_NextArg      The Position index is the next argument.
      @constant     MinWidth_Inline_Digits         The Position index is in the format specifier.
      */
-    typedef enum FormatIO_Positions {
+    typedef enum FormatIO_Positions : uint8_t {
         Position_Unspecified           = 0,
         Position_Asterisk_NextArg      = 1,
         Position_Inline_Digits         = 2,
@@ -215,13 +215,13 @@ extern "C" {
      @constant     Position_Asterisk_NextArg      The Precision is the next argument.
      @constant     MinWidth_Inline_Digits         The Precision is in the format specifier.
      */
-    typedef enum FormatIO_Precisions {
+    typedef enum FormatIO_Precisions : uint8_t {
         Precision_Unspecified          = 0,
         Precision_Asterisk_NextArg     = 1,
         Precision_Inline_Digits        = 2,
     } FormatIO_Precisions;
     
-    typedef enum FormatIO_ArgOrders {
+    typedef enum FormatIO_ArgOrders : uint8_t {
         ArgOrder_Unused    = 0,
         ArgOrder_MinWidth  = 1,
         ArgOrder_Precision = 2,

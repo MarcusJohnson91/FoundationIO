@@ -28,7 +28,7 @@ extern "C" {
      @constant     DescriptorType_Socket                Stream is a Socket
      @constant     DescriptorType_Pipe                  Stream is a Pipe
      */
-    typedef enum AsynchronousIO_DescriptorTypes {
+    typedef enum AsynchronousIO_DescriptorTypes : uint8_t {
                    DescriptorType_Unspecified           = 0,
                    DescriptorType_File                  = 1,
                    DescriptorType_Socket                = 2,
@@ -45,7 +45,7 @@ extern "C" {
      @constant     FileMode_Text                        Processes newlines and other text specific stuff
      @constant     FileMode_Binary                      Raw access as opposed to FileMode_Text
      */
-    typedef enum AsynchronousIO_FileModes {
+    typedef enum AsynchronousIO_FileModes : uint8_t {
                    FileMode_Unspecified                 = 0,
                    FileMode_Read                        = 1,
                    FileMode_Write                       = 2,
@@ -84,7 +84,7 @@ extern "C" {
      @constant    SeekType_Current                      Seek from the current position of the file.
      @constant    SeekType_End                          Seek from the end of the file.
      */
-    typedef enum AsynchronousIO_SeekTypes {
+    typedef enum AsynchronousIO_SeekTypes : uint8_t {
                   SeekType_Beginning                    = 0,
                   SeekType_Current                      = 1,
                   SeekType_End                          = 2,
@@ -102,7 +102,7 @@ extern "C" {
      @constant    PathType_Special_IPCPipe              The PathType is a IPC Block Device; used fr Inter-Process Communication.
      @constant    PathType_Special_Block                The PathType is a Block Device.
      */
-    typedef enum AsynchronousIO_PathTypes {
+    typedef enum AsynchronousIO_PathTypes : uint8_t {
                   PathType_Unspecified                  = 0,
                   PathType_File                         = 1,
                   PathType_Directory                    = 2,

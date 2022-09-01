@@ -24,7 +24,7 @@ extern "C" {
    @constant            StringType_UTF16                       UTF-16
    @constant            StringType_UTF32                       UTF-32
    */
-  typedef enum TextIO_StringTypes {
+  typedef enum TextIO_StringTypes : uint8_t {
                         StringType_Unspecified                 = 0,
                         StringType_UTF8                        = 1,
                         StringType_UTF16                       = 2,
@@ -45,7 +45,7 @@ extern "C" {
    @constant            Base_Scientific                        Decimal only.
    @constant            Base_Shortest                          Decimal only.
    */
-  typedef enum TextIO_Bases {
+  typedef enum TextIO_Bases : uint16_t {
                         Base_Unspecified                       = 0,
                         Base_Integer                           = 1,
                         Base_Radix2                            = 2,

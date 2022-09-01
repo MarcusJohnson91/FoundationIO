@@ -26,7 +26,7 @@ extern "C" {
      @constant     GUUIDType_BinaryGUID            The GUUID is a Binary GUID, aka LSByte first UUID without hyphens.
      @constant     GUUIDType_BinaryUUID            The GUUID is a Binary UUID, aka MSByte first UUID without hypthns.
      */
-    typedef enum GUUIDTypes {
+    typedef enum GUUIDTypes : uint8_t {
         GUUIDType_Unspecified           = 0,
         GUUIDType_GUIDString            = 1,
         GUUIDType_UUIDString            = 2,
@@ -34,7 +34,7 @@ extern "C" {
         GUUIDType_BinaryUUID            = 4,
     } GUUIDTypes;
 
-    typedef enum GUUIDConstants {
+    typedef enum GUUIDConstants : uint8_t {
         GUUIDString_Size                = 20,
         BinaryGUUID_Size                = 16,
     } GUUIDConstants;

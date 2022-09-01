@@ -31,7 +31,7 @@ extern "C" {
      @constant     RoundingType_Down              Round the number down.
      @constant     RoundingType_Up                Round the number up.
      */
-    typedef enum MathIO_RoundingTypes {
+    typedef enum MathIO_RoundingTypes : uint8_t {
                    RoundingType_Unspecified       = 0,
                    RoundingType_Down              = 1,
                    RoundingType_Up                = 2,
@@ -44,7 +44,7 @@ extern "C" {
      @constant     RotationType_Left              Rotate the number left putting the rotated-out bits on the right.
      @constant     RotationType_Right             Rotate the number right putting the rotated-out bits on the left.
      */
-    typedef enum MathIO_RotationTypes {
+    typedef enum MathIO_RotationTypes : uint8_t {
                    RotationType_Unspecified       = 0,
                    RotationType_Left              = 1,
                    RotationType_Right             = 2,

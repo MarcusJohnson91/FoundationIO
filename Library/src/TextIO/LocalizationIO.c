@@ -10,7 +10,7 @@
 extern "C" {
 #endif
     
-    typedef enum LocalizationIO_DateFormats {
+    typedef enum LocalizationIO_DateFormats : uint16_t {
                    DateFormat_Unspecified = 0,
                    DateFormat_Day1        = 1,
                    DateFormat_Day2        = 2,
@@ -23,7 +23,7 @@ extern "C" {
                    DateFormat_Year3       = 256,
     } LocalizationIO_DateFormats;
     
-    typedef enum LocalizationIO_TimeFormats {
+    typedef enum LocalizationIO_TimeFormats : uint16_t {
                    TimeFormat_Unspecified = 0,
                    TimeFormat_Hour1       = 1,
                    TimeFormat_Hour2       = 2,
@@ -310,7 +310,7 @@ extern "C" {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
 
-        typedef enum ASCIIConstants {
+        typedef enum ASCIIConstants : uint8_t {
             Zero   = 0x30,
             UpperA = 0x41,
             LowerA = 0x61,

@@ -27,7 +27,7 @@ extern "C" {
      @constant   Severity_USER                   An error occured because the user misused something.
      @constant   Severity_WARNING                Just an informational message.
      */
-    typedef enum LogIO_Severities {
+    typedef enum LogIO_Severities : uint8_t {
                  Severity_DEBUG                  = 1,
                  Severity_USER                   = 2,
                  Severity_WARNING                = 3,

@@ -323,7 +323,7 @@ extern "C" {
         return ModeString;
     }
     
-    typedef enum FileIO_Permissions {
+    typedef enum FileIO_Permissions : uint16_t {
         Permissions_Unspecified    = 0,
         Permissions_Owner_Read     = 1,
         Permissions_Owner_Write    = 2,
