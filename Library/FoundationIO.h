@@ -15,6 +15,7 @@
 #define FoundationIO_Version_Minor 9
 #define FoundationIO_Version_Patch 7
 
+#include "include/ArrayIO.h"
 #include "include/AssertIO.h"
 #include "include/AsynchronousIO.h"
 #include "include/BufferIO.h"
@@ -24,13 +25,15 @@
 #include "include/MathIO.h"
 #include "include/NetworkIO.h"
 #include "include/PlatformIO.h"
+#include "include/SortIO.h"
 #include "include/TestIO.h"
-#include "include/TextIO/TextIOTypes.h"
 #include "include/TextIO/CommandLineIO.h"
 #include "include/TextIO/FormatIO.h"
 #include "include/TextIO/LocalizationIO.h"
 #include "include/TextIO/LogIO.h"
 #include "include/TextIO/StringIO.h"
 #include "include/TextIO/StringSetIO.h"
+#include "include/TextIO/TextIOTypes.h"
+
 
 #endif /* FoundationIO_H */
