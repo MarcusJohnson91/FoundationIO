@@ -20,14 +20,14 @@ extern "C" {
 
 #define ScriptHash a1f9ba8b56e6c976075d0d2dadb1b1fa340baa7f
 
-#define UnicodeVersion 14.0.0
+#define UnicodeVersion 15.0.0
 
     typedef enum TextIOConstants {
         IntegerTableBase2Size            = 2,
         IntegerTableBase8Size            = 8,
         IntegerTableBase10Size           = 10,
         IntegerTableBase16Size           = 16,
-        IntegerValueTableSize            = 1749,
+        IntegerValueTableSize            = 1789,
         DecimalTableBase10Size           = 11,
         DecimalTableScientificSize       = 14,
         DecimalTableHexadecimalSize      = 21,
@@ -37,10 +37,10 @@ extern "C" {
         BiDirectionalControlsTableSize   = 12,
         WordBreakTableSize               = 18,
         CurrencyTableSize                = 63,
-        CombiningCharacterClassTableSize = 912,
-        GraphemeExtensionTableSize       = 2270,
-        KompatibleNormalizationTableSize = 2056,
-        CaseFoldTableSize                = 6255,
+        CombiningCharacterClassTableSize = 922,
+        GraphemeExtensionTableSize       = 2307,
+        KompatibleNormalizationTableSize = 2082,
+        CaseFoldTableSize                = 6317,
         CanonicalNormalizationTableSize  = 13233,
     } TextIOConstants;
 
