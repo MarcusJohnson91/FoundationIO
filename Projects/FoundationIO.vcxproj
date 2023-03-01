@@ -19,13 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Library\src\ArrayIO.c" />
+    <ClCompile Include="..\Library\src\AssertIO.c" />
     <ClCompile Include="..\Library\src\AsynchronousIO.c" />
     <ClCompile Include="..\Library\src\BufferIO.c" />
     <ClCompile Include="..\Library\src\CryptographyIO.c" />
     <ClCompile Include="..\Library\src\FileIO.c" />
+    <ClCompile Include="..\Library\src\GUUID.c" />
     <ClCompile Include="..\Library\src\MathIO.c" />
     <ClCompile Include="..\Library\src\NetworkIO.c" />
     <ClCompile Include="..\Library\src\PlatformIO.c" />
+    <ClCompile Include="..\Library\src\SortIO.c" />
     <ClCompile Include="..\Library\src\TestIO.c" />
     <ClCompile Include="..\Library\src\TextIO\CommandLineIO.c" />
     <ClCompile Include="..\Library\src\TextIO\FormatIO.c" />
@@ -35,21 +39,25 @@
     <ClCompile Include="..\Library\src\TextIO\StringIO.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Library\include\ArrayIO.h" />
+    <ClInclude Include="..\Library\include\AssertIO.h" />
     <ClInclude Include="..\Library\include\AsynchronousIO.h" />
     <ClInclude Include="..\Library\include\BufferIO.h" />
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
     <ClInclude Include="..\Library\include\FileIO.h" />
+    <ClInclude Include="..\Library\include\GUUID.h" />
     <ClInclude Include="..\Library\include\MathIO.h" />
     <ClInclude Include="..\Library\include\NetworkIO.h" />
     <ClInclude Include="..\Library\include\PlatformIO.h" />
-    <ClInclude Include="..\Library\include\Private\CommitID.h" />
-    <ClInclude Include="..\Library\include\Private\Version.h" />
+    <ClInclude Include="..\Library\include\RegistrationIO.h" />
+    <ClInclude Include="..\Library\include\SortIO.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
     <ClInclude Include="..\Library\include\TextIO\CommandLineIO.h" />
     <ClInclude Include="..\Library\include\TextIO\FormatIO.h" />
     <ClInclude Include="..\Library\include\TextIO\LocalizationIO.h" />
     <ClInclude Include="..\Library\include\TextIO\LogIO.h" />
     <ClInclude Include="..\Library\include\TextIO\StringIO.h" />
+    <ClInclude Include="..\Library\include\TextIO\StringSetIO.h" />
     <ClInclude Include="..\Library\include\TextIO\TextIOTypes.h" />
     <ClInclude Include="..\Library\include\TextIO\Private\TextIOTables.h" />
   </ItemGroup>
@@ -70,7 +78,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -79,7 +87,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
@@ -88,7 +96,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
@@ -97,7 +105,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -377,7 +385,7 @@
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <PreprocessToFile>false</PreprocessToFile>
       <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>

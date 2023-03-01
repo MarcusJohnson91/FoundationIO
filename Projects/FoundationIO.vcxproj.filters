@@ -4,9 +4,6 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{05add13e-8113-412d-8d79-8e78e2479822}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Private">
-      <UniqueIdentifier>{3e2861ab-cacb-4615-beef-27ccfa5f063f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\TextIO">
       <UniqueIdentifier>{c48625fe-e5fe-4383-b7e1-0db3e425d9c6}</UniqueIdentifier>
     </Filter>
@@ -69,6 +66,18 @@
     <ClCompile Include="..\Library\src\TextIO\Private\TextIOTables.c">
       <Filter>Source Files\TextIO\Private</Filter>
     </ClCompile>
+    <ClCompile Include="..\Library\src\ArrayIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\AssertIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\GUUID.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\SortIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Library\include\CryptographyIO.h">
@@ -110,17 +119,29 @@
     <ClInclude Include="..\Library\include\NetworkIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Private\Version.h">
-      <Filter>Header Files\Private</Filter>
-    </ClInclude>
     <ClInclude Include="..\Library\include\TextIO\Private\TextIOTables.h">
       <Filter>Header Files\TextIO\Private</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\AsynchronousIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Private\CommitID.h">
-      <Filter>Header Files\Private</Filter>
+    <ClInclude Include="..\Library\include\ArrayIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\AssertIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\GUUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\RegistrationIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\SortIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\TextIO\StringSetIO.h">
+      <Filter>Header Files\TextIO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
