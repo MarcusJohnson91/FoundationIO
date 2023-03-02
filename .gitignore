@@ -1,7 +1,9 @@
 CommitID.h
 # ^ We don't want to commit this file, we just want cmake to generate it
+/Stubs
+# ^ Used for writing new components without committing them
 *.p
-# ^ used for tracking macro expansions
+# ^ Used for debugging macros
 *.a
 *.bak
 *.cab
@@ -110,4 +112,3 @@ ipch/
 Temporary Items/
 xcuserdata/
 _UpgradeReport_Files/
-/Stubs
