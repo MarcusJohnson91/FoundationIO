@@ -349,6 +349,61 @@
 #define Macro2Redefine Value2Assign
 #endif /* PlatformIO_Redefine */
 
+#ifndef             PlatformIO_Typenames
+#define             PlatformIO_Typenames 1
+
+#define             PlatformIO_Typenames_Uint8  1
+#define             PlatformIO_Typenames_Uint16 2
+#define             PlatformIO_Typenames_Uint32 3
+#define             PlatformIO_Typenames_Uint64 4
+#define             PlatformIO_Typenames_Int8   5
+#define             PlatformIO_Typenames_Int16  6
+#define             PlatformIO_Typenames_Int32  7
+#define             PlatformIO_Typenames_Int64  8
+#endif /* PlatformIO_Typenames */
+
+#ifndef             PlatformIO_Typename2Type
+#define PlatformIO_Typename2Type(PlatformIO_Typename)
+#if (PlatformIO_Typename == PlatformIO_Typename_Uint8)
+uint8_t
+#elif (PlatformIO_Typename == PlatformIO_Typename_Uint16)
+uint16_t
+#elif (PlatformIO_Typename == PlatformIO_Typename_Uint32)
+uint32_t
+#elif (PlatformIO_Typename == PlatformIO_Typename_Uint64)
+uint64_t
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int8)
+int8_t
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int16)
+int16_t
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int32)
+int32_t
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int64)
+int64_t
+#endif /* Typename Checks */
+#endif /* PlatformIO_Typename2Type */
+
+#ifndef PlatformIO_Typename2Suffix
+#define PlatformIO_Typename2Suffix(Prefix, PlatformIO_Typename)
+#if (PlatformIO_Typename == PlatformIO_Typename_Uint8)
+    PlatformIO_Concat(Prefix, U8)
+#elif (PlatformIO_Typename == PlatformIO_Typename_Uint16)
+    PlatformIO_Concat(Prefix, U16)
+#elif (PlatformIO_Typename == PlatformIO_Typename_Uint32)
+    PlatformIO_Concat(Prefix, U32)
+#elif (PlatformIO_Typename == PlatformIO_Typename_Uint64)
+    PlatformIO_Concat(Prefix, U64)
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int8)
+    PlatformIO_Concat(Prefix, S8)
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int16)
+    PlatformIO_Concat(Prefix, S16)
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int32)
+    PlatformIO_Concat(Prefix, S32)
+#elif (PlatformIO_Typename == PlatformIO_Typename_Int64)
+    PlatformIO_Concat(Prefix, S64)
+#endif /* Checks typename */
+#endif /* PlatformIO_Typename2Suffix */
+
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define             PlatformIO_ByteOrder                                          (PlatformIO_ByteOrderIsBE)
@@ -523,16 +578,6 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-
-    typedef enum PlatformIOTypes : uint8_t {
-        PlatformIOType_Unspecified  = 0,
-        PlatformIOType_Unsigned     = 1,
-        PlatformIOType_Signed       = 2,
-        PlatformIOType_Integer8     = 4,
-        PlatformIOType_Integer16    = 8,
-        PlatformIOType_Integer32    = 16,
-        PlatformIOType_Integer64    = 32,
-    } PlatformIOTypes;
 
     /*!
      @abstract      Gets the total amount of memory in the system.

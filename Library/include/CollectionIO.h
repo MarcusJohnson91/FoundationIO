@@ -18,77 +18,27 @@
 extern "C" {
 #endif
 
-#ifndef CollectionIO_Typenames
-#define CollectionIO_Typenames 1
+    #ifndef CollectionIO_CreateTypedef
+    #define CollectionIO_CreateTypedef(PlatformIO_TypeName)
+        typedef PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName) PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName);
+    #endif /* CollectionIO_CreateTypedef */
 
-#define CollectionIO_Typename_Uint8  1
-#define CollectionIO_Typename_Uint16 2
-#define CollectionIO_Typename_Uint32 3
-#define CollectionIO_Typename_Uint64 4
-#define CollectionIO_Typename_Int8   5
-#define CollectionIO_Typename_Int16  6
-#define CollectionIO_Typename_Int32  7
-#define CollectionIO_Typename_Int64  8
-#endif /* CollectionIO_Typenames */
-
-#ifndef CollectionIO_Typename_AddSuffix
-#define CollectionIO_Typename_AddSuffix(Prefix, CollectionIO_Typename)
-#if (CollectionIO_Typename == CollectionIO_Typename_Uint8)
-    PlatformIO_Concat(Prefix, U8)
-#elif (CollectionIO_Typename == CollectionIO_Typename_Uint16)
-    PlatformIO_Concat(Prefix, U16)
-#elif (CollectionIO_Typename == CollectionIO_Typename_Uint32)
-    PlatformIO_Concat(Prefix, U32)
-#elif (CollectionIO_Typename == CollectionIO_Typename_Uint64)
-    PlatformIO_Concat(Prefix, U64)
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int8)
-    PlatformIO_Concat(Prefix, S8)
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int16)
-    PlatformIO_Concat(Prefix, S16)
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int32)
-    PlatformIO_Concat(Prefix, S32)
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int64)
-    PlatformIO_Concat(Prefix, S64)
-#endif /* Checks typename */
-#endif /* CollectionIO_Typename_AddSuffix */
-
-#ifndef CollectionIO_Typename2Type
-#define CollectionIO_Typename2Type(CollectionIO_Typename)
-#if (CollectionIO_Typename == CollectionIO_Typename_Uint8)
-        uint8_t
-#elif (CollectionIO_Typename == CollectionIO_Typename_Uint16)
-        uint16_t
-#elif (CollectionIO_Typename == CollectionIO_Typename_Uint32)
-        uint32_t
-#elif (CollectionIO_Typename == CollectionIO_Typename_Uint64)
-        uint64_t
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int8)
-        int8_t
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int16)
-        int16_t
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int32)
-        int32_t
-#elif (CollectionIO_Typename == CollectionIO_Typename_Int64)
-        int64_t
-#endif /* Typename Checks */
-#endif /* CollectionIO_Typename2Type */
-
-    #define CollectionIO_Distribution(CollectionIO_TypeName)                                                \
-         typedef struct CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) { \
-            CollectionIO_Typename2Type(CollectionIO_TypeName) NumElements;                                  \
-            CollectionIO_Typename2Type(CollectionIO_TypeName) *Frequencies;                                 \
-        } CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName);
+    #define CollectionIO_Distribution(PlatformIO_TypeName)                                                \
+         typedef struct PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName) { \
+            PlatformIO_TypeName2Type(PlatformIO_TypeName) NumElements;                                  \
+            PlatformIO_TypeName2Type(PlatformIO_TypeName) *Frequencies;                                 \
+        } PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName);
 
         /* Macro to make the function declaration:
         
         */
 
-#define CollectionIO_Distribution_Init(CollectionIO_TypeName, NumberOfElements) \
-    typedef CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName); \ // Typedef the newly created type created by this macro.
-            CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) PlatformIO_Concat(CollectionIO_Typename_AddSuffix(CollectionIO_Distribution_Init, CollectionIO_TypeName), (size_t NumElements)) { \
+#define CollectionIO_Distribution_Init(PlatformIO_TypeName, NumberOfElements) \
+    typedef PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName) PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName); \ // Typedef the newly created type created by this macro.
+            PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName) PlatformIO_Concat(PlatformIO_Typename2Suffix(CollectionIO_Distribution_Init, PlatformIO_TypeName), (size_t NumElements)) { \
         AssertIO(NumElements > 0); \
-        CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) Distribution = {0}; \
-        Distribution.Array = calloc(NumElements, sizeof(CollectionIO_Typename2Type(CollectionIO_TypeName))); \
+        PlatformIO_Typename2Suffix(CollectionIO_Distribution, PlatformIO_TypeName) Distribution = {0}; \
+        Distribution.Array = calloc(NumElements, sizeof(PlatformIO_TypeName2Type(PlatformIO_TypeName))); \
         AssertIO(Distribution.Frequencies != NULL); \
         Distribution.NumEntries = NumElements; \
         return Frequencies; \
@@ -107,35 +57,29 @@ extern "C" {
         SortType_Descending              = 2,
     } ArrayIO_SortTypes;
 
-    typedef struct ArrayIO_Frequencies {
-        void           *Array;
-        size_t          NumEntries;
-        PlatformIOTypes Type;
-    } ArrayIO_Frequencies;
-
     /*!
      @abstract               Measure the frequency of each symbol in the array
      @param Array2Measure    The array to measure
      @param ArrayNumElements The number of elements in the array
      @param ArrayType        The actual type of the array
      */
-    void ArrayIOFequncies_Measure(ArrayIO_Frequencies *Frequencies, void *Array2Measure, size_t ArrayNumElements, PlatformIOTypes ArrayType);
+    void ArrayIOFequncies_Measure(auto Frequencies, auto *Array2Measure, size_t ArrayNumElements);
 
-    void ArrayIOFrequencies_Sort(ArrayIO_Frequencies *Frequencies, ArrayIO_SortTypes SortType);
+    void ArrayIOFrequencies_Sort(auto Frequencies, ArrayIO_SortTypes SortType);
 
-    void ArrayIOFequencies_Deinit(ArrayIO_Frequencies *Frequencies);
+    void ArrayIOFequencies_Deinit(auto Frequencies);
 
-    void ArrayIO_Rotate(void *Array, PlatformIOTypes Type, size_t Amount2Rotate);
+    void ArrayIO_Rotate(auto *Array, size_t Amount2Rotate);
 
-    void ArrayIO_Rotate_Ranged(void *Array, size_t Amount2Rotate, PlatformIO_Range Range);
+    void ArrayIO_Rotate_Ranged(auto *Array, size_t Amount2Rotate, PlatformIO_Range Range);
 
-    int64_t ArrayIO_GetMin(void *Array, PlatformIOTypes Type, size_t NumElements);
+    int64_t ArrayIO_GetMin(auto *Array, size_t NumElements);
 
-    int64_t ArrayIO_GetMax(void *Array, PlatformIOTypes Type, size_t NumElements);
+    int64_t ArrayIO_GetMax(auto *Array, size_t NumElements);
 
-    int64_t ArrayIO_GetSum(void *Array, PlatformIOTypes Type, size_t NumElements);
+    int64_t ArrayIO_GetSum(auto *Array, PlatformIOTypes Type, size_t NumElements);
 
-    void    ArrayIO_Reverse(void *Array, PlatformIOTypes Type, size_t NumElements);
+    void ArrayIO_Reverse(auto *Array, PlatformIOTypes Type, size_t NumElements);
 
     /*!
      @abstract                                    Sums an array from whatever position the start pointer is to that + NumElements2Sum.
