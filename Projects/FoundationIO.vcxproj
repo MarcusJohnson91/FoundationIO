@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Library\src\ArrayIO.c" />
+    <ClCompile Include="..\Library\src\CollectionIO.c" />
     <ClCompile Include="..\Library\src\AssertIO.c" />
     <ClCompile Include="..\Library\src\AsynchronousIO.c" />
     <ClCompile Include="..\Library\src\BufferIO.c" />
@@ -39,7 +39,7 @@
     <ClCompile Include="..\Library\src\TextIO\StringIO.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Library\include\ArrayIO.h" />
+    <ClInclude Include="..\Library\include\CollectionIO.h" />
     <ClInclude Include="..\Library\include\AssertIO.h" />
     <ClInclude Include="..\Library\include\AsynchronousIO.h" />
     <ClInclude Include="..\Library\include\BufferIO.h" />

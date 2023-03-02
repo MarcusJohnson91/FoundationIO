@@ -64,10 +64,10 @@ configure_file("${FoundationIO_Resources_Dir}/FoundationIO.pc.in" "${CMAKE_OUTPU
 endif(IS_DIRECTORY "../.git")
 
 set(FoundationIO_SOURCE
-    "${FoundationIO_Library_Dir}/src/ArrayIO.c"
     "${FoundationIO_Library_Dir}/src/AssertIO.c"
     "${FoundationIO_Library_Dir}/src/AsynchronousIO.c"
     "${FoundationIO_Library_Dir}/src/BufferIO.c"
+    "${FoundationIO_Library_Dir}/src/CollectionIO.c"
     "${FoundationIO_Library_Dir}/src/CryptographyIO.c"
     "${FoundationIO_Library_Dir}/src/FileIO.c"
     "${FoundationIO_Library_Dir}/src/GUUID.c"
@@ -128,6 +128,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 
     RegisterTest(${FoundationIO_Tests_Dir} AsynchronousIO FoundationIO)
     RegisterTest(${FoundationIO_Tests_Dir} BufferIO FoundationIO)
+    RegisterTest(${FoundationIO_Tests_Dir} CollectionIO FoundationIO)
     RegisterTest(${FoundationIO_Tests_Dir} CryptographyIO FoundationIO)
     RegisterTest(${FoundationIO_Tests_Dir} FileIO FoundationIO)
     RegisterTest(${FoundationIO_Tests_Dir} GUUID FoundationIO)

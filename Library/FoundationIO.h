@@ -15,10 +15,10 @@
 #define FoundationIO_Version_Minor 9
 #define FoundationIO_Version_Patch 7
 
-#include "include/ArrayIO.h"
 #include "include/AssertIO.h"
 #include "include/AsynchronousIO.h"
 #include "include/BufferIO.h"
+#include "include/CollectionIO.h"
 #include "include/CryptographyIO.h"
 #include "include/FileIO.h"
 #include "include/GUUID.h"

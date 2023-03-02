@@ -66,7 +66,7 @@
     <ClCompile Include="..\Library\src\TextIO\Private\TextIOTables.c">
       <Filter>Source Files\TextIO\Private</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\ArrayIO.c">
+    <ClCompile Include="..\Library\src\CollectionIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\src\AssertIO.c">
@@ -125,7 +125,7 @@
     <ClInclude Include="..\Library\include\AsynchronousIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\ArrayIO.h">
+    <ClInclude Include="..\Library\include\CollectionIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\AssertIO.h">
