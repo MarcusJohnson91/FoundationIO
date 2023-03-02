@@ -18,6 +18,53 @@
 extern "C" {
 #endif
 
+#define CollectionIO_Typename_Uint8  1
+#define CollectionIO_Typename_Uint16 2
+#define CollectionIO_Typename_Uint32 3
+#define CollectionIO_Typename_Uint64 4
+#define CollectionIO_Typename_Int8   5
+#define CollectionIO_Typename_Int16  6
+#define CollectionIO_Typename_Int32  7
+#define CollectionIO_Typename_Int64  8
+
+#ifndef CollectionIO_Typename_AddSuffix
+#define CollectionIO_Typename_AddSuffix(Prefix, CollectionIO_Typename)
+#if (CollectionIO_Typename == CollectionIO_Typename_Uint8)
+    PlatformIO_Concat(Prefix, U8)
+#elif (CollectionIO_Typename == CollectionIO_Typename_Uint16)
+    PlatformIO_Concat(Prefix, U16)
+#elif (CollectionIO_Typename == CollectionIO_Typename_Uint32)
+    PlatformIO_Concat(Prefix, U32)
+#elif (CollectionIO_Typename == CollectionIO_Typename_Uint64)
+    PlatformIO_Concat(Prefix, U64)
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int8)
+    PlatformIO_Concat(Prefix, S8)
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int16)
+    PlatformIO_Concat(Prefix, S16)
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int32)
+    PlatformIO_Concat(Prefix, S32)
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int64)
+    PlatformIO_Concat(Prefix, S64)
+#endif
+
+    #define CollectionIO_Distribution(TYPE)                \
+         typedef struct CollectionIO_Distribution_##TYPE { \
+            TYPE  NumElements;                             \
+            TYPE *Frequencies;                             \
+        } CollectionIO_Distribution_##TYPE##;
+
+#define CollectionIO_Distribution_Init(CollectionIO_TypeName, NumberOfElements)                                   \
+    typedef CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName);
+        CollectionIO_Typename_AddSuffix(CollectionIO_Distribution_Init_, CollectionIO_TypeName)##(size_t NumElements) {
+        AssertIO(NumElements > 0);
+        ArrayIO_Frequencies *Frequencies = calloc(1, sizeof(ArrayIO_Frequencies));
+        AssertIO(Frequencies != NULL);
+        Frequencies->Array = calloc(NumElements, sizeof(TYPE));
+        AssertIO(Frequencies->Array != NULL);
+        Frequencies->NumEntries = NumElements;
+        return Frequencies;
+    }
+
     /*!
      @enum         ArrayIO_SortTypes
      @abstract                                      Defines the type of sorting.
@@ -36,22 +83,6 @@ extern "C" {
         size_t          NumEntries;
         PlatformIOTypes Type;
     } ArrayIO_Frequencies;
-
-    #define CollectionIO_Distribution(TYPE) \
-        typedef struct CollectionIO_Distribution_##TYPE { \
-            TYPE NumElements; \
-            TYPE *Frequencies; \
-        } CollectionIO_Distribution_##TYPE##;
-
-    #define CollectionIO_Distribution_Init(TYPE, NumberOfElements) \
-        CollectionIO_Distribution_##TYPE CollectionIO_Distribution_Init_##TYPE(size_t NumElements) { \
-            AssertIO(NumElements > 0); \
-            ArrayIO_Frequencies *Frequencies = calloc(1, sizeof(ArrayIO_Frequencies)); \
-            AssertIO(Frequencies != NULL); \
-            Frequencies->Array = calloc(NumElements, sizeof(TYPE)); \
-            AssertIO(Frequencies->Array != NULL); \
-            Frequencies->NumEntries = NumElements; \
-            return Frequencies;
 
     CollectionIO_Distribution_uint8_t What = CollectionIO_Distribution_Init(uint8_t, 67);
 
