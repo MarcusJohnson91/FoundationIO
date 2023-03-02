@@ -1,4 +1,4 @@
-#include "../include/ArrayIO.h"        /* Included for our declarations */
+#include "../include/CollectionIO.h"   /* Included for our declarations */
 
 #include "../include/AssertIO.h"       /* Included for Assertions */
 

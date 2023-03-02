@@ -1,6 +1,6 @@
 /*!
  @unsorted
- @header          ArrayIO.h
+ @header          CollectionIO.h
  @author          Marcus Johnson
  @copyright       2022+
  @version         1.0.0
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef FoundationIO_ArrayIO_H
-#define FoundationIO_ArrayIO_H
+#ifndef FoundationIO_CollectionIO_H
+#define FoundationIO_CollectionIO_H
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -64,7 +64,23 @@ extern "C" {
         PlatformIOTypes Type;
     } ArrayIO_Frequencies;
 
-    ArrayIO_Frequencies *ArrayIOFrequency_Init(size_t NumElements, PlatformIOTypes Type);
+    #define CollectionIO_Distribution(TYPE) \
+        typedef struct CollectionIO_Distribution_##TYPE { \
+            TYPE NumElements; \
+            TYPE *Frequencies; \
+        } CollectionIO_Distribution_##TYPE##;
+
+    #define CollectionIO_Distribution_Init(TYPE, NumberOfElements) \
+        CollectionIO_Distribution_##TYPE CollectionIO_Distribution_Init_##TYPE(size_t NumElements) { \
+            AssertIO(NumElements > 0); \
+            ArrayIO_Frequencies *Frequencies = calloc(1, sizeof(ArrayIO_Frequencies)); \
+            AssertIO(Frequencies != NULL); \
+            Frequencies->Array = calloc(NumElements, sizeof(TYPE)); \
+            AssertIO(Frequencies->Array != NULL); \
+            Frequencies->NumEntries = NumElements; \
+            return Frequencies;
+
+    CollectionIO_Distribution_uint8_t What = CollectionIO_Distribution_Init(uint8_t, 67);
 
     /*!
      @abstract               Measure the frequency of each symbol in the array
@@ -109,4 +125,4 @@ extern "C" {
 }
 #endif /* Extern C */
 
-#endif /* FoundationIO_ArrayIO_H */
+#endif /* FoundationIO_CollectionIO_H */
