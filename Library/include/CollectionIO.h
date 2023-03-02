@@ -18,6 +18,9 @@
 extern "C" {
 #endif
 
+#ifndef CollectionIO_Typenames
+#define CollectionIO_Typenames 1
+
 #define CollectionIO_Typename_Uint8  1
 #define CollectionIO_Typename_Uint16 2
 #define CollectionIO_Typename_Uint32 3
@@ -26,6 +29,7 @@ extern "C" {
 #define CollectionIO_Typename_Int16  6
 #define CollectionIO_Typename_Int32  7
 #define CollectionIO_Typename_Int64  8
+#endif /* CollectionIO_Typenames */
 
 #ifndef CollectionIO_Typename_AddSuffix
 #define CollectionIO_Typename_AddSuffix(Prefix, CollectionIO_Typename)
@@ -45,24 +49,49 @@ extern "C" {
     PlatformIO_Concat(Prefix, S32)
 #elif (CollectionIO_Typename == CollectionIO_Typename_Int64)
     PlatformIO_Concat(Prefix, S64)
-#endif
+#endif /* Checks typename */
+#endif /* CollectionIO_Typename_AddSuffix */
 
-    #define CollectionIO_Distribution(TYPE)                \
-         typedef struct CollectionIO_Distribution_##TYPE { \
-            TYPE  NumElements;                             \
-            TYPE *Frequencies;                             \
-        } CollectionIO_Distribution_##TYPE##;
+#ifndef CollectionIO_Typename2Type
+#define CollectionIO_Typename2Type(CollectionIO_Typename)
+#if (CollectionIO_Typename == CollectionIO_Typename_Uint8)
+        uint8_t
+#elif (CollectionIO_Typename == CollectionIO_Typename_Uint16)
+        uint16_t
+#elif (CollectionIO_Typename == CollectionIO_Typename_Uint32)
+        uint32_t
+#elif (CollectionIO_Typename == CollectionIO_Typename_Uint64)
+        uint64_t
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int8)
+        int8_t
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int16)
+        int16_t
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int32)
+        int32_t
+#elif (CollectionIO_Typename == CollectionIO_Typename_Int64)
+        int64_t
+#endif /* Typename Checks */
+#endif /* CollectionIO_Typename2Type */
 
-#define CollectionIO_Distribution_Init(CollectionIO_TypeName, NumberOfElements)                                   \
-    typedef CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName);
-        CollectionIO_Typename_AddSuffix(CollectionIO_Distribution_Init_, CollectionIO_TypeName)##(size_t NumElements) {
-        AssertIO(NumElements > 0);
-        ArrayIO_Frequencies *Frequencies = calloc(1, sizeof(ArrayIO_Frequencies));
-        AssertIO(Frequencies != NULL);
-        Frequencies->Array = calloc(NumElements, sizeof(TYPE));
-        AssertIO(Frequencies->Array != NULL);
-        Frequencies->NumEntries = NumElements;
-        return Frequencies;
+    #define CollectionIO_Distribution(CollectionIO_TypeName)                                                \
+         typedef struct CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) { \
+            CollectionIO_Typename2Type(CollectionIO_TypeName) NumElements;                                  \
+            CollectionIO_Typename2Type(CollectionIO_TypeName) *Frequencies;                                 \
+        } CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName);
+
+        /* Macro to make the function declaration:
+        
+        */
+
+#define CollectionIO_Distribution_Init(CollectionIO_TypeName, NumberOfElements) \
+    typedef CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName); \ // Typedef the newly created type created by this macro.
+            CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) PlatformIO_Concat(CollectionIO_Typename_AddSuffix(CollectionIO_Distribution_Init, CollectionIO_TypeName), (size_t NumElements)) { \
+        AssertIO(NumElements > 0); \
+        CollectionIO_Typename_AddSuffix(CollectionIO_Distribution, CollectionIO_TypeName) Distribution = {0}; \
+        Distribution.Array = calloc(NumElements, sizeof(CollectionIO_Typename2Type(CollectionIO_TypeName))); \
+        AssertIO(Distribution.Frequencies != NULL); \
+        Distribution.NumEntries = NumElements; \
+        return Frequencies; \
     }
 
     /*!
@@ -83,8 +112,6 @@ extern "C" {
         size_t          NumEntries;
         PlatformIOTypes Type;
     } ArrayIO_Frequencies;
-
-    CollectionIO_Distribution_uint8_t What = CollectionIO_Distribution_Init(uint8_t, 67);
 
     /*!
      @abstract               Measure the frequency of each symbol in the array
