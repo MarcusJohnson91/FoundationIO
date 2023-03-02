@@ -6,22 +6,6 @@
 extern "C" {
 #endif
 
-    ArrayIO_Slice Slice_Init(size_t StartElement, size_t StopElement) {
-        AssertIO(StartElement < StopElement);
-        ArrayIO_Slice Slice = {};
-        Slice.StartElement = StartElement;
-        Slice.StopElement  = StopElement;
-        return Slice;
-    }
-
-    size_t Slice_GetStartElement(ArrayIO_Slice Slice) {
-        return Slice.StartElement;
-    }
-
-    size_t Slice_GetStopElement(ArrayIO_Slice Slice) {
-        return Slice.StopElement;
-    }
-
     /*
      if PlatformIO_Is(Type, PlatformIOType_Signed) {
      if PlatformIO_Is(Type, PlatformIOType_Integer8) {
@@ -599,6 +583,24 @@ extern "C" {
         }
         return Sum;
     }
+
+    /* Slice stuff */
+    CollectionIO_Slice Slice_Init(size_t StartElement, size_t StopElement) {
+        AssertIO(StartElement < StopElement);
+        CollectionIO_Slice Slice = {0};
+        Slice.StartElement  = StartElement;
+        Slice.StopElement   = StopElement;
+        return Slice;
+    }
+
+    size_t Slice_GetStartElement(CollectionIO_Slice Slice) {
+        return Slice.StartElement;
+    }
+
+    size_t Slice_GetStopElement(CollectionIO_Slice Slice) {
+        return Slice.StopElement;
+    }
+    /* Slice stuff */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

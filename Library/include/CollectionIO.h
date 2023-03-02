@@ -18,33 +18,6 @@
 extern "C" {
 #endif
 
-    typedef struct ArrayIO_Slice {
-        size_t StartElement;
-        size_t StopElement;
-    } ArrayIO_Slice;
-
-    /*!
-     @abstract                                  Creates an instance of a ArrayIO_Slice.
-     @param       StartElement                  Where should the string start?
-     @param       StopElement                   Where should the string end?
-     @return                                    Returns the initailized Slice.
-     */
-    ArrayIO_Slice Slice_Init(size_t StartElement, size_t StopElement);
-
-    /*!
-     @abstract                                  Where does this slice start?
-     @param       Slice                         The instance of the ArrayIO_Slice.
-     @return                                    The Start of the ArrayIO_Slice in Elements.
-     */
-    size_t        Slice_GetStartElement(ArrayIO_Slice Slice);
-
-    /*!
-     @abstract                                      Where does this slice end?
-     @param       Slice                             The instance of the ArrayIO_Slice.
-     @return                                        The End of the ArrayIO_Slice in Elements.
-     */
-    size_t        Slice_GetStopElement(ArrayIO_Slice Slice);
-
     /*!
      @enum         ArrayIO_SortTypes
      @abstract                                      Defines the type of sorting.
@@ -120,6 +93,35 @@ extern "C" {
     size_t        ArrayIO_Sum16(uint16_t *Array2Sum, size_t NumElements2Sum);
     size_t        ArrayIO_Sum32(uint32_t *Array2Sum, size_t NumElements2Sum);
     size_t        ArrayIO_Sum64(uint64_t *Array2Sum, size_t NumElements2Sum);
+
+    /* Slice stuff */
+    typedef struct CollectionIO_Slice {
+        size_t StartElement;
+        size_t StopElement;
+    } CollectionIO_Slice;
+
+    /*!
+     @abstract                                  Creates an instance of a ArrayIO_Slice.
+     @param       StartElement                  Where should the string start?
+     @param       StopElement                   Where should the string end?
+     @return                                    Returns the initailized Slice.
+     */
+    CollectionIO_Slice Slice_Init(size_t StartElement, size_t StopElement);
+
+    /*!
+     @abstract                                  Where does this slice start?
+     @param       Slice                         The instance of the ArrayIO_Slice.
+     @return                                    The Start of the ArrayIO_Slice in Elements.
+     */
+    size_t Slice_GetStartElement(CollectionIO_Slice Slice);
+
+    /*!
+     @abstract                                      Where does this slice end?
+     @param       Slice                             The instance of the ArrayIO_Slice.
+     @return                                        The End of the ArrayIO_Slice in Elements.
+     */
+    size_t Slice_GetStopElement(CollectionIO_Slice Slice);
+    /* Slice stuff */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
