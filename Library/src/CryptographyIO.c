@@ -189,6 +189,7 @@ extern "C" {
         free(Insecure);
     }
 
+#ifdef OVIA_CodecIO_FLAC /* Disable MD5 support unless FLAC is enabled, MD5 is insecure, and ONLY exists in OVIA to verify lossless decoding of FLAC audio. */
     /* MD5, Based on WJCryptLib, Unlicense, Date = Dec_30_2021 */
     /* MD5.h */
     typedef struct MD5Context {
@@ -455,6 +456,7 @@ extern "C" {
     }
     /* MD5.c */
     /* MD5, Based on WJCryptLib, Unlicense, Date = Dec_30_2021 */
+#endif /* OVIA_CodecIO_FLAC */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

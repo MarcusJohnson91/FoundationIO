@@ -72,6 +72,7 @@ extern "C" {
      */
     void              InsecurePRNG_Deinit(InsecurePRNG *Insecure);
 
+#ifdef OVIA_CodecIO_FLAC /* MD5 is ONLY here to verify lossless decoding of FLAC audio, it is extremely insecure and should not be used for ANY other purpose. */
     /*!
      @remark                                MD5 is EXTREMELY INSECURE, IT'S ONLY HERE FOR OVIA
      */
@@ -97,6 +98,8 @@ extern "C" {
      @abstract                              Converts a binary MD5 hash to a string.
      */
     char             *MD5ToString(MD5Hash *Digest);
+
+#endif /* OVIA_CodecIO_FLAC */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
