@@ -4,7 +4,6 @@
  @copyright       2015+
  @version         1.0.0
  @brief           This header contains code for reading and writing buffers, and utilities to manage them.
- @todo            Maybe BufferIO should be renamed ArrayIO?
  */
 
 #pragma once

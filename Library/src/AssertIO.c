@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
     void AssertIO_Message(const UTF8 *FileName, const UTF8 *FunctionName, UTF8 *ExpressionString, ...) {
-        // Check if there's any specifiers in Expression
+        // Check if there's any specifiers in ExpressionString
         uint64_t NumSpecifiers = UTF8_GetNumFormatSpecifiers(ExpressionString);
         UTF8    *ExpressionVA  = (UTF8*) ExpressionString;
         if (NumSpecifiers > 0) {
