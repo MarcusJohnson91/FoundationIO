@@ -1,9 +1,10 @@
 /*!
- @header          MathIO.h
- @author          Marcus Johnson
- @copyright       2017+
- @version         1.0.0
- @brief           This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
+ @header:                  MathIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2017+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
  */
 
 #pragma once

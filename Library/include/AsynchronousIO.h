@@ -1,9 +1,10 @@
 /*!
- @header          AsynchronousIO.h
- @author          Marcus Johnson
- @copyright       2020+
- @version         1.0.0
- @brief           This header contains code for Asynchronous IO, and utilities to manage it.
+ @header:                  AsynchronousIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2020+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains code for Asynchronous IO, and utilities to manage it.
  */
 
 #pragma once

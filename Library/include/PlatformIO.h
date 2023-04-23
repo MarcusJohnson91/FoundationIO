@@ -1,9 +1,10 @@
 /*!
- @header          PlatformIO.h
- @author          Marcus Johnson
- @copyright       2017+
- @version         2.0.0
- @brief           This header contains preprocessor macros for generic functions in FoundationIO.
+ @header:                  PlatformIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2017+
+ @version:                 2.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains preprocessor macros for generic functions in FoundationIO.
  */
 
 #pragma once

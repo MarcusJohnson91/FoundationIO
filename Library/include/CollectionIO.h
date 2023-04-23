@@ -1,10 +1,10 @@
 /*!
- @unsorted
- @header          CollectionIO.h
- @author          Marcus Johnson
- @copyright       2022+
- @version         1.0.0
- @brief           This header contains code for array operations.
+ @header:                  CollectionIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2022+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains code for array operations.
  */
 
 #include "../include/PlatformIO.h" /* Included fo platfom independence macros */

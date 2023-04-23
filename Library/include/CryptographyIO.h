@@ -1,9 +1,10 @@
 /*!
- @header          CryptographyIO.h
- @author          Marcus Johnson
- @copyright       2019+
- @version         1.0.0
- @brief           This header contains types, functions, and tables for cryptography and hashing.
+ @header:                  CryptographyIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2019+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains types, functions, and tables for cryptography and hashing.
  @TODO:           Look into replacing Xoshiro256** with Shishua
  */
 

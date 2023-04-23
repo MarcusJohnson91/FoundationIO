@@ -1,9 +1,10 @@
 /*!
- @header          FileIO.h
- @author          Marcus Johnson
- @copyright       2020+
- @version         1.0.0
- @brief           This header contains code for reading and writing files, and utilities to manage them.
+ @header:                  FileIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2020+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains code for reading and writing files, and utilities to manage them.
  */
 
 #pragma once

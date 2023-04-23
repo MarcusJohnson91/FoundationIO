@@ -1,9 +1,10 @@
 /*!
- @header      RegistrationIO.h
- @author      Marcus Johnson
- @copyright   2021+
- @version     1.0.0
- @brief       This header contains macros for compile-time registration via creating named sections in the generated binary.
+ @header:                  RegistrationIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2021+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains macros for compile-time registration via creating named sections in the generated binary.
  */
 
 #pragma once

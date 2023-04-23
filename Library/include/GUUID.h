@@ -1,9 +1,10 @@
 /*!
- @header          GUUID.h
- @author          Marcus Johnson
- @copyright       2021+
- @version         1.0.0
- @brief           This header contains code for manipulating GUIDs and UUIDs.
+ @header:                  GUUID.h
+ @author:                  Marcus Johnson
+ @copyright:               2021+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains code for manipulating GUIDs and UUIDs.
  */
 
 #pragma once

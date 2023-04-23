@@ -1,13 +1,14 @@
 /*!
- @header      TestIO.h
- @author      Marcus Johnson
- @copyright   2021+
- @version     2.0.0
- @brief       This header contains types, functions, and tables for automated testing.
- @terminology
-  Case:        Individual test.
-  Fixture:     Operate on a user defined type.
-  Suite:       Group of similar test cases.
+ @header:                  TestIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2021+
+ @version:                 2.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains types, functions, and tables for automated testing.
+ @terminology:
+  Case:                    Individual test.
+  Fixture:                 Operate on a user defined type.
+  Suite:                   Group of similar test cases.
  */
 
 #pragma once

@@ -1,9 +1,10 @@
 /*!
- @header      SortIO.h
- @author      Marcus Johnson
- @copyright   2021+
- @version     1.0.0
- @brief       This header contains code for sorting data; it's based on the Unlicensed WikiSort.
+ @header:                  SortIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2021+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains code for sorting data; it's based on the Unlicensed WikiSort.
  */
 
 #pragma once

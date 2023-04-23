@@ -1,9 +1,10 @@
 /*!
- @header          StringIO.h
- @author          Marcus Johnson
- @copyright       2017+
- @version         1.0.0
- @brief           This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
+ @header:                  StringIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2017+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
  */
 
 #pragma once

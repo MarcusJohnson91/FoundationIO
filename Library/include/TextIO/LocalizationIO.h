@@ -1,9 +1,10 @@
 /*!
- @header          LocalizationIO.h
- @author          Marcus Johnson
- @copyright       2019+
- @version         1.0.0
- @brief           This header contains types, functions, and tables for cryptography and hashing.
+ @header:                  LocalizationIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2019+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains types, functions, and tables for cryptography and hashing.
  */
 
 #pragma once

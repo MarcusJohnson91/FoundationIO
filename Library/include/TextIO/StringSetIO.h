@@ -1,9 +1,10 @@
 /*!
- @header          StringSetIO.h
- @author          Marcus Johnson
- @copyright       2021+
- @version         1.0.0
- @brief           This header contains types, functions, and tables for interacting with StringSets.
+ @header:                  StringSetIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2021+
+ @version:                 1.0.0
+ @SPDX-License-Identifier: Apache-2.0
+ @brief:                   This header contains types, functions, and tables for interacting with StringSets.
  */
 
 #pragma once

@@ -1,9 +1,10 @@
 /*!
- @header          FoundationIO.h
- @author          Marcus Johnson
- @copyright       2015+
- @version         0.9.7
- @brief           This header contains all of FoundationIO's public API in one easy to include header.
+ @header:                  FoundationIO.h
+ @author:                  Marcus Johnson
+ @copyright:               2015+
+ @SPDX-License-Identifier: Apache-2.0
+ @version:                 0.9.7
+ @brief:                   This header contains all of FoundationIO's public APIs in one easy to include header.
  */
 
 #pragma once
