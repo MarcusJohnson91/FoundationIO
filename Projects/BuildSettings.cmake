@@ -27,7 +27,6 @@ ${CMAKE_C_FLAGS} \
 -Bsymbolic-functions \
 -ferror-limit=1024 \
 -foptimize-sibling-calls \
--fshort-enums \
 -funsigned-char \
 -fvisibility-inlines-hidden \
 -Wenum-conversion \
@@ -109,7 +108,6 @@ elseif($<C_COMPILER_ID:GNU>)
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
 -fPIC \
--fshort-enums \
 -funroll-loops \
 -funsigned-char \
 -std=c2x \
