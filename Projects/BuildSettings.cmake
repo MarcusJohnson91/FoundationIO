@@ -41,6 +41,7 @@ ${CMAKE_C_FLAGS} \
 -Wpedantic \
 -Wreserved-identifier \
 -Wswitch-enum \
+-Wno-unknown-pragmas \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
@@ -67,7 +68,7 @@ ${CMAKE_C_FLAGS} \
 -fno-optimize-sibling-calls \
 -fstack-check \
 -DDEBUG=1 \
--g \
+-g3 \
 -Ofast \
 ")
 
@@ -132,6 +133,7 @@ ${CMAKE_C_FLAGS} \
 -fno-semantic-interposition \
 -fvisibility-inlines-hidden \
 -foptimize-sibling-calls \
+-Wno-unknown-pragmas \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
@@ -140,7 +142,7 @@ ${CMAKE_C_FLAGS} \
 -fsanitize=address,undefined \
 -fstack-check \
 -DDEBUG=1 \
--g \
+-g3 \
 -O1 \
 ")
 
@@ -156,7 +158,7 @@ ${CMAKE_C_FLAGS} \
 -fno-omit-frame-pointer \
 -fstack-check \
 -DDEBUG=1 \
--g \
+-g3 \
 -Ofast \
 ")
 
@@ -225,6 +227,8 @@ ${CMAKE_C_FLAGS} \
 /Zc:rvalueCast \
 /Zc:wchar_t \
 /Wall \
+/wd4146 \
+/wd4245 \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
