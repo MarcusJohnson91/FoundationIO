@@ -10,8 +10,9 @@
 * Format: APILevel.ABILevel.CommitID
 
 # License:
-* All contributions are accepted only under the terms of the public-domain and CC0 licenses.
-* FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
+=======
+* Contributions are accepted only under the terms of the [‘Unlicense’](https://tldrlegal.com/license/unlicense) license.
+* FoundationIO is released under the terms of the Apache 2.0 license.
 
 
 # Compiling:
