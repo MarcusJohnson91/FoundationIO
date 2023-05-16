@@ -42,6 +42,9 @@ ${CMAKE_C_FLAGS} \
 -Wreserved-identifier \
 -Wswitch-enum \
 -Wno-unknown-pragmas \
+-Rpass=loop-vectorize \
+-Rpass-missed=loop-vectorize \
+-Rpass-analysis=loop-vectorize \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
