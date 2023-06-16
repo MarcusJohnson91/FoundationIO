@@ -49,7 +49,7 @@
     <ClInclude Include="..\Library\include\MathIO.h" />
     <ClInclude Include="..\Library\include\NetworkIO.h" />
     <ClInclude Include="..\Library\include\PlatformIO.h" />
-    <ClInclude Include="..\Library\include\RegistrationIO.h" />
+    <ClInclude Include="..\Library\include\ExecutableIO.h" />
     <ClInclude Include="..\Library\include\SortIO.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
     <ClInclude Include="..\Library\include\TextIO\CommandLineIO.h" />

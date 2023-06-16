@@ -310,7 +310,7 @@ extern "C" {
 
      For Testing, we need to create a set of test suites, composed of individual test cases.
 
-     Test cases are registered to Test suites, suites are registered via RegistrationIO to create the sections within the binary for them to be ran later.
+     Test cases are registered to Test suites, suites are registered via ExecutableIO to create the sections within the binary for them to be ran later.
 
      The main blocker here is I need #repeat and _Pragma(redefine_macro("Macro2Redefine NewDefinition")) to be supported by the compiler.
      */

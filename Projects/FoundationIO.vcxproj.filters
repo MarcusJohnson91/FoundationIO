@@ -134,7 +134,7 @@
     <ClInclude Include="..\Library\include\GUUID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\RegistrationIO.h">
+    <ClInclude Include="..\Library\include\ExecutableIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\SortIO.h">

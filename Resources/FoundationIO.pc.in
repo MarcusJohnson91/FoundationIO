@@ -18,7 +18,7 @@ GUUID:              UUID/GUID handling.
 MathIO:             Mathematical functions.
 NetworkIO:          TCPv6 and UDPv6 IP stack.
 PlatformIO:         Platform independence macros.
-RegistrationIO:     Creates sections in linked executables and libraries.
+ExecutableIO:     Creates sections in linked executables and libraries.
 TestIO:             Unit testing framework with automatic test registration, only available in Debug builds.
 TextIO:             The Unicode handling portion of FoundationIO, consists of:
     StringIO:       Generic string handling functions.
