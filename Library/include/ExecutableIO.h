@@ -54,7 +54,7 @@ __attribute__((section("\""SectionName"\""), used))
 @abstract Call this macro once per section per translation unit, this macro exists only to create a symbol that represents the beginning of the named section.
 */
 #define ExecutableIO_Header(SectionName) \
-ExecutableIO_Register(SectionName) extern UTF8 *ExecutableIO_Start_##SectionName = u8"\""SectionName"\"";
+ExecutableIO_Register(SectionName) extern UTF8 *ExecutableIO_Start_##SectionName = u8"\""Begin_##SectionName"\"";
 
 #endif /* ExecutableIO_Header */
 
@@ -65,7 +65,7 @@ ExecutableIO_Register(SectionName) extern UTF8 *ExecutableIO_Start_##SectionName
 @abstract Call this macro once per section per translation unit, this macro exists only to create a symbol that represents the beginning of the named section.
 */
 #define ExecutableIO_Footer(SectionName) \
-ExecutableIO_Register(SectionName) extern UTF8 *ExecutableIO_Stop_##SectionName = u8"\""SectionName"\"";
+ExecutableIO_Register(SectionName) extern UTF8 *ExecutableIO_Stop_##SectionName = u8"\""End_##SectionName"\"";
 
 #endif /* ExecutableIO_Footer */
 
