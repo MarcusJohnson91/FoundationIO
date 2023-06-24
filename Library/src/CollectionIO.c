@@ -551,8 +551,16 @@ extern "C" {
         free(Frequencies->Array);
         free(Frequencies);
     }
-
-    size_t ArrayIO_Sum8(uint8_t *Array2Sum, size_t NumElements2Sum) {
+    
+    int64_t CollectionIO_SumS8(int8_t *Array2Sum, size_t NumElements2Sum) {
+        size_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+    
+    uint64_t CollectionIO_SumU8(uint8_t *Array2Sum, size_t NumElements2Sum) {
         size_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
@@ -560,7 +568,15 @@ extern "C" {
         return Sum;
     }
 
-    size_t ArrayIO_Sum16(uint16_t *Array2Sum, size_t NumElements2Sum) {
+    int64_t CollectionIO_SumS16(int16_t *Array2Sum, size_t NumElements2Sum) {
+        size_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+    
+    uint64_t CollectionIO_SumU16(uint16_t *Array2Sum, size_t NumElements2Sum) {
         size_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
@@ -568,16 +584,32 @@ extern "C" {
         return Sum;
     }
 
-    size_t ArrayIO_Sum32(uint32_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
+    int64_t CollectionIO_SumS32(int32_t *Array2Sum, size_t NumElements2Sum) {
+        int64_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+    
+    uint64_t CollectionIO_SumU32(uint32_t *Array2Sum, size_t NumElements2Sum) {
+        uint64_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
         }
         return Sum;
     }
 
-    size_t ArrayIO_Sum64(uint64_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
+    int64_t CollectionIO_SumS64(int64_t *Array2Sum, size_t NumElements2Sum) {
+        int64_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+    
+    uint64_t CollectionIO_SumU64(uint64_t *Array2Sum, size_t NumElements2Sum) {
+        uint64_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
         }

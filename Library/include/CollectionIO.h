@@ -78,6 +78,27 @@ extern "C" {
     int64_t ArrayIO_GetMax(auto *Array, size_t NumElements);
 
     int64_t ArrayIO_GetSum(auto *Array, PlatformIOTypes Type, size_t NumElements);
+    
+    auto CollectionIO_SumS8(int8_t *Array2Sum, size_t NumElements);
+    
+    uint64_t CollectionIO_SumU8(uint8_t *Array2Sum, size_t NumElements);
+    
+    int64_t CollectionIO_SumS16(int16_t *Array2Sum, size_t NumElements);
+    
+    uint64_t CollectionIO_SumU16(uint16_t *Array2Sum, size_t NumElements);
+    
+    int64_t CollectionIO_SumS32(int32_t *Array2Sum, size_t NumElements);
+    
+    uint64_t CollectionIO_SumU32(uint32_t *Array2Sum, size_t NumElements);
+    
+    int64_t CollectionIO_SumS64(int64_t *Array2Sum, size_t NumElements);
+    
+    uint64_t CollectionIO_SumU64(uint64_t *Array2Sum, size_t NumElements);
+    
+#ifndef CollectionIO_Sun
+#define CollectionIO_Sum(Array2Sum, NumElements) \
+_Generic(Array2Sum, int8_t:CollectionIO_SumS8, uint8_t:CollectionIO_SumU8, int16_t:CollectionIO_SumS16, uint16_t:CollectionIO_SunU16, int32_t:CollectionIO_SumS32, uint32_t:CollectionIO_SumU32, int64_t:CollectionIO_SumS64, uint64_t:CollectionIO_SumU64)(Array2Sum, NumElements)
+#endif /* CollectionIO_Sum */
 
     void ArrayIO_Reverse(auto *Array, PlatformIOTypes Type, size_t NumElements);
 
