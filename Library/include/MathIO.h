@@ -533,6 +533,10 @@ extern "C" {
      @return                                      Returns the rotated value.
      */
     uint64_t     Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value);
+    
+    uint64_t      RotateLeft(uint8_t NumBits2Rotate, uint64_t Value);
+    
+    uint64_t      RotateRight(uint8_t NumBits2Rotate, uint64_t Value);
 
     /*!
      @abstract                                    Packs smaller integers into a single larger one.

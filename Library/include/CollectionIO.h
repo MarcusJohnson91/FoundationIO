@@ -173,6 +173,76 @@ _Generic(Array, int8_t*:CollectionIO_GetMaxS8, uint8_t*:CollectionIO_GetMaxU8, i
 #define CollectionIO_Sum(Array2Sum, NumElements) \
 _Generic(Array2Sum, int8_t*:CollectionIO_SumS8, uint8_t*:CollectionIO_SumU8, int16_t*:CollectionIO_SumS16, uint16_t*:CollectionIO_SunU16, int32_t*:CollectionIO_SumS32, uint32_t*:CollectionIO_SumU32, int64_t*:CollectionIO_SumS64, uint64_t*:CollectionIO_SumU64)(Array2Sum, NumElements)
 #endif /* CollectionIO_Sum */
+    
+    /*!
+     @abstract                                    Reverses an array in place from whatever position the start pointer is to that + NumElements.
+     @param       Array                       Where to start the Reversal.
+     @param       NumElements                 How many elements to reverse.
+     @return                                      Returns the sum of the array.
+     @function    CollectionIO_ReverseS8
+     @function    CollectionIO_ReverseU8
+     @function    CollectionIO_ReverseS16 
+     @function    CollectionIO_ReverseU16
+          @function    CollectionIO_ReverseS32
+     @function    CollectionIO_ReverseU32
+     @function    CollectionIO_ReverseS64
+     @function    CollectionIO_ReverseU64
+     */
+    int64_t CollectionIO_ReverseS8(int8_t *Array, size_t NumElements);
+    
+    void CollectionIO_ReverseU8(uint8_t *Array, size_t NumElements);
+    
+    void CollectionIO_ReverseS16(int16_t *Array, size_t NumElements);
+    
+    void CollectionIO_ReverseU16(uint16_t *Array, size_t NumElements);
+    
+    void CollectionIO_ReverseS32(int32_t *Array, size_t NumElements);
+    
+    void CollectionIO_ReverseU32(uint32_t *Array, size_t NumElements);
+    
+    void CollectionIO_ReverseS64(int64_t *Array, size_t NumElements);
+    
+    void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements);
+    
+#ifndef CollectionIO_Reverse
+#define CollectionIO_Reverse(Array, NumElements) \
+_Generic(Array, int8_t*:CollectionIO_SumS8, uint8_t*:CollectionIO_SumU8, int16_t*:CollectionIO_SumS16, uint16_t*:CollectionIO_SunU16, int32_t*:CollectionIO_SumS32, uint32_t*:CollectionIO_SumU32, int64_t*:CollectionIO_SumS64, uint64_t*:CollectionIO_SumU64)(Array, NumElements)
+#endif /* CollectionIO_Reverse */
+
+    /*!
+     @abstract                                    Rotates an array in place from whatever position the start pointer is to that + Amount2Rotate.
+     @param       Array                       Where to start the Rotation.
+     @param       NumElements                 How many elements to reverse.
+     @param        Amount2Rotate The number of elements to rotate.
+     @function    CollectionIO_RotateS8
+     @function    CollectionIO_RotateU8
+     @function    CollectionIO_RotateS16 
+     @function    CollectionIO_RotateU16
+          @function    CollectionIO_RotateS32
+     @function    CollectionIO_RotateU32
+     @function    CollectionIO_RotateS64
+     @function    CollectionIO_RotateU64
+     */
+     void CollectionIO_RotateS8(int8_t *Array, size_t NumElements, size_t Amount2Rotate);
+     
+     void CollectionIO_RotateU8(uint8_t *Array, size_t NumElements, size_t Amount2Rotate);
+     
+     void CollectionIO_RotateS16(int16_t *Array, size_t NumElements, size_t Amount2Rotate);
+     
+     void CollectionIO_RotateU16(uint16_t *Array, size_t NumElements, size_t Amount2Rotate);
+     
+     void CollectionIO_RotateS32(int32_t *Array, size_t NumElements, size_t Amount2Rotate);
+     
+     void CollectionIO_RotateU32(uint32_t *Array, size_t NumElements, size_t Amount2Rotate);
+     
+     void CollectionIO_RotateS64(int64_t *Array, size_t NumElements, size_t Amount2Rotate);
+     
+     void CollectionIO_RotateU64(uint64_t *Array, size_t NumElements, size_t Amount2Rotate);
+    
+#ifndef CollectionIO_Rotate
+#define CollectionIO_Rotate(Array, NumElements) \
+_Generic(Array, int8_t*:CollectionIO_RotateS8, uint8_*t*:CollectionIO_RotateU8, int16_t*:CollectionIO_RotateS16, uint16_t*:CollectionIO_RotateU16, int32_t*:CollectionIO_RotateS32, uint32_t*:CollectionIO_RotateU32, int64_t*:CollectionIO_RotateS64, uint64_t*:CollectionIO_RotateU64)(Array, NumElements)
+#endif /* CollectionIO_Rotate */
 
 
     /* Slice stuff */
