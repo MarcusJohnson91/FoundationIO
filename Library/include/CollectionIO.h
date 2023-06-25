@@ -45,17 +45,17 @@ extern "C" {
     }
 
     /*!
-     @enum         ArrayIO_SortTypes
+     @enum         CollectionIO_SortTypes
      @abstract                                      Defines the type of sorting.
      @constant     SortType_Unspecified             Invalid SortType, exists solely to tell when it hasn't been set.
      @constant     SortType_Ascending               Index 0 contains the most common value.
      @constant     SortType_Descending              Index 0 contains the least common value.
      */
-    typedef enum ArrayIO_SortTypes : uint8_t {
+    typedef enum CollectionIO_SortTypes : uint8_t {
         SortType_Unspecified             = 0,
         SortType_Ascending               = 1,
         SortType_Descending              = 2,
-    } ArrayIO_SortTypes;
+    } CollectionIO_SortTypes;
 
     /*!
      @abstract               Measure the frequency of each symbol in the array
@@ -63,59 +63,59 @@ extern "C" {
      @param ArrayNumElements The number of elements in the array
      @param ArrayType        The actual type of the array
      */
-    void ArrayIOFequncies_Measure(auto Frequencies, auto *Array2Measure, size_t ArrayNumElements);
+    void CollectionIO_Histogram_Measure(auto Frequencies, auto *Array2Measure, size_t ArrayNumElements);
 
-    void ArrayIOFrequencies_Sort(auto Frequencies, ArrayIO_SortTypes SortType);
+    void CollectionIO_Histogram_Sort(auto Frequencies, CollectionIO_SortTypes SortType);
 
-    void ArrayIOFequencies_Deinit(auto Frequencies);
+    void CollectionIO_Histogram_Deinit(auto Frequencies);
 
-    void ArrayIO_Rotate(auto *Array, size_t Amount2Rotate);
+    void CollectionIO_Rotate(auto *Array, size_t Amount2Rotate);
 
-    void ArrayIO_Rotate_Ranged(auto *Array, size_t Amount2Rotate, PlatformIO_Range Range);
+    void CollectionIO_Rotate_Ranged(auto *Array, size_t Amount2Rotate, PlatformIO_Range Range);
 
-    int64_t ArrayIO_GetMin(auto *Array, size_t NumElements);
+    int64_t CollectionIO_GetMin(auto *Array, size_t NumElements);
 
-    int64_t ArrayIO_GetMax(auto *Array, size_t NumElements);
+    int64_t CollectionIO_GetMax(auto *Array, size_t NumElements);
 
-    int64_t ArrayIO_GetSum(auto *Array, PlatformIOTypes Type, size_t NumElements);
+    int64_t CollectionIO_GetSum(auto *Array, PlatformIOTypes Type, size_t NumElements);
     
-    auto CollectionIO_SumS8(int8_t *Array2Sum, size_t NumElements);
     
-    uint64_t CollectionIO_SumU8(uint8_t *Array2Sum, size_t NumElements);
+    /*!
+     @abstract                                    Sums an array from whatever position the start pointer is to that + NumElements2Sum.
+     @param       Array2Sum                       Where to start the sumation.
+     @param       NumElements2Sum                 How many elements to sum.
+     @return                                      Returns the sum of the array.
+     @function    CollectionIO_SumS8
+     @function    CollectionIO_SumU8
+     @function    CollectionIO_SumS16 
+     @function    CollectionIO_SumU16
+          @function    CollectionIO_SumS32
+     @function    CollectionIO_SumU32
+     @function    CollectionIO_SumS64
+     @function    CollectionIO_SumU64
+     */
+    int64_t CollectionIO_SumS8(int8_t *Array2Sum, size_t NumElements2Sun);
     
-    int64_t CollectionIO_SumS16(int16_t *Array2Sum, size_t NumElements);
+    uint64_t CollectionIO_SumU8(uint8_t *Array2Sum, size_t NumElements2Sun);
     
-    uint64_t CollectionIO_SumU16(uint16_t *Array2Sum, size_t NumElements);
+    int64_t CollectionIO_SumS16(int16_t *Array2Sum, size_t NumElements2Sun);
     
-    int64_t CollectionIO_SumS32(int32_t *Array2Sum, size_t NumElements);
+    uint64_t CollectionIO_SumU16(uint16_t *Array2Sum, size_t NumElements2Sun);
     
-    uint64_t CollectionIO_SumU32(uint32_t *Array2Sum, size_t NumElements);
+    int64_t CollectionIO_SumS32(int32_t *Array2Sum, size_t NumElements2Sun);
     
-    int64_t CollectionIO_SumS64(int64_t *Array2Sum, size_t NumElements);
+    uint64_t CollectionIO_SumU32(uint32_t *Array2Sum, size_t NumElements2Sun);
     
-    uint64_t CollectionIO_SumU64(uint64_t *Array2Sum, size_t NumElements);
+    int64_t CollectionIO_SumS64(int64_t *Array2Sum, size_t NumElements2Sun);
+    
+    uint64_t CollectionIO_SumU64(uint64_t *Array2Sum, size_t NumElements2Sun);
     
 #ifndef CollectionIO_Sun
 #define CollectionIO_Sum(Array2Sum, NumElements) \
 _Generic(Array2Sum, int8_t:CollectionIO_SumS8, uint8_t:CollectionIO_SumU8, int16_t:CollectionIO_SumS16, uint16_t:CollectionIO_SunU16, int32_t:CollectionIO_SumS32, uint32_t:CollectionIO_SumU32, int64_t:CollectionIO_SumS64, uint64_t:CollectionIO_SumU64)(Array2Sum, NumElements)
 #endif /* CollectionIO_Sum */
 
-    void ArrayIO_Reverse(auto *Array, PlatformIOTypes Type, size_t NumElements);
-
-    /*!
-     @abstract                                    Sums an array from whatever position the start pointer is to that + NumElements2Sum.
-     @param       Array2Sum                       Where to start the sumation.
-     @param       NumElements2Sum                 How many elements to sum.
-     @return                                      Returns the sum of the array.
-     @function    ArrayIO_Sum8
-     @function    ArrayIO_Sum16
-     @function    ArrayIO_Sum32
-     @function    ArrayIO_Sum64
-     */
-    size_t        ArrayIO_Sum8(uint8_t *Array2Sum, size_t NumElements2Sum);
-    size_t        ArrayIO_Sum16(uint16_t *Array2Sum, size_t NumElements2Sum);
-    size_t        ArrayIO_Sum32(uint32_t *Array2Sum, size_t NumElements2Sum);
-    size_t        ArrayIO_Sum64(uint64_t *Array2Sum, size_t NumElements2Sum);
+    void CollectionIO_Reverse(auto *Array, PlatformIOTypes Type, size_t NumElements);
 
     /* Slice stuff */
     typedef struct CollectionIO_Slice {
@@ -124,7 +124,7 @@ _Generic(Array2Sum, int8_t:CollectionIO_SumS8, uint8_t:CollectionIO_SumU8, int16
     } CollectionIO_Slice;
 
     /*!
-     @abstract                                  Creates an instance of a ArrayIO_Slice.
+     @abstract                                  Creates an instance of a CollectionIO_Slice.
      @param       StartElement                  Where should the string start?
      @param       StopElement                   Where should the string end?
      @return                                    Returns the initailized Slice.
@@ -133,15 +133,15 @@ _Generic(Array2Sum, int8_t:CollectionIO_SumS8, uint8_t:CollectionIO_SumU8, int16
 
     /*!
      @abstract                                  Where does this slice start?
-     @param       Slice                         The instance of the ArrayIO_Slice.
-     @return                                    The Start of the ArrayIO_Slice in Elements.
+     @param       Slice                         The instance of the CollectionIO_Slice.
+     @return                                    The Start of the CollectionIO_Slice in Elements.
      */
     size_t Slice_GetStartElement(CollectionIO_Slice Slice);
 
     /*!
      @abstract                                      Where does this slice end?
-     @param       Slice                             The instance of the ArrayIO_Slice.
-     @return                                        The End of the ArrayIO_Slice in Elements.
+     @param       Slice                             The instance of the CollectionIO_Slice.
+     @return                                        The End of the CollectionIO_Slice in Elements.
      */
     size_t Slice_GetStopElement(CollectionIO_Slice Slice);
     /* Slice stuff */

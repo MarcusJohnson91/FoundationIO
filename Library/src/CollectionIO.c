@@ -30,7 +30,7 @@ extern "C" {
      }
      */
 
-    int64_t ArrayIO_GetMin(void *Array, PlatformIOTypes Type, size_t NumElements) {
+    int64_t CollectionIO_GetMin(void *Array, PlatformIOTypes Type, size_t NumElements) {
         AssertIO(Array != NULL);
         AssertIO(Type != PlatformIOType_Unspecified);
         AssertIO(NumElements > 0);
@@ -99,7 +99,7 @@ extern "C" {
         return Min;
     }
 
-    int64_t ArrayIO_GetMax(void *Array, PlatformIOTypes Type, size_t NumElements) {
+    int64_t CollectionIO_GetMax(void *Array, PlatformIOTypes Type, size_t NumElements) {
         AssertIO(Array != NULL);
         AssertIO(Type != PlatformIOType_Unspecified);
         AssertIO(NumElements > 0);
@@ -168,7 +168,7 @@ extern "C" {
         return Max;
     }
 
-    int64_t ArrayIO_GetSum(void *Array, PlatformIOTypes Type, size_t NumElements) {
+    int64_t CollectionIO_GetSum(void *Array, PlatformIOTypes Type, size_t NumElements) {
         AssertIO(Array != NULL);
         AssertIO(Type != PlatformIOType_Unspecified);
         AssertIO(NumElements > 0);
@@ -221,7 +221,7 @@ extern "C" {
         return Sum;
     }
 
-    void ArrayIO_Reverse(void *Array, PlatformIOTypes Type, size_t NumElements) {
+    void CollectionIO_Reverse(void *Array, PlatformIOTypes Type, size_t NumElements) {
         AssertIO(Array != NULL);
         AssertIO(NumElements > 0);
         if PlatformIO_Is(Type, PlatformIOType_Signed) {
@@ -285,7 +285,7 @@ extern "C" {
      like PlatformIOTypes, that all variables of that type have either a Signed or Unsigned bit set, and that all of them contain a valid type too.
      */
 
-    void ArrayIO_Rotate(void *Array, size_t NumElementsInArray, PlatformIOTypes Type, size_t Amount2Rotate) {
+    void CollectionIO_Rotate(void *Array, size_t NumElementsInArray, PlatformIOTypes Type, size_t Amount2Rotate) {
         AssertIO(Array != NULL);
         AssertIO(Type != PlatformIOType_Unspecified);
 
@@ -321,7 +321,7 @@ extern "C" {
         }
     }
 
-    void ArrayIO_Reverse_Ranged(void *Array, PlatformIOTypes Type, PlatformIO_Range Range) {
+    void CollectionIO_Reverse_Ranged(void *Array, PlatformIOTypes Type, PlatformIO_Range Range) {
         AssertIO(Array != NULL);
         AssertIO(Type != PlatformIOType_Unspecified);
         AssertIO(Range_GetLength(Range) != 0);
@@ -330,12 +330,12 @@ extern "C" {
         PlatformIO_Range Range1 = Range_Init(Range.Start, Split);
         PlatformIO_Range Range2 = Range_Init(Split, Range.End);
 
-        ArrayIO_Reverse_Ranged(Array, Type, Range1);
-        ArrayIO_Reverse_Ranged(Array, Type, Range2);
-        ArrayIO_Reverse_Ranged(Array, Type, Range);
+        CollectionIO_Reverse_Ranged(Array, Type, Range1);
+        CollectionIO_Reverse_Ranged(Array, Type, Range2);
+        CollectionIO_Reverse_Ranged(Array, Type, Range);
     }
 
-    void ArrayIO_CircleShift(void *Array, size_t NumElementsInArray, size_t NumElements2Shift) { // Inspired by UTF32_ShiftCodePoints
+    void CollectionIO_CircleShift(void *Array, size_t NumElementsInArray, size_t NumElements2Shift) { // Inspired by UTF32_ShiftCodePoints
         AssertIO(Array != NULL);
         AssertIO(NumElementsInArray > 0);
         AssertIO(NumElements2Shift > 0);
@@ -347,11 +347,11 @@ extern "C" {
          */
     }
 
-    ArrayIO_Frequencies *ArrayIOFrequency_Init(size_t NumElements, PlatformIOTypes Type) {
+    CollectionIO_Histogram *CollectionIO_Histogram_Init(size_t NumElements, PlatformIOTypes Type) {
         AssertIO(NumElements > 0);
         AssertIO(Type != PlatformIOType_Unspecified);
 
-        ArrayIO_Frequencies *Frequencies = calloc(1, sizeof(ArrayIO_Frequencies));
+        CollectionIO_Histogram *Frequencies = calloc(1, sizeof(CollectionIO_Histogram));
         AssertIO(Frequencies != NULL);
 
         Frequencies->Array = calloc(NumElements, (Type & 0x3C) / 4);
@@ -369,7 +369,7 @@ extern "C" {
      The values can be audio of image samples, it could be a string, it can be almos everything
      */
 
-    void ArrayIOFequncies_Measure(ArrayIO_Frequencies *Frequencies, void *Array2Measure, size_t ArrayNumElements, PlatformIOTypes ArrayType) {
+    void CollectionIO_Histogram_Measure(CollectionIO_Histogram *Frequencies, void *Array2Measure, size_t ArrayNumElements, PlatformIOTypes ArrayType) {
         AssertIO(Frequencies != NULL);
         AssertIO(Array2Measure != NULL);
         AssertIO(ArrayNumElements > 0);
@@ -496,7 +496,7 @@ extern "C" {
 
 
 
-    void ArrayIOFrequencies_Sort(ArrayIO_Frequencies *Frequencies, ArrayIO_SortTypes SortType) {
+    void CollectionIO_Histogram_Sort(CollectionIO_Histogram *Frequencies, CollectionIO_SortTypes SortType) {
         AssertIO(Frequencies != NULL);
         AssertIO(SortType != SortType_Unspecified);
 
@@ -547,7 +547,7 @@ extern "C" {
         }
     }
 
-    void ArrayIOFequencies_Deinit(ArrayIO_Frequencies *Frequencies) {
+    void CollectionIO_Histogram_Deinit(CollectionIO_Histogram *Frequencies) {
         free(Frequencies->Array);
         free(Frequencies);
     }

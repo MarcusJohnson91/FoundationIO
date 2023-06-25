@@ -8,7 +8,7 @@ Version: @OUTPUT_VERSION_STRING@
 
 name:               FoundationIO
 description:        FoundationIO's purpose is to provide a consistent interface between platforms that is safer and easier to use.
-ArrayIO:            Array modification, used by the rest of FoundationIO.
+CollectionIO:            Array modification, used by the rest of FoundationIO.
 AssertIO:           Compile time assertions.
 AsynchronousIO:     Async reading and writing to file and socket descriptors.
 BufferIO:           Bitwise reading and writing to buffers.
