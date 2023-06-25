@@ -531,9 +531,9 @@ extern "C" {
      @param      NumBits2Rotate                   The number of bits to rotate.
      @param      Value                            The value to rotate.
      @return                                      Returns the rotated value.
+     @function RotateLeft
+     @function RotateRight
      */
-    uint64_t     Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value);
-    
     uint64_t      RotateLeft(uint8_t NumBits2Rotate, uint64_t Value);
     
     uint64_t      RotateRight(uint8_t NumBits2Rotate, uint64_t Value);
