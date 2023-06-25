@@ -250,7 +250,7 @@ extern "C" {
      
      
      int64_t CollectionIO_SumS8(int8_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
+        int64_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
         }
@@ -258,7 +258,7 @@ extern "C" {
     }
     
     uint64_t CollectionIO_SumU8(uint8_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
+        uint64_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
         }
@@ -266,7 +266,7 @@ extern "C" {
     }
 
     int64_t CollectionIO_SumS16(int16_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
+        int64_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
         }
@@ -274,7 +274,7 @@ extern "C" {
     }
     
     uint64_t CollectionIO_SumU16(uint16_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
+        uint64_t Sum = 0;
         for (size_t Element = 0; Element < NumElements2Sum; Element++) {
             Sum += Array2Sum[Element];
         }
