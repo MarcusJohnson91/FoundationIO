@@ -77,15 +77,6 @@ extern "C" {
 
     int64_t CollectionIO_GetMax(auto *Array, size_t NumElements);
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
     /*!
      @abstract                                    Gets the Minimum value from whatever position the start pointer is to that + NumElements.
      @param       Array                       Where to start.
@@ -155,13 +146,6 @@ _Generic(Array, int8_t:CollectionIO_GetMinS8, uint8_t:CollectionIO_GetMinU8, int
 #define CollectionIO_GetMax(Array, NumElements) \
 _Generic(Array, int8_t:CollectionIO_GetMaxS8, uint8_t:CollectionIO_GetMaxU8, int16_t:CollectionIO_GetMaxS16, uint16_t:CollectionIO_GetMaxU16, int32_t:CollectionIO_GetMaxS32, uint32_t:CollectionIO_GetMaxU32, int64_t:CollectionIO_GetMaxS64, uint64_t:CollectionIO_GetMaxU64)(Array, NumElements)
 #endif /* CollectionIO_GetMax */
-    
-    
-    
-    
-    
-    
-    
     
     /*!
      @abstract                                    Sums an array from whatever position the start pointer is to that + NumElements2Sum.
