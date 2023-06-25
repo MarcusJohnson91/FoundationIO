@@ -68,14 +68,6 @@ extern "C" {
     void CollectionIO_Histogram_Sort(auto Frequencies, CollectionIO_SortTypes SortType);
 
     void CollectionIO_Histogram_Deinit(auto Frequencies);
-
-    void CollectionIO_Rotate(auto *Array, size_t Amount2Rotate);
-
-    void CollectionIO_Rotate_Ranged(auto *Array, size_t Amount2Rotate, PlatformIO_Range Range);
-
-    int64_t CollectionIO_GetMin(auto *Array, size_t NumElements);
-
-    int64_t CollectionIO_GetMax(auto *Array, size_t NumElements);
     
     /*!
      @abstract                                    Gets the Minimum value from whatever position the start pointer is to that + NumElements.
@@ -109,7 +101,7 @@ extern "C" {
     
 #ifndef CollectionIO_GetMin
 #define CollectionIO_GetMin(Array, NumElements) \
-_Generic(Array, int8_t:CollectionIO_GetMinS8, uint8_t:CollectionIO_GetMinU8, int16_t:CollectionIO_GetMinS16, uint16_t:CollectionIO_GetMinU16, int32_t:CollectionIO_GetMinS32, uint32_t:CollectionIO_GetMinU32, int64_t:CollectionIO_GetMinS64, uint64_t:CollectionIO_GetMinU64)(Array, NumElements)
+_Generic(Array, int8_t*:CollectionIO_GetMinS8, uint8_t*:CollectionIO_GetMinU8, int16_t*:CollectionIO_GetMinS16, uint16_t*:CollectionIO_GetMinU16, int32_t*:CollectionIO_GetMinS32, uint32_t*:CollectionIO_GetMinU32, int64_t*:CollectionIO_GetMinS64, uint64_t*:CollectionIO_GetMinU64)(Array, NumElements)
 #endif /* CollectionIO_GetMin */
     
     /*!
@@ -144,7 +136,7 @@ _Generic(Array, int8_t:CollectionIO_GetMinS8, uint8_t:CollectionIO_GetMinU8, int
     
 #ifndef CollectionIO_GetMax
 #define CollectionIO_GetMax(Array, NumElements) \
-_Generic(Array, int8_t:CollectionIO_GetMaxS8, uint8_t:CollectionIO_GetMaxU8, int16_t:CollectionIO_GetMaxS16, uint16_t:CollectionIO_GetMaxU16, int32_t:CollectionIO_GetMaxS32, uint32_t:CollectionIO_GetMaxU32, int64_t:CollectionIO_GetMaxS64, uint64_t:CollectionIO_GetMaxU64)(Array, NumElements)
+_Generic(Array, int8_t*:CollectionIO_GetMaxS8, uint8_t*:CollectionIO_GetMaxU8, int16_t*:CollectionIO_GetMaxS16, uint16_t*:CollectionIO_GetMaxU16, int32_t*:CollectionIO_GetMaxS32, uint32_t*:CollectionIO_GetMaxU32, int64_t*:CollectionIO_GetMaxS64, uint64_t*:CollectionIO_GetMaxU64)(Array, NumElements)
 #endif /* CollectionIO_GetMax */
     
     /*!
@@ -177,12 +169,11 @@ _Generic(Array, int8_t:CollectionIO_GetMaxS8, uint8_t:CollectionIO_GetMaxU8, int
     
     uint64_t CollectionIO_SumU64(uint64_t *Array2Sum, size_t NumElements2Sun);
     
-#ifndef CollectionIO_Sun
+#ifndef CollectionIO_Sum
 #define CollectionIO_Sum(Array2Sum, NumElements) \
-_Generic(Array2Sum, int8_t:CollectionIO_SumS8, uint8_t:CollectionIO_SumU8, int16_t:CollectionIO_SumS16, uint16_t:CollectionIO_SunU16, int32_t:CollectionIO_SumS32, uint32_t:CollectionIO_SumU32, int64_t:CollectionIO_SumS64, uint64_t:CollectionIO_SumU64)(Array2Sum, NumElements)
+_Generic(Array2Sum, int8_t*:CollectionIO_SumS8, uint8_t*:CollectionIO_SumU8, int16_t*:CollectionIO_SumS16, uint16_t*:CollectionIO_SunU16, int32_t*:CollectionIO_SumS32, uint32_t*:CollectionIO_SumU32, int64_t*:CollectionIO_SumS64, uint64_t*:CollectionIO_SumU64)(Array2Sum, NumElements)
 #endif /* CollectionIO_Sum */
 
-    void CollectionIO_Reverse(auto *Array, PlatformIOTypes Type, size_t NumElements);
 
     /* Slice stuff */
     typedef struct CollectionIO_Slice {

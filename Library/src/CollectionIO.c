@@ -316,131 +316,193 @@ extern "C" {
 
     
 
-    void CollectionIO_Reverse(void *Array, PlatformIOTypes Type, size_t NumElements) {
+
+
+    void CollectionIO_ReverseS8(int8_t *Array, size_t NumElements) {
         AssertIO(Array != NULL);
         AssertIO(NumElements > 0);
-        if PlatformIO_Is(Type, PlatformIOType_Signed) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                int8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                int16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                int32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                int64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            }
-        } else if PlatformIO_Is(Type, PlatformIOType_Unsigned) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                int8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                int16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                int32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                int64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    TypedArray[Element]               = TypedArray[NumElements - Element];
-                    TypedArray[NumElements - Element] = TypedArray[Element];
-                }
-            }
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
         }
     }
 
-    /*
-     Make a function to check that multiple chunks of an OR-able enum are all represented.
 
-     like PlatformIOTypes, that all variables of that type have either a Signed or Unsigned bit set, and that all of them contain a valid type too.
-     */
-
-    void CollectionIO_Rotate(void *Array, size_t NumElementsInArray, PlatformIOTypes Type, size_t Amount2Rotate) {
+void CollectionIO_ReverseU8(uint8_t *Array, size_t NumElements) {
         AssertIO(Array != NULL);
-        AssertIO(Type != PlatformIOType_Unspecified);
-
-        //Rotating an array is a circular shift, so move Amount2Rotate elements from the starting position to the ending position.
-
-        /*
-         {1, 2, 3, 4} Amount2Rotate = 2 = {3, 4, 1, 2}
-         */
-
-        if PlatformIO_Is(Type, PlatformIOType_Signed) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                int8_t *TypedArray = Array;
-                for (size_t Element = Amount2Rotate; Element < NumElementsInArray; Element++) {
-                    TypedArray[Element] = TypedArray[Element + Amount2Rotate];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-
-            }
-        } else if PlatformIO_Is(Type, PlatformIOType_Unsigned) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-
-            }
+        AssertIO(NumElements > 0);
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
         }
     }
 
-    void CollectionIO_Reverse_Ranged(void *Array, PlatformIOTypes Type, PlatformIO_Range Range) {
+void CollectionIO_ReverseS16(int16_t *Array, size_t NumElements) {
         AssertIO(Array != NULL);
-        AssertIO(Type != PlatformIOType_Unspecified);
-        AssertIO(Range_GetLength(Range) != 0);
-
-        size_t           Split  = Range.Start;
-        PlatformIO_Range Range1 = Range_Init(Range.Start, Split);
-        PlatformIO_Range Range2 = Range_Init(Split, Range.End);
-
-        CollectionIO_Reverse_Ranged(Array, Type, Range1);
-        CollectionIO_Reverse_Ranged(Array, Type, Range2);
-        CollectionIO_Reverse_Ranged(Array, Type, Range);
+        AssertIO(NumElements > 0);
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
+        }
     }
 
-    void CollectionIO_CircleShift(void *Array, size_t NumElementsInArray, size_t NumElements2Shift) { // Inspired by UTF32_ShiftCodePoints
+void CollectionIO_ReverseU16(uint16_t *Array, size_t NumElements) {
         AssertIO(Array != NULL);
-        AssertIO(NumElementsInArray > 0);
-        AssertIO(NumElements2Shift > 0);
-
-        /*
-         "0123456789" -> "2345678901"
-         aka read the first two elements and put them at the end
-
-         */
+        AssertIO(NumElements > 0);
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
+        }
     }
+
+    void CollectionIO_ReverseS32(int32_t *Array, size_t NumElements) {
+        AssertIO(Array != NULL);
+        AssertIO(NumElements > 0);
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
+        }
+    }
+
+
+void CollectionIO_ReverseU32(uint32_t *Array, size_t NumElements) {
+        AssertIO(Array != NULL);
+        AssertIO(NumElements > 0);
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
+        }
+    }
+
+void CollectionIO_ReverseS64(int64_t *Array, size_t NumElements) {
+        AssertIO(Array != NULL);
+        AssertIO(NumElements > 0);
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
+        }
+    }
+
+void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
+        AssertIO(Array != NULL);
+        AssertIO(NumElements > 0);
+        
+        for (size_t Element = 0; Element < NumElements; Element++) {
+            Array[Element]               = Array[NumElements - Element];
+                    Array[NumElements - Element] = Array[Element];
+        }
+    }
+
+   void CollectionIO_RotateS8(int8_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
+   
+   void CollectionIO_RotateU8(uint8_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
+   
+   void CollectionIO_RotateS16(int16_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
+   
+   void CollectionIO_RotateU16(uint16_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
+   
+   void CollectionIO_RotateS32(int32_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
+   
+   void CollectionIO_RotateU32(uint32_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
+   
+   void CollectionIO_RotateS64(int64_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
+   
+   void CollectionIO_RotateU64(uint64_t *Array, size_t NumElements, size_t Amount2Rotate) {
+       AssertIO(Array != NULL);
+       AssertIO(NumElements > 0);
+       AssertIO(Amount2Rotate > 0);
+       AssertIO(Amount2Rotate <= NumElements);
+       
+       CollectionIO_Reverse(Array, Amount2Rotate);
+
+          CollectionIO_Reverse(Array[Amount2Rotate], NumElements - Amount2Rotate);
+       
+       CollectionIO_Reverse(Array, NumElements);
+   }
 
     CollectionIO_Histogram *CollectionIO_Histogram_Init(size_t NumElements, PlatformIOTypes Type) {
         AssertIO(NumElements > 0);

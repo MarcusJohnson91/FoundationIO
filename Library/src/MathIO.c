@@ -483,15 +483,13 @@ extern "C" {
 __attribute__((no_sanitize("undefined")))
 #endif
  */
-    uint64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const uint64_t Value) {
-        uint64_t Rotated = 0ULL;
-        AssertIO(RotationType != RotationType_Unspecified);
-        if (RotationType == RotationType_Left) {
-            Rotated     = (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
-        } else if (RotationType == RotationType_Right) {
-            Rotated     = (Value >> NumBits2Rotate) | (Value << (64 - NumBits2Rotate));
-        }
-        return Rotated;
+    
+    uint64_t RotateLeft(uint8_t NumBits2Rotate, uint64_t Value) {
+        return (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
+    }
+    
+    uint64_t RotateRight(uint8_t NumBits2Rotate, uint64_t Value) {
+        return (Value >> NumBits2Rotate) | (Value << (64 - NumBits2Rotate));
     }
 
     uint16_t PackIntegers8To16(uint8_t Values[2]) {

@@ -75,10 +75,10 @@ extern "C" {
             S3 = Xoshiro_Constants[0][3];
         }
         for (uint8_t LeftShift = 0; LeftShift < 64; LeftShift++) {
-            S0 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[0]);
-            S1 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[1]);
-            S2 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[2]);
-            S3 ^= Rotate(RotationType_Left, LeftShift, Insecure->State[3]);
+            S0 ^= RotateLeft(LeftShift, Insecure->State[0]);
+            S1 ^= RotateLeft(LeftShift, Insecure->State[1]);
+            S2 ^= RotateLeft(LeftShift, Insecure->State[2]);
+            S3 ^= RotateLeft(LeftShift, Insecure->State[3]);
         }
         const uint64_t Temp = S0 << 17;
         Insecure->State[2] ^= S0;
@@ -86,7 +86,7 @@ extern "C" {
         Insecure->State[1] ^= S2;
         Insecure->State[0] ^= S3;
         Insecure->State[2] ^= Temp;
-        Insecure->State[3]  = Rotate(RotationType_Left, 45, Insecure->State[3]);
+        Insecure->State[3]  = RotateLeft(45, Insecure->State[3]);
         Insecure->NumBitsRemaining = 256;
     }
 
