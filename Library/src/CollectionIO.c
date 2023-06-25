@@ -5,221 +5,316 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-
-    /*
-     if PlatformIO_Is(Type, PlatformIOType_Signed) {
-     if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-
-     } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-
-     } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-
-     } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-
-     }
-     } else if PlatformIO_Is(Type, PlatformIOType_Unsigned) {
-     if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-
-     } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-
-     } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-
-     } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-
-     }
-     }
-     */
-
-    int64_t CollectionIO_GetMin(void *Array, PlatformIOTypes Type, size_t NumElements) {
-        AssertIO(Array != NULL);
-        AssertIO(Type != PlatformIOType_Unspecified);
-        AssertIO(NumElements > 0);
-        int64_t Min = INT64_MAX;
-        if PlatformIO_Is(Type, PlatformIOType_Signed) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                int8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                int16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                int32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                int64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            }
-        } else if PlatformIO_Is(Type, PlatformIOType_Unsigned) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                uint8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                uint16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                uint32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                uint64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Min) {
-                        Min = TypedArray[Element];
-                    }
-                }
-            }
-        }
-        return Min;
+     
+     size_t CollectionIO_GetMinS8(int8_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT8_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
     }
-
-    int64_t CollectionIO_GetMax(void *Array, PlatformIOTypes Type, size_t NumElements) {
-        AssertIO(Array != NULL);
-        AssertIO(Type != PlatformIOType_Unspecified);
-        AssertIO(NumElements > 0);
-        int64_t Max = INT64_MIN;
-        if PlatformIO_Is(Type, PlatformIOType_Signed) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                int8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                int16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                int32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                int64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            }
-        } else if PlatformIO_Is(Type, PlatformIOType_Unsigned) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                uint8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                uint16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                uint32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                uint64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    if (TypedArray[Element] > Max) {
-                        Max = TypedArray[Element];
-                    }
-                }
-            }
-        }
-        return Max;
+         
+     
+     size_t CollectionIO_GetMinU8(uint8_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT8_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
     }
-
-    int64_t CollectionIO_GetSum(void *Array, PlatformIOTypes Type, size_t NumElements) {
-        AssertIO(Array != NULL);
-        AssertIO(Type != PlatformIOType_Unspecified);
-        AssertIO(NumElements > 0);
-        int64_t Sum = 0;
-        if PlatformIO_Is(Type, PlatformIOType_Signed) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                int8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                int16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                int32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                int64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            }
-        } else if PlatformIO_Is(Type, PlatformIOType_Unsigned) {
-            if PlatformIO_Is(Type, PlatformIOType_Integer8) {
-                uint8_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer16) {
-                uint16_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer32) {
-                uint32_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            } else if PlatformIO_Is(Type, PlatformIOType_Integer64) {
-                uint64_t *TypedArray = Array;
-                for (size_t Element = 0; Element < NumElements; Element++) {
-                    Sum += TypedArray[Element];
-                }
-            }
+     
+     size_t CollectionIO_GetMinS16(int16_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT16_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
+    }
+     
+     size_t CollectionIO_GetMinU16(uint16_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT16_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
+    }
+     
+     size_t CollectionIO_GetMinS32(int32_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT32_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
+    }
+     
+     size_t CollectionIO_GetMinU32(uint32_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT32_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
+    }
+     
+     size_t CollectionIO_GetMinS64(int64_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT64_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
+    }
+     
+     size_t CollectionIO_GetMinU64(uint64_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MinIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT64_MIN) {
+                 MinIndex = Element;
+                 break; // Return
+             } else if (Array[Element] < Array[MinIndex]) {
+                 MinIndex = Element;
+         }
+         return MinIndex;
+    }
+     
+     int8_t CollectionIO_GetMaxS8(int8_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT8_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     uint8_t CollectionIO_GetMaxU8(uint8_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT8_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     int16_t CollectionIO_GetMaxS16(int16_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT16_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     uint16_t CollectionIO_GetMAxU16(uint16_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT16_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     int32_t CollectionIO_GetMaxS32(int32_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT32_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     uint32_t CollectionIO_GetMaxU32(uint32_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT32_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     int64_t CollectionIO_GetMaxS64(int64_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == INT64_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     uint64_t CollectionIO_GetMaxU64(uint64_t *Array, size_t NumElements) {
+         AssertIO(Array != NULL);
+         AssertIO(NumElements > 0);
+         size_t MaxIndex = 0;
+         
+         for (size_t Element = 0; Element < NumElements; Element++) {
+             if (Array[Element] == UINT64_MAX) {
+                 MaxIndex = Element;
+                 break; // Return
+             } else if (Array[Element] > Array[MaxIndex]) {
+                 MaxIndex = Element;
+         }
+         return MaxIndex;
+    }
+     
+     
+     int64_t CollectionIO_SumS8(int8_t *Array2Sum, size_t NumElements2Sum) {
+        size_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
         }
         return Sum;
     }
+    
+    uint64_t CollectionIO_SumU8(uint8_t *Array2Sum, size_t NumElements2Sum) {
+        size_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+
+    int64_t CollectionIO_SumS16(int16_t *Array2Sum, size_t NumElements2Sum) {
+        size_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+    
+    uint64_t CollectionIO_SumU16(uint16_t *Array2Sum, size_t NumElements2Sum) {
+        size_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+
+    int64_t CollectionIO_SumS32(int32_t *Array2Sum, size_t NumElements2Sum) {
+        int64_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+    
+    uint64_t CollectionIO_SumU32(uint32_t *Array2Sum, size_t NumElements2Sum) {
+        uint64_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+
+    int64_t CollectionIO_SumS64(int64_t *Array2Sum, size_t NumElements2Sum) {
+        int64_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+    
+    uint64_t CollectionIO_SumU64(uint64_t *Array2Sum, size_t NumElements2Sum) {
+        uint64_t Sum = 0;
+        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
+            Sum += Array2Sum[Element];
+        }
+        return Sum;
+    }
+     
+
+    
 
     void CollectionIO_Reverse(void *Array, PlatformIOTypes Type, size_t NumElements) {
         AssertIO(Array != NULL);
@@ -550,70 +645,6 @@ extern "C" {
     void CollectionIO_Histogram_Deinit(CollectionIO_Histogram *Frequencies) {
         free(Frequencies->Array);
         free(Frequencies);
-    }
-    
-    int64_t CollectionIO_SumS8(int8_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
-    }
-    
-    uint64_t CollectionIO_SumU8(uint8_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
-    }
-
-    int64_t CollectionIO_SumS16(int16_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
-    }
-    
-    uint64_t CollectionIO_SumU16(uint16_t *Array2Sum, size_t NumElements2Sum) {
-        size_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
-    }
-
-    int64_t CollectionIO_SumS32(int32_t *Array2Sum, size_t NumElements2Sum) {
-        int64_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
-    }
-    
-    uint64_t CollectionIO_SumU32(uint32_t *Array2Sum, size_t NumElements2Sum) {
-        uint64_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
-    }
-
-    int64_t CollectionIO_SumS64(int64_t *Array2Sum, size_t NumElements2Sum) {
-        int64_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
-    }
-    
-    uint64_t CollectionIO_SumU64(uint64_t *Array2Sum, size_t NumElements2Sum) {
-        uint64_t Sum = 0;
-        for (size_t Element = 0; Element < NumElements2Sum; Element++) {
-            Sum += Array2Sum[Element];
-        }
-        return Sum;
     }
 
     /* Slice stuff */

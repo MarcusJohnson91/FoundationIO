@@ -76,8 +76,91 @@ extern "C" {
     int64_t CollectionIO_GetMin(auto *Array, size_t NumElements);
 
     int64_t CollectionIO_GetMax(auto *Array, size_t NumElements);
-
-    int64_t CollectionIO_GetSum(auto *Array, PlatformIOTypes Type, size_t NumElements);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /*!
+     @abstract                                    Gets the Minimum value from whatever position the start pointer is to that + NumElements.
+     @param       Array                       Where to start.
+     @param       NumElements                 How many elements to search.
+     @return                                      Returns the Index of the minimum value, if the value bottoms out it returns the first element of that dip.
+     @function    CollectionIO_GetMinS8
+     @function    CollectionIO_GetMinU8
+     @function    CollectionIO_GetMinS16 
+     @function    CollectionIO_GetMinU15
+          @function    CollectionIO_GetMinS32
+     @function    CollectionIO_GetMinU32
+     @function    CollectionIO_GetMinS64
+     @function    CollectionIO_GetMinU64
+     */
+    size_t CollectionIO_GetMinS8(int8_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMinU8(uint8_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMinS16(int16_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMinU16(uint16_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMinS32(int32_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMinU32(uint32_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMinS64(int64_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMinU64(uint64_t *Array, size_t NumElements);
+    
+#ifndef CollectionIO_GetMin
+#define CollectionIO_GetMin(Array, NumElements) \
+_Generic(Array, int8_t:CollectionIO_GetMinS8, uint8_t:CollectionIO_GetMinU8, int16_t:CollectionIO_GetMinS16, uint16_t:CollectionIO_GetMinU16, int32_t:CollectionIO_GetMinS32, uint32_t:CollectionIO_GetMinU32, int64_t:CollectionIO_GetMinS64, uint64_t:CollectionIO_GetMinU64)(Array, NumElements)
+#endif /* CollectionIO_GetMin */
+    
+    /*!
+     @abstract                                    Gets the Maximum value from whatever position the start pointer is to that + NumElements.
+     @param       Array                       Where to start.
+     @param       NumElements                 How many elements to search.
+     @return                                      Returns the Index of the maximum value, if the value tops out it returns the first element of that peak.
+     @function    CollectionIO_GetMaxS8
+     @function    CollectionIO_GetMaxU8
+     @function    CollectionIO_GetMaxS16 
+     @function    CollectionIO_GetMaxU16
+          @function    CollectionIO_GetMaxS32
+     @function    CollectionIO_GetMaxU32
+     @function    CollectionIO_GetMaxS64
+     @function    CollectionIO_GetMaxU64
+     */
+    size_t CollectionIO_GetMaxS8(int8_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMaxU8(uint8_t *Array, size_t NumElements);
+    
+    size_t CollectionIO_GetMaxS16(int16_t *Array, size_t NumElements);
+    
+    uint64_t CollectionIO_GetMaxU16(uint16_t *Array, size_t NumElements);
+    
+    int64_t CollectionIO_GetMaxS32(int32_t *Array, size_t NumElements);
+    
+    uint64_t CollectionIO_GetMaxU32(uint32_t *Array, size_t NumElements);
+    
+    int64_t CollectionIO_GetMaxS64(int64_t *Array, size_t NumElements);
+    
+    uint64_t CollectionIO_GetMaxU64(uint64_t *Array, size_t NumElements);
+    
+#ifndef CollectionIO_GetMax
+#define CollectionIO_GetMax(Array, NumElements) \
+_Generic(Array, int8_t:CollectionIO_GetMaxS8, uint8_t:CollectionIO_GetMaxU8, int16_t:CollectionIO_GetMaxS16, uint16_t:CollectionIO_GetMaxU16, int32_t:CollectionIO_GetMaxS32, uint32_t:CollectionIO_GetMaxU32, int64_t:CollectionIO_GetMaxS64, uint64_t:CollectionIO_GetMaxU64)(Array, NumElements)
+#endif /* CollectionIO_GetMax */
+    
+    
+    
+    
+    
+    
     
     
     /*!
