@@ -244,6 +244,135 @@ _Generic(Array, int8_t*:CollectionIO_SumS8, uint8_t*:CollectionIO_SumU8, int16_t
 _Generic(Array, int8_t*:CollectionIO_RotateS8, uint8_*t*:CollectionIO_RotateU8, int16_t*:CollectionIO_RotateS16, uint16_t*:CollectionIO_RotateU16, int32_t*:CollectionIO_RotateS32, uint32_t*:CollectionIO_RotateU32, int64_t*:CollectionIO_RotateS64, uint64_t*:CollectionIO_RotateU64)(Array, NumElements)
 #endif /* CollectionIO_Rotate */
 
+    /*!
+     @abstract                                    Measures the histogram of the Array from whatever position the start pointer is to that + NumElements.
+     @param       Histogram                Where to store the measured results.
+     @param       Array                       Where to start measuring.
+     @param       NumElements                 How many elements to measure.
+     @function    HistogramS8_Measure
+     @function    HistogramS16_Measure
+     @function    HistogramU16_Measure 
+     @function    HistogramS32_Measure
+          @function    HistogramU32_Measure
+     @function    HistogramS64_Measure
+     @function    HistogramU64_Measure
+     */
+void HistogramS8_Measure(HistogramS8 *Histogram, int8_t *Array, size_t NumElements);
+
+void HistogramU8_Measure(HistogramU8 *Histogram, uint8_t *Array, size_t NumElements);
+
+void HistogramS16_Measure(HistogramS16 *Histogram, int16_t *Array, size_t NumElements);
+
+void HistogramU16_Measure(HistogramU16 *Histogram, uint16_t *Array, size_t NumElements);
+
+void HistogramS32_Measure(HistogramS32 *Histogram, int32_t *Array, size_t NumElements);
+
+void HistogramU32_Measure(HistogramU32 *Histogram, uint32_t *Array, size_t NumElements);
+
+void HistogramS64_Measure(HistogramS64 *Histogram, int64_t *Array, size_t NumElements)
+
+void HistogramU64_Measure(HistogramU64 *Histogram, int64_t *Array, size_t NumElements);
+#ifndef Histogram_Measure
+#define Histogram_Measure(Histogram, Array, NumElements) \
+_Generic(Array, int8_t*:HistogramS8_Measure, uint8_*t*:HistogramU8_Measure, int16_t*:HistogramS16_Measure, uint16_t*:HistogramU16_Measure, int32_t*:HistogramS32_Measure, uint32_t*:HistogramU32_Measure, int64_t*:HistogramS64_Measure, uint64_t*:HistogramU64_Measure)(Histogram, Array, NumElements)
+#endif /* Histogram_Measure */
+
+    /*!
+     @abstract                                    Sorts the histogram.
+     @param       Histogram                The Histogram to sort.
+     @param       SortType                       Should the Histogram be sorted in Ascending or Descending order?
+     @function    HistogramS8_Sort
+     @function    HistogramS16_Sort
+     @function    HistogramU16_Sort 
+     @function    HistogramS32_Sort
+          @function    HistogramU32_Sort
+     @function    HistogramS64_Sort
+     @function    HistogramU64_Sort
+     */
+void HistogramS8_Sort(HistogramS8 Histogram, CollectionIO_SortTypes SortType);
+
+void HistogramU8_Sort(HistogramU8 Histogram, CollectionIO_SortTypes SortType);
+
+void HistogramS16_Sort(HistogramS16 Histogram, CollectionIO_SortTypes SortType);
+
+void HistogramU16_Sort(HistogramU16 Histogram, CollectionIO_SortTypes SortType);
+
+void HistogramS32_Sort(HistogramS32 Histogram, CollectionIO_SortTypes SortType);
+
+void HistogramU32_Sort(HistogramU32 Histogram, CollectionIO_SortTypes SortType);
+
+void HistogramS64_Sort(HistogramS64 Histogram, CollectionIO_SortTypes SortType);
+
+void HistogramU64_Sort(HistogramU64 Histogram, CollectionIO_SortTypes SortType);
+#ifndef Histogram_Sort
+#define Histogram_Sort(Histogram, SortType) \
+_Generic(Histogram, HistogramS8:HistogramS8_Sort, HistogramU8:HistogramU8_Sort, HistogramS16:HistogramS16_Sort, HistogramU16:HistogramU16_Sort, HistogramS32:HistogramS32_Sort, HistogramU32:HistogramU32_Sort, HistogramS64:HistogramS64_Sort, HistogramU64:HistogramU64_Sort)(Histogram, SortType)
+#endif /* Histogram_Sort */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*!
+     @abstract                                    Deinitializes the histogram.
+     @param       Histogram                The Histogram to deinitialize.
+     @function    HistogramS8_Deinit
+     @function HistogramU8_Deinit
+     @function    HistogramS16_Deinit
+     @function    HistogramU16_Deinit 
+     @function    HistogramS32_Deinit
+          @function    HistogramU32_Deinit
+     @function    HistogramS64_Deinit
+     @function    HistogramU64_Deinit
+     */
+void HistogramS8_Deinit(HistogramS8 Histogram);
+
+void HistogramU8_Deinit(HistogramU8 Histogram);
+
+void HistogramS16_Deinit(HistogramS16 Histogram);
+
+void HistogramU16_Deinit(HistogramU16 Histogram);
+
+void HistogramS32_Deinit(HistogramS32 Histogram);
+
+void HistogramU32_Deinit(HistogramU32 Histogram);
+
+void HistogramS64_Deinit(HistogramS64 Histogram);
+
+void HistogramU64_Deinit(HistogramU64 Histogram);
+#ifndef Histogram_Deinit
+#define Histogram_Deinit(Histogram) \
+_Generic(Histogram, HistogramS8:HistogramS8_Deinit, HistogramU8:HistogramU8_Deinit, HistogramS16:HistogramS16_Deinit, HistogramU16:HistogramU16_Deinit, HistogramS32:HistogramS32_Deinit, HistogramU32:HistogramU32_Deinit, HistogramS64:HistogramS64_Deinit, HistogramU64:HistogramU64_Deinit)(Histogram)
+#endif /* Histogram_Deinit */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /* Slice stuff */
     typedef struct CollectionIO_Slice {

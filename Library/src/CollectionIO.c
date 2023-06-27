@@ -503,206 +503,465 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        CollectionIO_Reverse(Array, NumElements);
    }
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   typedef struct HistogramS8 {
+       int8_t *Frequencies;
+       size_t  NumFrequencies;
+   } HistogramS8;
+   
+   typedef struct HistogramU8 {
+       uint8_t *Frequencies;
+       size_t   NumFrequencies;
+   } HistogramU8;
+   
+   typedef struct HistogramS16 {
+       int16_t *Frequencies;
+       size_t   NumFrequencies;
+   } HistogramS16;
+   
+   typedef struct HistogramU16 {
+       uint16_t *Frequencies;
+       size_t    NumFrequencies;
+   } HistogramU16;
+   
+   
+   typedef struct HistogramS32 {
+       int32_t *Frequencies;
+       size_t   NumFrequencies;
+   } HistogramS32;
+   
+   typedef struct HistogramU32 {
+       uint32_t *Frequencies;
+       size_t    NumFrequencies;
+   } HistogramU32;
+   
+   
+   typedef struct HistogramS64 {
+       int64_t *Frequencies;
+       size_t   NumFrequencies;
+   } HistogramS64;
+   
+   typedef struct HistogramU64 {
+       uint64_t *Frequencies;
+       size_t    NumFrequencies;
+   } HistogramU64;
+   
+   
+   
+   
+   
+   
+   HistogramS8 HistogramS8_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 256);
+       
+       HistogramS8 Histogram = calloc(1, sizeof(HistogramS8);
+       
+       Histogram.Frequencies = calloc(sizeof(int8_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   
+   HistogramU8 HistogramU8_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 256);
+       
+       HistogramU8 Histogram = calloc(1, sizeof(HistogramU8);
+       
+       Histogram.Frequencies = calloc(sizeof(uint8_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   HistogramS16 HistogramS16_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 65536);
+       
+       HistogramS16 Histogram = calloc(1, sizeof(HistogramS16);
+       
+       Histogram.Frequencies = calloc(sizeof(int16_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   HistogramU16 HistogramU16_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 65536);
+       
+       HistogramU16 Histogram = calloc(1, sizeof(HistogramU16);
+       
+       Histogram.Frequencies = calloc(sizeof(uint16_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   HistogramS32 HistogramS32_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 4294967296);
+       
+       HistogramS32 Histogram = calloc(1, sizeof(HistogramS32);
+       
+       Histogram.Frequencies = calloc(sizeof(int32_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   HistogramU32 HistogramU32_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 4294967296);
+       
+       HistogramU32 Histogram = calloc(1, sizeof(HistogramU32);
+       
+       Histogram.Frequencies = calloc(sizeof(uint32_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   HistogramS64 HistogramS64_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 18446744073709551616);
+       
+       HistogramS64 Histogram = calloc(1, sizeof(HistogramS64);
+       
+       Histogram.Frequencies = calloc(sizeof(int64_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   HistogramU64 HistogramU64_Init(size_t NumElements) {
+       AssertIO(NumElements > 0);
+       AssertIO(NumElements <= 18446744073709551616);
+       
+       HistogramU64 Histogram = calloc(1, sizeof(HistogramU64);
+       
+       Histogram.Frequencies = calloc(sizeof(uint64_t), NumElements);
+       AssertIO(Histogram.Frequencies != NULL);
+       
+       Histogram.NumElements = NumElements;
+       return Histogram;
+   }
+   
+   
+   void HistogramS8_Measure(HistogramS8 *Histogram, int8_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   void HistogramU8_Measure(HistogramU8 *Histogram, uint8_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   void HistogramS16_Measure(HistogramS16 *Histogram, int16_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   void HistogramU16_Measure(HistogramU16 *Histogram, uint16_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   void HistogramS32_Measure(HistogramS32 *Histogram, int32_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   void HistogramU32_Measure(HistogramU32 *Histogram, uint32_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   void HistogramS64_Measure(HistogramS64 *Histogram, int64_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   void HistogramU64_Measure(HistogramU64 *Histogram, uint64_t *Array, size_t NumElements) {
+       AssertIO(Histogram != NULL);
+       AssertIO(Array != NULL);
+       AssertIO(ArraySize > 0);
+       
+       for (size_t Element = 0; Element < NumElements; Element++) {
+           Histogram.Frequencies[Array[Element]] += 1;
+       }
+   }
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
 
-    CollectionIO_Histogram *CollectionIO_Histogram_Init(size_t NumElements, PlatformIOTypes Type) {
-        AssertIO(NumElements > 0);
-        AssertIO(Type != PlatformIOType_Unspecified);
-
-        CollectionIO_Histogram *Frequencies = calloc(1, sizeof(CollectionIO_Histogram));
-        AssertIO(Frequencies != NULL);
-
-        Frequencies->Array = calloc(NumElements, (Type & 0x3C) / 4);
-        AssertIO(Frequencies->Array != NULL);
-        Frequencies->NumEntries = NumElements;
-        Frequencies->Type = Type;
-        return Frequencies;
-    }
-
-    /*
-     Now we need a function to actually measure the frequencies and a function to sort them
-
-     like, if we're handed an array that we need to measure, what do we do?
-
-     The values can be audio of image samples, it could be a string, it can be almos everything
-     */
-
-    void CollectionIO_Histogram_Measure(CollectionIO_Histogram *Frequencies, void *Array2Measure, size_t ArrayNumElements, PlatformIOTypes ArrayType) {
-        AssertIO(Frequencies != NULL);
-        AssertIO(Array2Measure != NULL);
-        AssertIO(ArrayNumElements > 0);
-        AssertIO(ArrayType != PlatformIOType_Unspecified);
-
-        if PlatformIO_Is(ArrayType, PlatformIOType_Unsigned) {
-            if PlatformIO_Is(ArrayType, PlatformIOType_Integer8) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    uint8_t *OldArray = Frequencies->Array;
-                    uint8_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            } else if PlatformIO_Is(ArrayType, PlatformIOType_Integer16) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    uint16_t *OldArray = Frequencies->Array;
-                    uint16_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            } else if PlatformIO_Is(ArrayType, PlatformIOType_Integer32) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    uint32_t *OldArray = Frequencies->Array;
-                    uint32_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            } else if PlatformIO_Is(ArrayType, PlatformIOType_Integer64) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    uint64_t *OldArray = Frequencies->Array;
-                    uint64_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            }
-        } else if PlatformIO_Is(ArrayType, PlatformIOType_Signed) {
-            if PlatformIO_Is(ArrayType, PlatformIOType_Integer8) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    int8_t *OldArray = Frequencies->Array;
-                    int8_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            } else if PlatformIO_Is(ArrayType, PlatformIOType_Integer16) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    int16_t *OldArray = Frequencies->Array;
-                    int16_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            } else if PlatformIO_Is(ArrayType, PlatformIOType_Integer32) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    int32_t *OldArray = Frequencies->Array;
-                    int32_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            } else if PlatformIO_Is(ArrayType, PlatformIOType_Integer64) {
-                for (size_t Element = 0; Element < ArrayNumElements; Element++) {
-                    int64_t *OldArray = Frequencies->Array;
-                    int64_t *NewArray = Array2Measure;
-                    OldArray[NewArray[Element]] += 1;
-                }
-            }
-        }
-    }
-
-    static int Sort_Compare_AscendingU8(const uint8_t *A, const uint8_t *B) {
-        return A - B;
-    }
+    
 
     static int Sort_Compare_AscendingS8(const int8_t *A, const int8_t *B) {
         return A - B;
     }
-
-    static int Sort_Compare_AscendingU16(const uint16_t *A, const uint16_t *B) {
+    
+    static int Sort_Compare_AscendingU8(const uint8_t *A, const uint8_t *B) {
         return A - B;
     }
 
     static int Sort_Compare_AscendingS16(const int16_t *A, const int16_t *B) {
         return A - B;
     }
-
-    static int Sort_Compare_AscendingU32(const uint32_t *A, const uint32_t *B) {
+    
+    static int Sort_Compare_AscendingU16(const uint16_t *A, const uint16_t *B) {
         return A - B;
     }
 
     static int Sort_Compare_AscendingS32(const int32_t *A, const int32_t *B) {
         return A - B;
     }
-
-    static int Sort_Compare_AscendingU64(const uint64_t *A, const uint64_t *B) {
+    
+    static int Sort_Compare_AscendingU32(const uint32_t *A, const uint32_t *B) {
         return A - B;
     }
 
     static int Sort_Compare_AscendingS64(const int64_t *A, const int64_t *B) {
         return A - B;
     }
-
-    static int Sort_Compare_DescendingU8(const uint8_t *A, const uint8_t *B) {
-        return B - A;
+    
+    static int Sort_Compare_AscendingU64(const uint64_t *A, const uint64_t *B) {
+        return A - B;
     }
 
     static int Sort_Compare_DescendingS8(const int8_t *A, const int8_t *B) {
         return B - A;
     }
-
-    static int Sort_Compare_DescendingU16(const uint16_t *A, const uint16_t *B) {
+    
+    static int Sort_Compare_DescendingU8(const uint8_t *A, const uint8_t *B) {
         return B - A;
     }
 
     static int Sort_Compare_DescendingS16(const int16_t *A, const int16_t *B) {
         return B - A;
     }
-
-    static int Sort_Compare_DescendingU32(const uint32_t *A, const uint32_t *B) {
+    
+    static int Sort_Compare_DescendingU16(const uint16_t *A, const uint16_t *B) {
         return B - A;
     }
 
     static int Sort_Compare_DescendingS32(const int32_t *A, const int32_t *B) {
         return B - A;
     }
-
-    static int Sort_Compare_DescendingU64(const uint64_t *A, const uint64_t *B) {
+    
+    static int Sort_Compare_DescendingU32(const uint32_t *A, const uint32_t *B) {
         return B - A;
     }
 
     static int Sort_Compare_DescendingS64(const int64_t *A, const int64_t *B) {
         return B - A;
     }
-
-
-
-    void CollectionIO_Histogram_Sort(CollectionIO_Histogram *Frequencies, CollectionIO_SortTypes SortType) {
-        AssertIO(Frequencies != NULL);
+    
+    static int Sort_Compare_DescendingU64(const uint64_t *A, const uint64_t *B) {
+        return B - A;
+    }
+    
+    void HistogramS8_Sort(HistogramS8 Histogram, CollectionIO_SortTypes SortType) {
         AssertIO(SortType != SortType_Unspecified);
-
+        
         if (SortType == SortType_Ascending) {
-            if PlatformIO_Is(Frequencies->Type, PlatformIOType_Unsigned) {
-                if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer8) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint8_t), Sort_Compare_AscendingU8);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer16) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint16_t), Sort_Compare_AscendingU16);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer32) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint32_t), Sort_Compare_AscendingU32);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer64) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint64_t), Sort_Compare_AscendingU64);
-                }
-            } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Signed) {
-                if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer8) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint8_t), Sort_Compare_AscendingS8);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer16) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint16_t), Sort_Compare_AscendingS16);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer32) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint32_t), Sort_Compare_AscendingS32);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer64) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint64_t), Sort_Compare_AscendingS64);
-                }
-            }
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int8_t), Sort_Compare_AscendingS8);
         } else if (SortType == SortType_Descending) {
-            if PlatformIO_Is(Frequencies->Type, PlatformIOType_Unsigned) {
-                if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer8) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint8_t), Sort_Compare_DescendingS8);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer16) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint16_t), Sort_Compare_DescendingS16);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer32) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint32_t), Sort_Compare_DescendingS32);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer64) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint64_t), Sort_Compare_DescendingS64);
-                }
-            } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Signed) {
-                if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer8) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint8_t), Sort_Compare_DescendingS8);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer16) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint16_t), Sort_Compare_DescendingS16);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer32) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint32_t), Sort_Compare_DescendingS32);
-                } else if PlatformIO_Is(Frequencies->Type, PlatformIOType_Integer64) {
-                    qsort(Frequencies->Array, Frequencies->NumEntries, sizeof(uint64_t), Sort_Compare_DescendingS64);
-                }
-            }
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int8_t), Sort_Compare_DescendingS8);
         }
     }
+
+void HistogramU8_Sort(HistogramU8 Histogram, CollectionIO_SortTypes SortType) {
+        AssertIO(SortType != SortType_Unspecified);
+        
+        if (SortType == SortType_Ascending) {
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint8_t), Sort_Compare_AscendingU8);
+        } else if (SortType == SortType_Descending) {
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint8_t), Sort_Compare_DescendingU8);
+        }
+    }
+    
+    void HistogramS16_Sort(HistogramS16 Histogram, CollectionIO_SortTypes SortType) {
+        AssertIO(SortType != SortType_Unspecified);
+        
+        if (SortType == SortType_Ascending) {
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int16_t), Sort_Compare_AscendingS16);
+        } else if (SortType == SortType_Descending) {
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int16_t), Sort_Compare_DescendingS16);
+        }
+    }
+    
+    void HistogramU16_Sort(HistogramU16 Histogram, CollectionIO_SortTypes SortType) {
+        AssertIO(SortType != SortType_Unspecified);
+        
+        if (SortType == SortType_Ascending) {
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint16_t), Sort_Compare_AscendingU16);
+        } else if (SortType == SortType_Descending) {
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint16_t), Sort_Compare_DescendingU16);
+        }
+    }
+    
+    void HistogramS32_Sort(HistogramS32 Histogram, CollectionIO_SortTypes SortType) {
+        AssertIO(SortType != SortType_Unspecified);
+        
+        if (SortType == SortType_Ascending) {
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int32_t), Sort_Compare_AscendingS32);
+        } else if (SortType == SortType_Descending) {
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int32_t), Sort_Compare_DescendingS32);
+        }
+    }
+    
+    void HistogramU32_Sort(HistogramU32 Histogram, CollectionIO_SortTypes SortType) {
+        AssertIO(SortType != SortType_Unspecified);
+        
+        if (SortType == SortType_Ascending) {
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint32_t), Sort_Compare_AscendingU32);
+        } else if (SortType == SortType_Descending) {
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint32_t), Sort_Compare_DescendingU32);
+        }
+    }
+    
+    void HistogramS64_Sort(HistogramS64 Histogram, CollectionIO_SortTypes SortType) {
+        AssertIO(SortType != SortType_Unspecified);
+        
+        if (SortType == SortType_Ascending) {
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int64_t), Sort_Compare_AscendingS64);
+        } else if (SortType == SortType_Descending) {
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(int64_t), Sort_Compare_DescendingS64);
+        }
+    }
+    
+    void HistogramU64_Sort(HistogramU64 Histogram, CollectionIO_SortTypes SortType) {
+        AssertIO(SortType != SortType_Unspecified);
+        
+        if (SortType == SortType_Ascending) {
+            qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint64_t), Sort_Compare_AscendingU64);
+        } else if (SortType == SortType_Descending) {
+        qsort(Histogram.Frequencies, Histogram.NumEntries, sizeof(uint64_t), Sort_Compare_DescendingU64);
+        }
+    }
+    
+    void HistogramS8_Deinit(HistogramS8 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    
+    void HistogramU8_Deinit(HistogramU8 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    void HistogramS16_Deinit(HistogramS16 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    void HistogramU16_Deinit(HistogramU16 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    void HistogramS32_Deinit(HistogramS32 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    void HistogramU32_Deinit(HistogramU32 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    void HistogramS64_Deinit(HistogramS64 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    
+    void HistogramU64_Deinit(HistogramU64 Histogram) {
+        free(Histogram.Frequencies); 
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     void CollectionIO_Histogram_Deinit(CollectionIO_Histogram *Frequencies) {
         free(Frequencies->Array);
