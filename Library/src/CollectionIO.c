@@ -312,11 +312,6 @@ extern "C" {
         }
         return Sum;
     }
-     
-
-    
-
-
 
     void CollectionIO_ReverseS8(int8_t *Array, size_t NumElements) {
         AssertIO(Array != NULL);
@@ -504,56 +499,95 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        CollectionIO_Reverse(Array, NumElements);
    }
    
-   
-   
-   
-   
-   
-   
-   
-   
+   typedef struct FrequencyS8 {
+       size_t Count;
+       int8_t Value;
+   } FrequencyS8;
    
    typedef struct HistogramS8 {
-       int8_t *Frequencies;
-       size_t  NumFrequencies;
+       FrequencyS8 *Frequencies;
+       size_t       NumFrequencies;
    } HistogramS8;
    
+   typedef struct FrequencyU8 {
+       size_t  Count;
+       uint8_t Value;
+   } FrequencyU8;
+   
    typedef struct HistogramU8 {
-       uint8_t *Frequencies;
-       size_t   NumFrequencies;
+       FrequencyU8 *Frequencies;
+       size_t       NumFrequencies;
    } HistogramU8;
    
+   typedef struct FrequencyS16 {
+       size_t  Count;
+       int16_t Value;
+   } FrequencyS16;
+   
    typedef struct HistogramS16 {
-       int16_t *Frequencies;
-       size_t   NumFrequencies;
+       FrequencyS16 *Frequencies;
+       size_t        NumFrequencies;
    } HistogramS16;
    
+   typedef struct FrequencyU16 {
+       size_t   Count;
+       uint16_t Value;
+   } FrequencyU16;
+   
    typedef struct HistogramU16 {
-       uint16_t *Frequencies;
-       size_t    NumFrequencies;
+       FrequencyU16 *Frequencies;
+       size_t       NumFrequencies;
    } HistogramU16;
    
+   typedef struct FrequencyS32 {
+       size_t  Count;
+       int32_t Value;
+   } FrequencyS32;
    
    typedef struct HistogramS32 {
-       int32_t *Frequencies;
-       size_t   NumFrequencies;
+       FrequencyS32 *Frequencies;
+       size_t        NumFrequencies;
    } HistogramS32;
    
+   typedef struct FrequencyU32 {
+       size_t   Count;
+       uint32_t Value;
+   } FrequencyU32;
+   
    typedef struct HistogramU32 {
-       uint32_t *Frequencies;
-       size_t    NumFrequencies;
+       FrequencyU32 *Frequencies;
+       size_t       NumFrequencies;
    } HistogramU32;
    
+   typedef struct FrequencyS64 {
+       size_t  Count;
+       int64_t Value;
+   } FrequencyS64;
    
    typedef struct HistogramS64 {
-       int64_t *Frequencies;
-       size_t   NumFrequencies;
+       FrequencyS64 *Frequencies;
+       size_t        NumFrequencies;
    } HistogramS64;
    
+   typedef struct FrequencyU64 {
+       size_t   Count;
+       uint64_t Value;
+   } FrequencyU64;
+   
    typedef struct HistogramU64 {
-       uint64_t *Frequencies;
-       size_t    NumFrequencies;
+       FrequencyU64 *Frequencies;
+       size_t       NumFrequencies;
    } HistogramU64;
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
    
    
@@ -566,7 +600,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramS8 Histogram = calloc(1, sizeof(HistogramS8);
        
-       Histogram.Frequencies = calloc(sizeof(int8_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyS8), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -580,7 +614,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramU8 Histogram = calloc(1, sizeof(HistogramU8);
        
-       Histogram.Frequencies = calloc(sizeof(uint8_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyU8), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -593,7 +627,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramS16 Histogram = calloc(1, sizeof(HistogramS16);
        
-       Histogram.Frequencies = calloc(sizeof(int16_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyS16), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -606,7 +640,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramU16 Histogram = calloc(1, sizeof(HistogramU16);
        
-       Histogram.Frequencies = calloc(sizeof(uint16_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyU16), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -619,7 +653,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramS32 Histogram = calloc(1, sizeof(HistogramS32);
        
-       Histogram.Frequencies = calloc(sizeof(int32_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyS32), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -632,7 +666,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramU32 Histogram = calloc(1, sizeof(HistogramU32);
        
-       Histogram.Frequencies = calloc(sizeof(uint32_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyU32), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -645,7 +679,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramS64 Histogram = calloc(1, sizeof(HistogramS64);
        
-       Histogram.Frequencies = calloc(sizeof(int64_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyS64), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -658,7 +692,7 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        
        HistogramU64 Histogram = calloc(1, sizeof(HistogramU64);
        
-       Histogram.Frequencies = calloc(sizeof(uint64_t), NumElements);
+       Histogram.Frequencies = calloc(sizeof(FrequencyU64), NumElements);
        AssertIO(Histogram.Frequencies != NULL);
        
        Histogram.NumElements = NumElements;
@@ -672,7 +706,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+    Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -682,7 +717,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+           Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -692,7 +728,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+           Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -702,7 +739,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+           Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -712,7 +750,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+           Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -722,7 +761,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+           Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -732,7 +772,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+           Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -742,7 +783,8 @@ void CollectionIO_ReverseU64(uint64_t *Array, size_t NumElements) {
        AssertIO(ArraySize > 0);
        
        for (size_t Element = 0; Element < NumElements; Element++) {
-           Histogram.Frequencies[Array[Element]] += 1;
+           Histogram.Frequencies.Count += 1;
+    Histogram.Frequencies.Value = Array[Element];
        }
    }
    
@@ -945,27 +987,6 @@ void HistogramU8_Sort(HistogramU8 Histogram, CollectionIO_SortTypes SortType) {
     
     void HistogramU64_Deinit(HistogramU64 Histogram) {
         free(Histogram.Frequencies); 
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    void CollectionIO_Histogram_Deinit(CollectionIO_Histogram *Frequencies) {
-        free(Frequencies->Array);
-        free(Frequencies);
     }
 
     /* Slice stuff */
