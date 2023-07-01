@@ -85,19 +85,19 @@
 #endif
 
 #ifndef             PlatformIO_LanguageVersionC99
-#define             PlatformIO_LanguageVersionC99                                       (199901UL)
+#define             PlatformIO_LanguageVersionC99                                       (199901L)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionC11
-#define             PlatformIO_LanguageVersionC11                                       (201112UL)
+#define             PlatformIO_LanguageVersionC11                                       (201112L)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionC18
-#define             PlatformIO_LanguageVersionC18                                       (201710UL)
+#define             PlatformIO_LanguageVersionC18                                       (201710L)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionC23
-#define             PlatformIO_LanguageVersionC23                                       (202000L)
+#define             PlatformIO_LanguageVersionC23                                       (202311L)
 #endif
 
 #ifndef             PlatformIO_LanguageVersionCXX98
