@@ -20,6 +20,7 @@ ${CMAKE_C_FLAGS} \
 -mtune=x86-64-v2 \
 -std=c2x \
 -fPIC \
+-ffat-lto-objects \
 -Wall \
 -Wextra \
 -Weverything \
@@ -112,6 +113,7 @@ elseif($<C_COMPILER_ID:GNU>)
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
 -fPIC \
+-ffat-lto-objects \
 -funroll-loops \
 -funsigned-char \
 -std=c2x \
