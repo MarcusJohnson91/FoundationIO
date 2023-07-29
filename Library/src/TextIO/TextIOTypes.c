@@ -29,7 +29,6 @@ extern "C" {
         }
         return StringsMatch;
     }
-  
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
