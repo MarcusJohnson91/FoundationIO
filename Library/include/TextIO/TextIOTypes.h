@@ -563,16 +563,9 @@ typedef                   const UTF32                         *MutableStringSet_
 #define String16Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Data = Literal}
 #define String32Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Data = Literal}
 
-
-
-
-    typedef struct TextIO_Normalization {
-        char32_t *Replacement; // Array of replacement code points
-        char32_t Replacee; // The Codepoint to replace
-        uint8_t ReplacementSize;
-    } TextIO_Normalization;
-
-
+    typedef struct TextIO_Normalization TextIO_Normalization;
+    
+    typedef struct TextIO_Normalizatoons TextIO_Normalizations;
 
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
