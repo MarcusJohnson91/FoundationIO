@@ -36,14 +36,14 @@ extern "C" {
     
     typedef struct TextIO_Normalization {
          union {
-             struct { // Optimized
-                 char32_t Replacement[(sizeof(size_t) * 2) / sizeof(char32_t)];
-                uint8_t ReplacementSizeMinus1:3;
-            }; // Short/Optimized version
-            struct { // Pointer
+             struct Internal {
+                 uint64_t Pauload0;
+                 uint64_t Payload1;
+            } Internal;
+            struct External {
                 char32_t *Replacement;
                 size_t ReplacementSizeMinus1;
-                }; // Pointer version
+                } External;
             };
         uint64_t Replacee;
     } TextIO_Normalization;
@@ -53,12 +53,11 @@ extern "C" {
     }
     
     size_t TextIO_Normalization_GetNumReplacements(TextIO_Normalization Norm) {
-        AssertIO(sizeof(size_t) == 8);
         size_t NumReplacements = 0;
         if (TextIO_Normalization_IsInternalized(Norm) {
             NumReplacements = ((Norm.Replacee & 0xE00000) >> 21) + 1;
         } else {
-            NumReplacements = Norm.ReplacementSizeMinus1 + 1;
+            NumReplacements = Norm.External.ReplacementSizeMinus1 + 1;
         }
         return NumReplacements;
     }
@@ -78,14 +77,27 @@ extern "C" {
         } else {
             if (TextIO_Normalization_IsInternalized(Norm) {
             if (ReplacementIndex == 0) {
-            // the first Replacement is stored in Replacee so we can tell when Replacements are internalized, the remaining bits are in the rest of the members, layout not yet finalized
-            Replacement = (Norm.Replacee & 0xFF000000) >> 24;
-            // The bottom bits which are most likely to be set are in the top of Replacee, which means we have to shift Replacee's upper bits the most, and the other bits the least.
-            } else { // Internalized, Replacement >= 1
-                // 21 bits per codepoint
+            Replacement = (Norm.Replacee & 0x1FFFFF000000) >> 24;
+            } else if (ReplacementIndex == 1) {
+            Replacement = (Norm.Replacee & 0xFFFFE00000000000) >> 45;
+            Replacement |= ((Norm.Internal.Payload1 & 0x3) << 19);
+            } else if (ReplacementIndex == 2) {
+                Replacement = ((Norm.Internal.Payload1 & 0x7FFFFC) >> 2);
+            } else if (ReplacementIndex == 3) {
+                Replacement = ((Norm.Internal.Payload1 & 0xFFFFF800000) >> 23;
+            } else if (ReplacementIndex == 4) {
+            // 20 bits here, gotta OR it with the last bit of Payload0 at the top
+                Replacement = ((Norm.Internal.Payload1 & 0xFFFFF00000000000) >> 44);
+                Replacement |= ((Norm.Internal.Payload0 & 0x1) << 20);
+            } else if (ReplacementIndex == 5) {
+                Replacement = ((Norm.Internal.Payload0 & 0x3FFFFE) >> 1);
+            } else if (ReplacementIndex == 6) {
+                Replacement = ((Norm.Internal.Payload0 & 0x7FFFFC00000) >> 22;
+            } else if (ReplacementIndex == 7) {
+                Replacement = ((Norm.Internal.Payload0 & 0xFFFFF80000000000) >> 43);
             }
             } else { // Externalized
-                Replacement = Norm.Replacement[ReplacementIndex];
+                Replacement = Norm.External.Replacement[ReplacementIndex];
             }
         } 
         return Replacement;
