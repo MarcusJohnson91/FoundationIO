@@ -30,6 +30,10 @@ extern "C" {
         return StringsMatch;
     }
     
+#if (sizeof(size_t) != 8)
+#error "TextIO_Normalization ONLY WORKS for 64 bit"
+#endif
+    
     typedef struct TextIO_Normalization {
          union {
              struct { // Optimized
@@ -41,23 +45,25 @@ extern "C" {
                 size_t ReplacementSizeMinus1;
                 }; // Pointer version
             };
-        char32_t Replacee;
+        uint64_t Replacee;
     } TextIO_Normalization;
     
-    size_t TextIO_Normalization_GetSize(TextIO_Normalization Norm) {
-        AssertIO(sizeof(size_t) == 4 || sizeof(size_t) == 8);
-        if (sizeof(size_t) == 4) {
-            // mask out Replacee to check the size, 
-        } else if (sizeof(size_t) == 8) {
-        
-        }
-    }
-    
     bool TextIO_Normalization_IsInternalized(TextIO_Normalization Norm) {
-        return ((Norm.Replacee & 0xFF000000) >> 24) > 0 ? true : false;
+        return ((Norm.Replacee & 0x10FFFF000000) >> 24) > 0 ? true : false;
     }
     
-    UTF32 TextIO_Normalization_GetReplacee(TextIO_Normalization Norm) {
+    size_t TextIO_Normalization_GetNumReplacements(TextIO_Normalization Norm) {
+        AssertIO(sizeof(size_t) == 8);
+        size_t NumReplacements = 0;
+        if (TextIO_Normalization_IsInternalized(Norm) {
+            NumReplacements = ((Norm.Replacee & 0xE00000) >> 21) + 1;
+        } else {
+            NumReplacements = Norm.ReplacementSizeMinus1 + 1;
+        }
+        return NumReplacements;
+    }
+    
+    UTF32 TextIO_Normalization_GetReplacee(TextIO_Normalization Norm) { 
         return Norm.Replacee & UnicodeMaxCodePoint;
     }
     
@@ -65,23 +71,21 @@ extern "C" {
         Norm.Replacee |= Replacee & UnicodeMaxCodePoint;
     }
     
-    size_t TextIO_Normalization_GetNumReplacements(TextIO_Normalization Norm) {
-        if (TextIO_Normalization_IsInternalized(Norm)) {
-            return (Norm.Replacee & 0xE00000) >> 21;
-        } else {
-            return Norm.NumReplacementsMinus1 + 1;
-        }
-    }
-    
     UTF32 TextIO_Normalization_GetReplacement(TextIO_Normalization Norm, size_t ReplacementIndex) {
         UTF32 Replacement = 0;
         if (ReplacementIndex + 1 > TextIO_Normalization_GetNumReplacements) {
         return 0;
         } else {
+            if (TextIO_Normalization_IsInternalized(Norm) {
             if (ReplacementIndex == 0) {
             // the first Replacement is stored in Replacee so we can tell when Replacements are internalized, the remaining bits are in the rest of the members, layout not yet finalized
             Replacement = (Norm.Replacee & 0xFF000000) >> 24;
             // The bottom bits which are most likely to be set are in the top of Replacee, which means we have to shift Replacee's upper bits the most, and the other bits the least.
+            } else { // Internalized, Replacement >= 1
+                // 21 bits per codepoint
+            }
+            } else { // Externalized
+                Replacement = Norm.Replacement[ReplacementIndex];
             }
         } 
         return Replacement;
