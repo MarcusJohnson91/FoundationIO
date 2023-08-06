@@ -625,29 +625,13 @@ typedef                   const UTF32                         *MutableStringSet_
     
 
 #ifndef TextIO_Normalization_SetSize
-#define TextIO_Normalization_SetSize(Size) \
-_Static_assert(Size <= 8); \
-((Size - 1) & 0x7) << 21;
+#define TextIO_Normalization_SetSize(Size) 
+#if (Size <= 8)
+.Replacee |= ((Size - 1) & 0x7) << 21;
+#elif (Size > 8)
+.ReplacementSizeMinus1 = Size - 1;
+#endif /* Size Check */
 #endif /* TextIO_Normalization_SetSize */
-
-
-
-
-
-
-
-#ifndef TextIO_Normalization_Init1
-#define TextIO_Normalization_Init1(Replacee, Replacement) \
-TextIO_Normalization {.Replacee = Replacee, .NumReplacements = TextIO_Normalization_SetSize(1), .Replacee |= (Replacement << 25);
-#endif /*TextIO_Normalization_Init1  */
-
-#ifndef TextIO_Normalization_Init2
-#define TextIO_Normalization_Init2(Replacee, Remplacement1, Replacement2) \
-TextIO_Normalization = {.Replacee = (Replacee & UnicodeMaxCodePoint), \ TextIO_Normalization_SetSize(2), .Replacee |= (Replacement1 & UnicodeMaxCodePoint), \
-.Replacee |= ((Replacement2 & 0x7FFFF) << 45), \
-.Payload2 |= ((Replacement2 & 0x180000) >> 19), \
-};
-#endif /* TextIO_Normalization_Init2 */
 
 #ifndef TextIO_Normalization_Init1
 #define TextIO_Normalization_Init1(Replacee, Replacement1) \
