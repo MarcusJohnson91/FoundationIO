@@ -18,6 +18,62 @@
 extern "C" {
 #endif
 
+        /*!
+     @enum         TextIOCommon
+     @constant     UTF8CodeUnitSizeInBits                The size of a single code unit in bits.
+     @constant     UTF16CodeUnitSizeInBits               The size of a single code unit in bits.
+     @constant     UTF32CodeUnitSizeInBits               The size of a single code unit in bits.
+     @constant     UTF8BOMSizeInCodeUnits                The number of code units (8 bits) the UTF8 BOM takes.
+     @constant     UTF16BOMSizeInCodeUnits               The number of code units (16 bits) the UTF16 BOM takes.
+     @constant     UnicodeBOMSizeInCodePoints            The number of CodePoints in a BOM.
+     @constant     UTF16BOM_LE                           UTF16BOM_LE byte order mark.
+     @constant     UTF16BOM_BE                           UTF16BOM_BE byte order mark.
+     @constant     UTF32BOM_LE                           UTF32BOM_LE byte order mark.
+     @constant     UTF32BOM_BE                           UTF32BOM_BE byte order mark.
+     @constant     UnicodeUNCPathPrefixSize              Size of "//?/" or "\\?\" in CodePoints and CodeUnits.
+     @constant     UTF16HighSurrogateStart               The value that marks the start of the High Surrogate range.
+     @constant     UTF16HighSurrogateEnd                 The value that marks the end   of the High Surrogate range.
+     @constant     UTF16LowSurrogateStart                The value that marks the start of the Low  Surrogate range.
+     @constant     UTF16LowSurrogateEnd                  The value that marks the end   of the Low  Surrogate range.
+     @constant     UTF16MaxCodeUnitValue                 The highest value that can be stored in a single UTF16 CodeUnit.
+     @constant     UTF16SurrogatePairModDividend         The value to modulo the surrogate pair by to decode a High Surrogate.
+     @constant     UTF16SurrogatePairStart               The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16.
+     @constant     InvalidReplacementCodePoint           The CodePoint to replace invalid codeunits.
+     @constant     UnicodeMaxCodePoint                   The highest CodePoint possible in Unicode, 1,114,111.
+     @constant     UTF8MaxCodeUnitsInCodePoint           The maximum number of codeunits per codepoint.
+     @constant     UTF16MaxCodeUnitsInCodePoint          The maximum number of codeunits per codepoint.
+     */
+    typedef enum TextIOCommon : uint32_t {
+                   UTF8CodeUnitSizeInBits                = 8,
+                   UTF16CodeUnitSizeInBits               = 16,
+                   UTF32CodeUnitSizeInBits               = 32,
+                   UTF8BOMSizeInCodeUnits                = 3,
+                   UTF16BOMSizeInCodeUnits               = 1,
+                   UnicodeBOMSizeInCodePoints            = 1,
+                   UTF8BOM_1                             = 0xEF,
+                   UTF8BOM_2                             = 0xBB,
+                   UTF8BOM_3                             = 0xBF,
+                   UTF16BOM_LE                           = 0xFFFE,
+                   UTF16BOM_BE                           = 0xFEFF,
+                   UTF32BOM_LE                           = 0xFFFE,
+                   UTF32BOM_BE                           = 0xFEFF,
+                   UnicodeUNCPathPrefixSize              = 4,
+                   UTF16SurrogateMask                    = 0x3FF,
+                   UTF16SurrogateShift                   = 10,
+                   UTF16HighSurrogateStart               = 0xD800,
+                   UTF16HighSurrogateEnd                 = 0xDBFF,
+                   UTF16LowSurrogateStart                = 0xDC00,
+                   UTF16LowSurrogateEnd                  = 0xDFFF,
+                   UTF16MaxCodeUnitValue                 = 0xFFFF,
+                   UTF16SurrogatePairModDividend         = 0x400,
+                   UTF16SurrogatePairStart               = 0x10000,
+                   InvalidReplacementCodePoint           = 0xFFFD,
+                   UnicodeMaxCodePoint                   = 0x10FFFF,
+                   UTF8MaxCodeUnitsInCodePoint           = 4,
+                   UTF16MaxCodeUnitsInCodePoint          = 2,
+                   UnicodeCodePointMask = 0x1FFFFF,
+    } TextIOCommon;
+
   /*!
    @enum                TextIO_StringTypes
    @constant            StringType_Unspecified                 Invalid/Default value
@@ -565,8 +621,176 @@ typedef                   const UTF32                         *MutableStringSet_
 
     typedef struct TextIO_Normalization TextIO_Normalization;
     
-    typedef struct TextIO_Normalizatoons TextIO_Normalizations;
+    typedef struct TextIO_Normalizatoons TextIO_Normalizations; 
+    
 
+#ifndef TextIO_Normalization_SetSize
+#define TextIO_Normalization_SetSize(Size) \
+_Static_assert(Size <= 8); \
+((Size - 1) & 0x7) << 21;
+#endif /* TextIO_Normalization_SetSize */
+
+
+
+
+
+
+
+#ifndef TextIO_Normalization_Init1
+#define TextIO_Normalization_Init1(Replacee, Replacement) \
+TextIO_Normalization {.Replacee = Replacee, .NumReplacements = TextIO_Normalization_SetSize(1), .Replacee |= (Replacement << 25);
+#endif /*TextIO_Normalization_Init1  */
+
+#ifndef TextIO_Normalization_Init2
+#define TextIO_Normalization_Init2(Replacee, Remplacement1, Replacement2) \
+TextIO_Normalization = {.Replacee = (Replacee & UnicodeMaxCodePoint), \ TextIO_Normalization_SetSize(2), .Replacee |= (Replacement1 & UnicodeMaxCodePoint), \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45), \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19), \
+};
+#endif /* TextIO_Normalization_Init2 */
+
+#ifndef TextIO_Normalization_Init1
+#define TextIO_Normalization_Init1(Replacee, Replacement1) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(1) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+};
+#endif /* TextIO_Normalization_Init1 */
+
+#ifndef TextIO_Normalization_Init2
+#define TextIO_Normalization_Init2(Replacee, Replacement1, Replacement2) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(2) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+};
+#endif /* TextIO_Normalization_Init2 */
+
+#ifndef TextIO_Normalization_Init3
+#define TextIO_Normalization_Init3(Replacee, Replacement1, Replacement2, Replacement3) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(3) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+.Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
+};
+#endif /* TextIO_Normalization_Init3 */
+
+#ifndef TextIO_Normalization_Init4
+#define TextIO_Normalization_Init4(Replacee, Replacement1, Replacement2, Replacement3, Replacement4) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(4) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+.Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
+.Payload2 |= ((Replacement4 & 0x1FFFFF) << 23); \
+};
+#endif /* TextIO_Normalization_Init4 */
+
+#ifndef TextIO_Normalization_Init5
+#define TextIO_Normalization_Init5(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(5) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+.Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
+.Payload2 |= ((Replacement4 & 0x1FFFFF) << 23); \
+.Payload2 |= ((Replacement5 & 0xFFFFF) << 44); \
+.Payload1 |= ((Replacement5 & 0x100000) >> 20); \
+};
+#endif /* TextIO_Normalization_Init5 */
+
+#ifndef TextIO_Normalization_Init6
+#define TextIO_Normalization_Init6(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(6) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+.Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
+.Payload2 |= ((Replacement4 & 0x1FFFFF) << 23); \
+.Payload2 |= ((Replacement5 & 0xFFFFF) << 44); \
+.Payload1 |= ((Replacement5 & 0x100000) >> 20); \
+.Payload1 |= ((Replacement6 & 0x1FFFFF) << 1); \
+};
+#endif /* TextIO_Normalization_Init6 */
+
+#ifndef TextIO_Normalization_Init7
+#define TextIO_Normalization_Init7(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6, Replacement7) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(7) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+.Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
+.Payload2 |= ((Replacement4 & 0x1FFFFF) << 23); \
+.Payload2 |= ((Replacement5 & 0xFFFFF) << 44); \
+.Payload1 |= ((Replacement5 & 0x100000) >> 20); \
+.Payload1 |= ((Replacement6 & 0x1FFFFF) << 1); \
+.Payload1 |= ((Replacement7 & 0x1FFFFF) << 22); \
+};
+#endif /* TextIO_Normalization_Init7 */
+
+#ifndef TextIO_Normalization_Init8
+#define TextIO_Normalization_Init8(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6, Replacement7, Replacement8) \
+TextIO_Normalization = { \
+ TextIO_Normalization_SetSize(8) \
+.Replacee |= (Replacee & 0x1FFFFF); \
+.Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
+.Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
+.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+.Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
+.Payload2 |= ((Replacement4 & 0x1FFFFF) << 23); \
+.Payload2 |= ((Replacement5 & 0xFFFFF) << 44); \
+.Payload1 |= ((Replacement5 & 0x100000) >> 20); \
+.Payload1 |= ((Replacement6 & 0x1FFFFF) << 1); \
+.Payload1 |= ((Replacement7 & 0x1FFFFF) << 22); \
+.Payload1 |= ((Replacement8 & 0x1FFFFF) << 43); \
+};
+#endif /* TextIO_Normalization_Init8 */
+
+#ifndef TextIO_Normalization_InitExternal
+#define TextIO_Normalization_InitExternal(Replacee, NumReplacements, String) \
+TextIO_Normalization = { \
+    .Replacee = (Replacee & UnicodeMaxCodePoint), \
+    .ReplacementSizeMinus1 = NumReplacements, \
+    .Replacement = U"/"String"/", \
+};
+#endif /* TextIO_Normalization_InitExternal */
+
+#ifndef TextIO_Normalization_Init
+#define TextIO_Normalization_Init(Replacee, NumReplacements, Replacements) \
+#if (NumReplacements == 1) \
+TextIO_Normalization_Init1(Replacee, Replacements)
+#elif (NumReplacements == 2) \
+TextIO_Normalization_Init2(Replacee, Replacements)
+#elif (NumReplacements == 3) \
+TextIO_Normalization_Init3(Replacee, Replacements)
+#elif (NumReplacements == 4) \
+TextIO_Normalization_Init4(Replacee, Replacements)
+#elif (NumReplacements == 5) \
+TextIO_Normalization_Init5(Replacee, Replacements)
+#elif (NumReplacements == 6) \
+TextIO_Normalization_Init6(Replacee, Replacements)
+#elif (NumReplacements == 7) \
+TextIO_Normalization_Init7(Replacee, Replacements)
+#elif (NumReplacements == 8) \
+TextIO_Normalization_Init8(Replacee, Replacements)
+#else
+TectIO_Normalization_InitExternal(Replacee, NumReplacements, String)
+#endif /* NumReplacements */
+#endif /* TextIO_Normalization_Init */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

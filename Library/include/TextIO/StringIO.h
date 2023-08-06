@@ -17,61 +17,6 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-    
-    /*!
-     @enum         StringIOCommon
-     @constant     UTF8CodeUnitSizeInBits                The size of a single code unit in bits.
-     @constant     UTF16CodeUnitSizeInBits               The size of a single code unit in bits.
-     @constant     UTF32CodeUnitSizeInBits               The size of a single code unit in bits.
-     @constant     UTF8BOMSizeInCodeUnits                The number of code units (8 bits) the UTF8 BOM takes.
-     @constant     UTF16BOMSizeInCodeUnits               The number of code units (16 bits) the UTF16 BOM takes.
-     @constant     UnicodeBOMSizeInCodePoints            The number of CodePoints in a BOM.
-     @constant     UTF16BOM_LE                           UTF16BOM_LE byte order mark.
-     @constant     UTF16BOM_BE                           UTF16BOM_BE byte order mark.
-     @constant     UTF32BOM_LE                           UTF32BOM_LE byte order mark.
-     @constant     UTF32BOM_BE                           UTF32BOM_BE byte order mark.
-     @constant     UnicodeUNCPathPrefixSize              Size of "//?/" or "\\?\" in CodePoints and CodeUnits.
-     @constant     UTF16HighSurrogateStart               The value that marks the start of the High Surrogate range.
-     @constant     UTF16HighSurrogateEnd                 The value that marks the end   of the High Surrogate range.
-     @constant     UTF16LowSurrogateStart                The value that marks the start of the Low  Surrogate range.
-     @constant     UTF16LowSurrogateEnd                  The value that marks the end   of the Low  Surrogate range.
-     @constant     UTF16MaxCodeUnitValue                 The highest value that can be stored in a single UTF16 CodeUnit.
-     @constant     UTF16SurrogatePairModDividend         The value to modulo the surrogate pair by to decode a High Surrogate.
-     @constant     UTF16SurrogatePairStart               The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16.
-     @constant     InvalidReplacementCodePoint           The CodePoint to replace invalid codeunits.
-     @constant     UnicodeMaxCodePoint                   The highest CodePoint possible in Unicode, 1,114,111.
-     @constant     UTF8MaxCodeUnitsInCodePoint           The maximum number of codeunits per codepoint.
-     @constant     UTF16MaxCodeUnitsInCodePoint          The maximum number of codeunits per codepoint.
-     */
-    typedef enum StringIOCommon : uint32_t {
-                   UTF8CodeUnitSizeInBits                = 8,
-                   UTF16CodeUnitSizeInBits               = 16,
-                   UTF32CodeUnitSizeInBits               = 32,
-                   UTF8BOMSizeInCodeUnits                = 3,
-                   UTF16BOMSizeInCodeUnits               = 1,
-                   UnicodeBOMSizeInCodePoints            = 1,
-                   UTF8BOM_1                             = 0xEF,
-                   UTF8BOM_2                             = 0xBB,
-                   UTF8BOM_3                             = 0xBF,
-                   UTF16BOM_LE                           = 0xFFFE,
-                   UTF16BOM_BE                           = 0xFEFF,
-                   UTF32BOM_LE                           = 0xFFFE,
-                   UTF32BOM_BE                           = 0xFEFF,
-                   UnicodeUNCPathPrefixSize              = 4,
-                   UTF16SurrogateMask                    = 0x3FF,
-                   UTF16SurrogateShift                   = 10,
-                   UTF16HighSurrogateStart               = 0xD800,
-                   UTF16HighSurrogateEnd                 = 0xDBFF,
-                   UTF16LowSurrogateStart                = 0xDC00,
-                   UTF16LowSurrogateEnd                  = 0xDFFF,
-                   UTF16MaxCodeUnitValue                 = 0xFFFF,
-                   UTF16SurrogatePairModDividend         = 0x400,
-                   UTF16SurrogatePairStart               = 0x10000,
-                   InvalidReplacementCodePoint           = 0xFFFD,
-                   UnicodeMaxCodePoint                   = 0x10FFFF,
-                   UTF8MaxCodeUnitsInCodePoint           = 4,
-                   UTF16MaxCodeUnitsInCodePoint          = 2,
-    } StringIOCommon;
 
     /*!
      @enum         StringIO_CodePages
