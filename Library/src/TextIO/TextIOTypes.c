@@ -35,17 +35,17 @@ extern "C" {
 #endif
     
     typedef struct TextIO_Normalization {
-         union {
-             struct Internal {
-                 uint64_t Pauload0;
-                 uint64_t Payload1;
+         const union {
+             const struct Internal {
+                 const uint64_t Pauload0;
+                 const uint64_t Payload1;
             } Internal;
-            struct External {
-                char32_t *Replacement;
-                size_t ReplacementSizeMinus1;
+            const struct External {
+                const char32_t *Replacement;
+                const size_t ReplacementSizeMinus1;
                 } External;
             };
-        uint64_t Replacee;
+        const uint64_t Replacee;
     } TextIO_Normalization;
     
     bool TextIO_Normalization_IsInternalized(TextIO_Normalization Norm) {
