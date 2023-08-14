@@ -12,7 +12,8 @@
 # License:
 =======
 * Contributions are accepted only under the terms of the [‘Unlicense’](https://tldrlegal.com/license/unlicense) license.
-* FoundationIO is released under the terms of the Apache 2.0 license.
+* By contributing to this project, you agree that the project can relicense at any time for any reason, including your contributions.
+* FoundationIO is released under the terms of the Apache 2.0 license, see LICENSE for more information.
 
 
 # Compiling:
