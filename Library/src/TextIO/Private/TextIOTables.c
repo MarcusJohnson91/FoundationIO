@@ -4,22 +4,6 @@
 extern "C" {
 #endif
 
-    const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {
-        U'0',
-        U'1',
-    };
-
-    const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {
-        U'0',
-        U'1',
-        U'2',
-        U'3',
-        U'4',
-        U'5',
-        U'6',
-        U'7',
-    };
-
     const UTF32 IntegerTableBase10[IntegerTableBase10Size] = {
         U'0',
         U'1',
@@ -31,44 +15,6 @@ extern "C" {
         U'7',
         U'8',
         U'9',
-    };
-
-    const UTF32 IntegerTableBase16Uppercase[IntegerTableBase16Size] = {
-        U'0',
-        U'1',
-        U'2',
-        U'3',
-        U'4',
-        U'5',
-        U'6',
-        U'7',
-        U'8',
-        U'9',
-        U'A',
-        U'B',
-        U'C',
-        U'D',
-        U'E',
-        U'F',
-    };
-
-    const UTF32 IntegerTableBase16Lowercase[IntegerTableBase16Size] = {
-        U'0',
-        U'1',
-        U'2',
-        U'3',
-        U'4',
-        U'5',
-        U'6',
-        U'7',
-        U'8',
-        U'9',
-        U'a',
-        U'b',
-        U'c',
-        U'd',
-        U'e',
-        U'f',
     };
 
     const uint64_t IntegerValueTable[IntegerValueTableSize][2] = {

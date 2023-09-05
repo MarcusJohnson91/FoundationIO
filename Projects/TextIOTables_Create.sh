@@ -16,10 +16,7 @@ CanonicalXpath="//u:char[@dm != @cp and @dm != '#' and @dt = 'can']"
 KompatibleXpath="//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']"
 
 CreateHeaderFile() {
-    IntegerTableBase2Size=2
-    IntegerTableBase8Size=8
     IntegerTableBase10Size=10
-    IntegerTableBase16Size=16
     IntegerValueTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(${IntegerXpath})" "$UCD_Data")
     DecimalTableBase10Size=11
     DecimalTableScientificSize=14
@@ -54,10 +51,7 @@ CreateHeaderFile() {
         printf '#define ScriptHash %s\n\n' "$ScriptSHA"
         printf '#define UnicodeVersion %s\n\n' "$ReadmeUnicodeVersion"
         printf '    typedef enum TextIOConstants {\n'
-        printf '        IntegerTableBase2Size            = %u,\n' "$IntegerTableBase2Size"
-        printf '        IntegerTableBase8Size            = %u,\n' "$IntegerTableBase8Size"
         printf '        IntegerTableBase10Size           = %u,\n' "$IntegerTableBase10Size"
-        printf '        IntegerTableBase16Size           = %u,\n' "$IntegerTableBase16Size"
         printf '        IntegerValueTableSize            = %u,\n' "$IntegerValueTableSize"
         printf '        DecimalTableBase10Size           = %u,\n' "$DecimalTableBase10Size"
         printf '        DecimalTableScientificSize       = %u,\n' "$DecimalTableScientificSize"
@@ -74,8 +68,7 @@ CreateHeaderFile() {
         printf '        CaseFoldTableSize                = %u,\n' "$CaseFoldTableSize"
         printf '        CanonicalNormalizationTableSize  = %u,\n' "$CanonicalNormalizationTableSize"
         printf '    } TextIOConstants;\n\n'
-        printf '    PlatformIO_Private extern const UTF32        IntegerTableBase2[IntegerTableBase2Size];\n\n'
-        printf '    PlatformIO_Private extern const UTF32        IntegerTableBase8[IntegerTableBase8Size];\n\n'
+        
         printf '    PlatformIO_Private extern const UTF32        IntegerTableBase10[IntegerTableBase10Size];\n\n'
         printf '    PlatformIO_Private extern const UTF32        IntegerTableBase16Uppercase[IntegerTableBase16Size];\n\n'
         printf '    PlatformIO_Private extern const UTF32        IntegerTableBase16Lowercase[IntegerTableBase16Size];\n\n'
@@ -118,20 +111,6 @@ CreateSourceFileBottom() {
 } >> "$SourceFile"
 
 CreateIntegerConstantTables() {
-    printf "    const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {\n"
-    printf "        U'0',\n"
-    printf "        U'1',\n"
-    printf "    };\n\n"
-    printf "    const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {\n"
-    printf "        U'0',\n"
-    printf "        U'1',\n"
-    printf "        U'2',\n"
-    printf "        U'3',\n"
-    printf "        U'4',\n"
-    printf "        U'5',\n"
-    printf "        U'6',\n"
-    printf "        U'7',\n"
-    printf "    };\n\n"
     printf "    const UTF32 IntegerTableBase10[IntegerTableBase10Size] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"

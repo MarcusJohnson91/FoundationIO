@@ -23,10 +23,7 @@ extern "C" {
 #define UnicodeVersion 15.0.0
 
     typedef enum TextIOConstants {
-        IntegerTableBase2Size            = 2,
-        IntegerTableBase8Size            = 8,
         IntegerTableBase10Size           = 10,
-        IntegerTableBase16Size           = 16,
         IntegerValueTableSize            = 1789,
         DecimalTableBase10Size           = 11,
         DecimalTableScientificSize       = 14,
@@ -43,10 +40,6 @@ extern "C" {
         CaseFoldTableSize                = 6317,
         CanonicalNormalizationTableSize  = 13233,
     } TextIOConstants;
-
-    PlatformIO_Private extern const UTF32        IntegerTableBase2[IntegerTableBase2Size];
-
-    PlatformIO_Private extern const UTF32        IntegerTableBase8[IntegerTableBase8Size];
 
     PlatformIO_Private extern const UTF32        IntegerTableBase10[IntegerTableBase10Size];
 
