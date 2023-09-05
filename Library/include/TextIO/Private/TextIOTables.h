@@ -43,10 +43,6 @@ extern "C" {
 
     PlatformIO_Private extern const UTF32        IntegerTableBase10[IntegerTableBase10Size];
 
-    PlatformIO_Private extern const UTF32        IntegerTableBase16Uppercase[IntegerTableBase16Size];
-
-    PlatformIO_Private extern const UTF32        IntegerTableBase16Lowercase[IntegerTableBase16Size];
-
     PlatformIO_Private extern const uint64_t     IntegerValueTable[IntegerValueTableSize][2];
 
     PlatformIO_Private extern const UTF32        DecimalTableScientificUppercase[DecimalTableScientificSize];

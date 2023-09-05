@@ -70,8 +70,6 @@ CreateHeaderFile() {
         printf '    } TextIOConstants;\n\n'
         
         printf '    PlatformIO_Private extern const UTF32        IntegerTableBase10[IntegerTableBase10Size];\n\n'
-        printf '    PlatformIO_Private extern const UTF32        IntegerTableBase16Uppercase[IntegerTableBase16Size];\n\n'
-        printf '    PlatformIO_Private extern const UTF32        IntegerTableBase16Lowercase[IntegerTableBase16Size];\n\n'
         printf '    PlatformIO_Private extern const uint64_t     IntegerValueTable[IntegerValueTableSize][2];\n\n'
         printf '    PlatformIO_Private extern const UTF32        DecimalTableScientificUppercase[DecimalTableScientificSize];\n\n'
         printf '    PlatformIO_Private extern const UTF32        DecimalTableScientificLowercase[DecimalTableScientificSize];\n\n'
@@ -122,42 +120,6 @@ CreateIntegerConstantTables() {
     printf "        U'7',\n"
     printf "        U'8',\n"
     printf "        U'9',\n"
-    printf "    };\n\n"
-    printf "    const UTF32 IntegerTableBase16Uppercase[IntegerTableBase16Size] = {\n"
-    printf "        U'0',\n"
-    printf "        U'1',\n"
-    printf "        U'2',\n"
-    printf "        U'3',\n"
-    printf "        U'4',\n"
-    printf "        U'5',\n"
-    printf "        U'6',\n"
-    printf "        U'7',\n"
-    printf "        U'8',\n"
-    printf "        U'9',\n"
-    printf "        U'A',\n"
-    printf "        U'B',\n"
-    printf "        U'C',\n"
-    printf "        U'D',\n"
-    printf "        U'E',\n"
-    printf "        U'F',\n"
-    printf "    };\n\n"
-    printf "    const UTF32 IntegerTableBase16Lowercase[IntegerTableBase16Size] = {\n"
-    printf "        U'0',\n"
-    printf "        U'1',\n"
-    printf "        U'2',\n"
-    printf "        U'3',\n"
-    printf "        U'4',\n"
-    printf "        U'5',\n"
-    printf "        U'6',\n"
-    printf "        U'7',\n"
-    printf "        U'8',\n"
-    printf "        U'9',\n"
-    printf "        U'a',\n"
-    printf "        U'b',\n"
-    printf "        U'c',\n"
-    printf "        U'd',\n"
-    printf "        U'e',\n"
-    printf "        U'f',\n"
     printf "    };\n\n"
 } >> "$SourceFile"
 
