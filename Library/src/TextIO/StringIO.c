@@ -39,76 +39,61 @@ extern "C" {
         UTF32_Debug_Text_32LE   = 0x3233,
     } StringIOConstants;
     
-    static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + TextIO_NULLTerminatorSize] = {0, 0, 0, 0, 0};
-    static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + TextIO_NULLTerminatorSize] = {0, 0, 0};
+    typedef struct UTF8CodePoint {
+    char8_t CodeUnits[UTF8MaxCodeUnitsInCodePoint];
+} UTF8CodePoint;
 
-    static void UTF8_Clear_Preallocated(void) {
-        for (uint8_t CodeUnit = 0; CodeUnit < UTF8MaxCodeUnitsInCodePoint + TextIO_NULLTerminatorSize; CodeUnit++) {
-            StringIO_PreallocateCodePoint_UTF8[CodeUnit] = 0;
-        }
-    }
+typedef struct UTF16CodePoint {
+    char16_t CodeUnits[UTF16MaxCodeUnitsInCodePoint];
+} UTF16CodePoint;
 
-    static void UTF16_Clear_Preallocated(void) {
-        for (uint8_t CodeUnit = 0; CodeUnit < UTF16MaxCodeUnitsInCodePoint + TextIO_NULLTerminatorSize; CodeUnit++) {
-            StringIO_PreallocateCodePoint_UTF16[CodeUnit] = 0;
-        }
-    }
-
-    static UTF8 *UTF8_ExtractCodePointAsCodeUnits(ImmutableString_UTF8 String) {
+    static UTF8CodePoint UTF8_ExtractCodePoint(ImmutableString_UTF8 String) {
         AssertIO(String != NULL);
-        UTF8 *CodeUnits                                       = NULL;
-        UTF8_Clear_Preallocated();
+        UTF8CodePoint CodePoint                                       = {};
         switch (UTF8_GetCodePointSizeInCodeUnits(String[0])) {
             case 1:
-                StringIO_PreallocateCodePoint_UTF8[0]     = String[0];
-                CodeUnits                                 = StringIO_PreallocateCodePoint_UTF8;
+                CodePoint.CodeUnits[0]     = String[0];
                 break;
             case 2:
                 if (String[1] != TextIO_NULLTerminator) {
-                    StringIO_PreallocateCodePoint_UTF8[0] = String[0];
-                    StringIO_PreallocateCodePoint_UTF8[1] = String[1];
-                    CodeUnits                             = StringIO_PreallocateCodePoint_UTF8;
+                    CodePoint.CodeUnits[0]     = String[0];
+CodePoint.CodeUnits[1]     = String[1];
                 }
                 break;
             case 3:
                 if (String[1] != TextIO_NULLTerminator && String[2] != TextIO_NULLTerminator) {
-                    StringIO_PreallocateCodePoint_UTF8[0] = String[0];
-                    StringIO_PreallocateCodePoint_UTF8[1] = String[1];
-                    StringIO_PreallocateCodePoint_UTF8[2] = String[2];
-                    CodeUnits                             = StringIO_PreallocateCodePoint_UTF8;
+                    CodePoint.CodeUnits[0] = String[0];
+CodePoint.CodeUnits[1] = String[1];
+CodePoint.CodeUnits[2] = String[2];
                 }
                 break;
             case 4:
                 if (String[1] != TextIO_NULLTerminator && String[2] != TextIO_NULLTerminator && String[3] != TextIO_NULLTerminator) {
-                    StringIO_PreallocateCodePoint_UTF8[0] = String[0];
-                    StringIO_PreallocateCodePoint_UTF8[1] = String[1];
-                    StringIO_PreallocateCodePoint_UTF8[2] = String[2];
-                    StringIO_PreallocateCodePoint_UTF8[3] = String[3];
-                    CodeUnits                             = StringIO_PreallocateCodePoint_UTF8;
+                    CodePoint.CodeUnits[0] = String[0];
+CodePoint.CodeUnits[1] = String[1];
+CodePoint.CodeUnits[2] = String[2];
+CodePoint.CodeUnits[3] = String[3];
                 }
                 break;
         }
-        return CodeUnits;
+        return CodePoint;
     }
 
-    static UTF16 *UTF16_ExtractCodePointAsCodeUnits(ImmutableString_UTF16 String) {
+    static UTF16CodePoint UTF16_ExtractCodePointAsCodeUnits(ImmutableString_UTF16 String) {
         AssertIO(String != NULL);
-        UTF16 *CodeUnits                                   = NULL;
-        UTF16_Clear_Preallocated();
+        UTF16CodePoint CodePoint                                   = {};
         if (String[0] < UTF16HighSurrogateStart || String[0] > UTF16LowSurrogateEnd) {
-            StringIO_PreallocateCodePoint_UTF16[0]     = String[0];
-            CodeUnits                                  = StringIO_PreallocateCodePoint_UTF16;
-        } else {
+            CodePoint.CodeUnits[0] = String[0];
+            } else {
             if (String[1] != TextIO_NULLTerminator) {
-                StringIO_PreallocateCodePoint_UTF16[0] = String[0];
-                StringIO_PreallocateCodePoint_UTF16[1] = String[1];
-                CodeUnits                              = StringIO_PreallocateCodePoint_UTF16;
+                CodePoint.CodeUnits[0] = String[0];
+                CodePoint.CodeUnits[1] = String[1];
             }
         }
-        return CodeUnits;
+        return CodePoint;
     }
 
-    static UTF32 UTF32_ExtractCodePoint(ImmutableString_UTF32 String) {
+    static UTF32 UTF32_ExtractCodePointAsCodeUnits(ImmutableString_UTF32 String) {
         AssertIO(String != NULL);
 
         return String[0];
@@ -375,28 +360,29 @@ extern "C" {
         return CodePoint;
     }
 
-    static void UTF8_EncodeCodePoint(UTF32 CodePoint) {
-        UTF8_Clear_Preallocated();
+    static UTF8CodePoint UTF8_EncodeCodePoint(UTF32 CodePoint) {
+    UTF8CodePoint CodePoint = {};
         switch (UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint)) {
             case 1:
-                StringIO_PreallocateCodePoint_UTF8[0] = (CodePoint & UTF8Max_ASCII);
+                CodePoint.CodeUnits[0] = (CodePoint & UTF8Max_ASCII);
                 break;
             case 2:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_2CodeUnits | (CodePoint & (UTF8Mask5Bit << 6)) >> 6;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint &  UTF8Mask6Bit);
+                CodePoint.CodeUnits[0] = UTF8Header_2CodeUnits | (CodePoint & (UTF8Mask5Bit << 6)) >> 6;
+                CodePoint.CodeUnits[1] = UTF8Header_Contine    | (CodePoint &  UTF8Mask6Bit);
                 break;
             case 3:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_3CodeUnits | (CodePoint & (UTF8Mask4Bit << 12)) >> 12;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
-                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
+                CodePoint.CodeUnits[0] = UTF8Header_3CodeUnits | (CodePoint & (UTF8Mask4Bit << 12)) >> 12;
+                CodePoint.CodeUnits[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
+                CodePoint.CodeUnits[2] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
                 break;
             case 4:
-                StringIO_PreallocateCodePoint_UTF8[0] = UTF8Header_4CodeUnits | (CodePoint & (UTF8Mask3Bit << 18)) >> 18;
-                StringIO_PreallocateCodePoint_UTF8[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 12)) >> 12;
-                StringIO_PreallocateCodePoint_UTF8[2] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
-                StringIO_PreallocateCodePoint_UTF8[3] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
+                CodePoint.CodeUnits[0] = UTF8Header_4CodeUnits | (CodePoint & (UTF8Mask3Bit << 18)) >> 18;
+                CodePoint.CodeUnits[1] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 12)) >> 12;
+                CodePoint.CodeUnits[2] = UTF8Header_Contine    | (CodePoint & (UTF8Mask6Bit << 6))  >> 6;
+                CodePoint.CodeUnits[3] = UTF8Header_Contine    | (CodePoint & UTF8Mask6Bit);
                 break;
         }
+        return CodePoint;
     }
     
     UTF32 UTF16_ExtractCodePoint(ImmutableString_UTF16 CodeUnits) {
@@ -473,17 +459,19 @@ extern "C" {
         return Grapheme;
     }
     
-    static void UTF16_EncodeCodePoint(UTF32 CodePoint) {
+    static UTF16CodePoint UTF16_EncodeCodePoint(UTF32 CodePoint) {
+    UTF16CodePoint CodePoint = {};
         UTF32   Ranged                                 = CodePoint + UTF16SurrogatePairStart;
         switch (UTF32_GetCodePointSizeInUTF16CodeUnits(CodePoint)) {
             case 1:
-                StringIO_PreallocateCodePoint_UTF16[0] = (CodePoint & UTF16MaxCodeUnitValue);
+                CodePoint.CodeUnits[0] = (CodePoint & UTF16MaxCodeUnitValue);
                 break;
             case 2:
-                StringIO_PreallocateCodePoint_UTF16[0] = UTF16HighSurrogateStart + (Ranged & (UTF16SurrogateMask << UTF16SurrogateShift) >> UTF16SurrogateShift);
-                StringIO_PreallocateCodePoint_UTF16[1] = UTF16LowSurrogateStart  + (Ranged & UTF16SurrogateMask);
+                CodePoint.CodeUnits[0] = UTF16HighSurrogateStart + (Ranged & (UTF16SurrogateMask << UTF16SurrogateShift) >> UTF16SurrogateShift);
+                CodePoint.CodeUnits[1] = UTF16LowSurrogateStart  + (Ranged & UTF16SurrogateMask);
                 break;
         }
+        return CodePoint;
     }
     
     size_t UTF8_GetGraphemeSizeInCodeUnits(UTF8 *String, size_t OffsetInCodeUnits) {
