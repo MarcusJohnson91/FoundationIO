@@ -175,6 +175,26 @@ extern "C" {
         CodePointClass_CCCAttachDoubleAbove              = 234,
         CodePointClass_CCCAttachIOTASubscript            = 240,
     } CodePointClass;
+    
+    /*!
+    @abstract How to compare strings
+    @constant Comparison_Unspecified Invalid value.
+    @constant Comparison_Literal Decode to CodePoint and compare, no conversions are done.
+    @constant Comparison_CaseInsensitive CaseFold/CaseMap after decoding to codepoint.
+    @constant Comparison_NormalizedNFD Decode and normalize to NFD, after casefolding/mapping.
+    @constant Comparison_NormalizedNFC Decode, casefold/map, then normalize to NFC.
+    @constant Comparison_NormalizedNFKD Decode, casefold/map, then normalize to NFKD.
+    @constant Comparison_MFKC Decode, casefold/map, then normalize to NFKC.
+    */
+    typedef enum StringIO_Comparisons : uint8_t {
+        Comparison_Unspecified     = 0,
+        Comparison_Literal         = 1,
+        Comparison_CaseInsensitive = 2,
+        Comparison_NormalizedNFD   = 3,
+        Comparison_NormalizedNFC   = 4,
+        Comparison_NormalizedNFKD  = 5,
+        Comparison_NormalizedNFKC  = 6,
+} StringIO_Comparisons;
 
     /*!
      @abstract                                           Creates a UTF8 string plus a NULL terminator.
