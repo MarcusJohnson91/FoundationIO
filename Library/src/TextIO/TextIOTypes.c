@@ -33,6 +33,15 @@ extern "C" {
 #if (sizeof(size_t) != 8)
 #error "TextIO_Normalization ONLY WORKS for 64 bit"
 #endif
+
+    typedef struct TextIO_CaseMap {
+        const uint64_t Map;
+        /*
+    Bits 0-20 = Start of the range.
+    Bits 21-41 = End of the range.
+    Bits 42-63 = Start of Replacement, so we can calculate the real value of the casefolded codepoint
+    */
+    } TextIO_CaseMap;
     
     typedef struct TextIO_Normalization {
          const union {
