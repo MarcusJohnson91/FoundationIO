@@ -35,13 +35,40 @@ extern "C" {
 #endif
 
     typedef struct TextIO_CaseMap {
-        const uint64_t Map;
+        const union Ranged {
+            const uint64_t Map;
+        } Ranged;
+        const union Literal {
+            const uint64_t Map;
+        } Literal;
         /*
+        Mode (Ranged vs Literal highest bit set for Ranged, Unset for Literal.
+        Ranged:
     Bits 0-20 = Start of the range.
     Bits 21-41 = End of the range.
-    Bits 42-63 = Start of Replacement, so we can calculate the real value of the casefolded codepoint
+    Bits 42-63 = Start of Replacement, so we can calculate the real value of the casefolded codepoint.
+    
+    Literal:
+    Bits 0-20 = Replacee
+    Bits 21-41 = Replacement
     */
     } TextIO_CaseMap;
+    
+    bool TextIO_CaseMapIsRanged(TextIO_CaseMap CaseMap) {
+    return (CaseMap.Ranged.Map & 0x8000000000000000) >> 63;
+}
+
+    UTF32 TextIO_CaseMap_GetStartOfRange(TextIO_CaseMap CaseMap) {
+        return CaseMap.Ranged.Map & 0x1FFFFF;
+    }
+    
+    UTF32 TextIO_CaseMap_GetEndOfRange(TextIO_CaseMap CaseMap) {
+        return (CaseMap.Ranged.Map & 0x3FFFFE00000) >> 21;
+    }
+    
+    UTF32 TextIO_CaseMap_GetStartOfReplacement(TextIO_CaseMap CaseMap) {
+        return (CaseMap.Ranged.Map & 0x 7FFFFC0000000000) >> 42;
+    }
     
     typedef struct TextIO_Normalization {
          const union {
