@@ -570,6 +570,54 @@ __attribute__((no_sanitize("undefined")))
         return x - (x >> 1);
     }
     
+    int8_t SignExtend8(uint8_t Value2Extend, uint8_t FieldSizeInBits) {
+        AssertIO(FieldSizeInBits <= 7);
+        int8_t Extended = 0;
+        bool Sign = (Value2Extend >> (FieldSizeInBits - 1));
+        if (Sign == 1) {
+           Extended = Value2Extend ^ 0;
+        } else {
+            Extended = Value2Extend ^ 1;
+        }
+        return Extended;
+    }
+    
+    int16_t SignExtend16(uint16_t Value2Extend, uint8_t FieldSizeInBits) {
+        AssertIO(FieldSizeInBits <= 15);
+        int16_t Extended = 0;
+        bool Sign = (Value2Extend >> (FieldSizeInBits - 1));
+        if (Sign == 1) {
+           Extended = Value2Extend ^ 0;
+        } else {
+            Extended = Value2Extend ^ 1;
+        }
+        return Extended;
+    }
+    
+    int32_t SignExtend32(uint32_t Value2Extend, uint8_t FieldSizeInBits) {
+        AssertIO(FieldSizeInBits <= 31);
+        int32_t Extended = 0;
+        bool Sign = (Value2Extend >> (FieldSizeInBits - 1));
+        if (Sign == 1) {
+           Extended = Value2Extend ^ 0;
+        } else {
+            Extended = Value2Extend ^ 1;
+        }
+        return Extended;
+    }
+    
+    int64_t SignExtend64(uint64_t Value2Extend, uint8_t FieldSizeInBits) {
+        AssertIO(FieldSizeInBits <= 63);
+        int64_t Extended = 0;
+        bool Sign = (Value2Extend >> (FieldSizeInBits - 1));
+        if (Sign == 1) {
+           Extended = Value2Extend ^ 0;
+        } else {
+            Extended = Value2Extend ^ 1;
+        }
+        return Extended;
+    }
+    
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */

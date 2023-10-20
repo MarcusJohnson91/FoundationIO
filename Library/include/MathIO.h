@@ -624,6 +624,14 @@ extern "C" {
 
     size_t        FloorPowerOfTwo(const size_t Value);
     
+    int8_t        SignExtend8(uint8_t Value2Extend, uint8_t FieldSizeInBits); 
+    
+    int16_t       SignExtend16(uint16_t Value2Extend, uint8_t FieldSizeInBits);
+    
+    int32_t       SignExtend32(uint32_t Value2Extend, uint8_t FieldSizeInBits);
+    
+    int64_t       SignExtend64(uint64_t Value2Extend, uint8_t FieldSizeInBits);
+    
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */
