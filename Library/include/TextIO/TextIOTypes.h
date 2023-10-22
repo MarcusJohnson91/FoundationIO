@@ -619,6 +619,10 @@ typedef                   const UTF32                         *MutableStringSet_
 #define String16Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Data = Literal}
 #define String32Constuct(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Data = Literal}
 
+    UTF32 TextIO_CaseMap_GetUppercase(TextIO_CaseMap CaseMap);
+    
+    UTF32 TextIO_CaseMap_GetLowercaseTextIO_CaseMap CaseMap);
+
     typedef struct TextIO_Normalization TextIO_Normalization;
     
     typedef struct TextIO_Normalizatoons TextIO_Normalizations; 

@@ -35,12 +35,7 @@ extern "C" {
 #endif
 
     typedef struct TextIO_CaseMap {
-        const union Ranged {
-            const uint64_t Map;
-        } Ranged;
-        const union Literal {
-            const uint64_t Map;
-        } Literal;
+        const UTF32 Map;
         /*
         Mode (Ranged vs Literal highest bit set for Ranged, Unset for Literal.
         Ranged:
@@ -51,24 +46,21 @@ extern "C" {
     Literal:
     Bits 0-20 = Replacee
     Bits 21-41 = Replacement
+    
+    ----
+    
+    better solution, store the Uppercase codepoint and a difference to the Lowercase one in 32 bits.
     */
     } TextIO_CaseMap;
     
-    bool TextIO_CaseMapIsRanged(TextIO_CaseMap CaseMap) {
-    return (CaseMap.Ranged.Map & 0x8000000000000000) >> 63;
+    UTF32 TextIO_CaseMap_GetUppercase(TextIO_CaseMap CaseMap) {
+    return CaseMap.Map & UnicodeCodePointMask;
 }
 
-    UTF32 TextIO_CaseMap_GetStartOfRange(TextIO_CaseMap CaseMap) {
-        return CaseMap.Ranged.Map & 0x1FFFFF;
-    }
-    
-    UTF32 TextIO_CaseMap_GetEndOfRange(TextIO_CaseMap CaseMap) {
-        return (CaseMap.Ranged.Map & 0x3FFFFE00000) >> 21;
-    }
-    
-    UTF32 TextIO_CaseMap_GetStartOfReplacement(TextIO_CaseMap CaseMap) {
-        return (CaseMap.Ranged.Map & 0x 7FFFFC0000000000) >> 42;
-    }
+UTF32 TextIO_CaseMap_GetLowercase(TextIO_CaseMap CaseMap) {
+    int32_t Extended = SignExtend32((CaseMap.Map & 0xFFE00000) >> 21, 11);
+return TextIO_CaseMap_GetUppercase(CaseMap) + Extended;
+}
     
     typedef struct TextIO_Normalization {
          const union {
