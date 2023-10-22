@@ -58,8 +58,10 @@ extern "C" {
 }
 
 UTF32 TextIO_CaseMap_GetLowercase(TextIO_CaseMap CaseMap) {
-    int32_t Extended = SignExtend32((CaseMap.Map & 0xFFE00000) >> 21, 11);
-return TextIO_CaseMap_GetUppercase(CaseMap) + Extended;
+    UTF32 Uppercase = TextIO_CaseMap_GetUppercase(CaseMap);
+    uint16_t Difference = (CaseMap.Map & 0xFFE00000) >> 21;
+    int32_t Extended = SignExtend32(Difference, 11);
+return Uppercase + Extended;
 }
     
     typedef struct TextIO_Normalization {
