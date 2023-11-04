@@ -11,7 +11,7 @@ BiDiXpath="//u:char[@Bidi_C = 'Y']"
 CurrencyXpath="//u:char[@gc = 'Sc']"
 CCCXpath="//u:char[@ccc != '0']"
 GraphemeXpath="//u:char[@Gr_Ext = 'Y' or @EComp = 'Y' or @EBase = 'Y']"
-CaseFoldXpath="//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]"
+CaseFoldXpath="//u:char[@gc ='Lu' and @slc != '#')]"
 CanonicalXpath="//u:char[@dm != @cp and @dm != '#' and @dt = 'can']"
 KompatibleXpath="//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']"
 
@@ -86,6 +86,8 @@ CreateHeaderFile() {
         printf '    PlatformIO_Private extern const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2];\n\n'
         printf '    PlatformIO_Private extern const UTF32 *const CaseFoldTable[CaseFoldTableSize][2];\n\n'
         printf '    PlatformIO_Private extern const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2];\n\n'
+        printf '    TextIO_CaseMap_SetUppercase(CodePoint) .Map |= (CodePoint & UnicodeCodePointMask)/n/n'
+        printf '    TextIO_CaseMap_SetLowercase(CodePoint) .Map |= ((CodePoint & UnicodeCodePointMask) << 21)/n/n'
         printf '#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n'
         printf '}\n'
         printf '#endif /* Extern C */\n\n'
