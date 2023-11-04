@@ -81,6 +81,7 @@ set(FoundationIO_SOURCE
     "${FoundationIO_Library_Dir}/src/SortIO.c"
     "${FoundationIO_Library_Dir}/src/TestIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/CommandLineIO.c"
+    "${FoundationIO_Library_Dir}/src/ExtensibleIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/FormatIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/LocalizationIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/LogIO.c"
@@ -148,6 +149,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     RegisterTest(${FoundationIO_Tests_Dir} NetworkIO FoundationIOName)
     RegisterTest(${FoundationIO_Tests_Dir} PlatformIO FoundationIOName)
     RegisterTest(${FoundationIO_TextIO_Tests} CommandLineIO FoundationIOName)
+    RegisterTest(${FoundationIO_TextIO_Tests} ExtensibleIO FoundationIOName)
     RegisterTest(${FoundationIO_TextIO_Tests} FormatIO FoundationIOName)
     RegisterTest(${FoundationIO_TextIO_Tests} LocalizationIO FoundationIOName)
     RegisterTest(${FoundationIO_TextIO_Tests} LogIO FoundationIOName)
