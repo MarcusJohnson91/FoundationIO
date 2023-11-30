@@ -83,13 +83,13 @@ ReflowComments: true
 SortIncludes: true
 IncludeCategories:
 - Regex: '"*PlatformIO.h"'
-  Priority: -5
-- Regex: '"*TextIOTypes.h"'
-  Priority: -4
-- Regex: '<[Ww]indows.h>'
   Priority: -3
-- Regex: '<*\/.h>'
+- Regex: '"*TextIOTypes.h"'
   Priority: -2
+- Regex: '<[Ww]indows.h>'
+  Priority: -1
+- Regex: '<*\/.h>'
+  Priority: 0
 - Regex: '"*\/.h"'
   Priority: 1
 
