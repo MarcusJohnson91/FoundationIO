@@ -780,6 +780,10 @@ TectIO_Normalization_InitExternal(Replacee, NumReplacements, String)
 #endif /* NumReplacements */
 #endif /* TextIO_Normalization_Init */
 
+    size_t TextIO_Normalization_UTF8_GetNumCodeUnitsInReplacements(TextIO_Normalization Norm);
+    
+    size_t TextIO_Normalization_UTF16_GetNumCodeUnitsInReplacements(TextIO_Normalization Norm);
+
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */

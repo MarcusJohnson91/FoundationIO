@@ -132,6 +132,22 @@ return Uppercase + Extended;
         } 
         return Replacement;
     }
+    
+    size_t TextIO_Normalization_UTF8_GetNumCodeUnitsInReplacements(TextIO_Normalization Norm) {
+        size_t NumCodeUnits = 0;
+            for (size_t Replacement = 0; Replacement < TextIO_Normalization_GetNumReplacements(Norm); Replacement++) {
+                NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(TextIO_Normalization_GetReplacement(Norm, Replacement));
+            }
+        return NumCodeUnits;
+    }
+    
+    size_t TextIO_Normalization_UTF16_GetNumCodeUnitsInReplacements(TextIO_Normalization Norm) {
+        size_t NumCodeUnits = 0;
+            for (size_t Replacement = 0; Replacement < TextIO_Normalization_GetNumReplacements(Norm); Replacement++) {
+                NumCodeUnits += UTF32_GetCodePointSizeInUTF16CodeUnits(TextIO_Normalization_GetReplacement(Norm, Replacement));
+            }
+        return NumCodeUnits;
+    }
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
