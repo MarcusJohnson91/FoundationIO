@@ -17,6 +17,8 @@ set(CMAKE_EXE_LINKER_FLAGS_INIT "-fsanitize=address,undefined -fno-omit-frame-po
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
+-ffinite-math-only \
+-fno-signed-zeros \
 -mtune=x86-64-v2 \
 -std=c2x \
 -fPIC \
