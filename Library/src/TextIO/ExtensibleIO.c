@@ -348,7 +348,7 @@ extern "C" {
      */
 
     /* UTF-8 */
-    static UTF8 NextCharacter_UTF8(SyntaxIO_XMLDocument *Doc) {
+    static UTF8 NextCharacter_UTF8(ExtensibleIO_XMLDocument *Doc) {
         UTF8 Character  = 0;
         Doc->DocOffset += 1;
         UTF8 *Document8 = Doc->Document;
@@ -357,16 +357,16 @@ extern "C" {
     }
 
     ExtensibleIO_XMLDocument *XMLDocument_Init8_FromPath(UTF8 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
-        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(SyntaxIO_XMLDocument));
+        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(ExtensibleIO_XMLDocument));
         Doc->Stream               = AsyncIOStream_Init();
         AsyncIOStream_OpenPathUTF8(Doc->Stream, DocumentPath, FileMode_Read);
         if (MaxDocumentSize <= 0) {
             int64_t DocSize       = AsyncIOStream_GetSize(Doc->Stream);
             Doc->Document         = calloc(1, DocSize);
             if (MaxNodes > 5) {
-                Doc->Nodes        = calloc(MaxNodes, sizeof(SyntaxIO_XMLNode));
+                Doc->Nodes        = calloc(MaxNodes, sizeof(ExtensibleIO_XMLNode));
             } else {
-                Doc->Nodes        = calloc(DocSize / 5, sizeof(SyntaxIO_XMLNode));
+                Doc->Nodes        = calloc(DocSize / 5, sizeof(ExtensibleIO_XMLNode));
             }
         } else {
             Doc->Document         = calloc(1, MaxDocumentSize);
@@ -382,7 +382,7 @@ extern "C" {
         return Doc;
     }
 
-    static bool CheckToken8(SyntaxIO_XMLDocument *Doc, StringIO_WhitespaceTypes WhitespaceType, UTF8 *Token) {
+    static bool CheckToken8(ExtensibleIO_XMLDocument *Doc, StringIO_WhitespaceTypes WhitespaceType, UTF8 *Token) {
         /*
          We need to update the DocOffset
 
@@ -418,17 +418,18 @@ extern "C" {
                     CodePoint     = UTF8_DecodeCodePoint(&Document[Offset + CodePointSize]);
                     CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Document[Offset + CodePointSize]);
                     if (CodePoint == '?') {
-                        //SyntaxIO_ParseInstruction8(Doc);
+                        //ExtensibleIO_ParseInstruction8(Doc);
                     } else if (CodePoint == '!') {
                         CodePoint     = UTF8_DecodeCodePoint(&Document[Offset + CodePointSize]);
                         CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Document[Offset + CodePointSize]);
                         if (CodePoint == '-') {
-                            //SyntaxIO_ParseComment8(Doc);
+                            //ExtensibleIO_ParseComment8(Doc);
                         } else if (CodePoint == '[') {
-                            //SyntaxIO_ParseCDATA8(Doc);
+                            //ExtensibleIO_ParseCDATA8(Doc);
                         }
                     } else {
                         // Tag
+                        ExtensibleIO_ParseTag(Doc);
                     }
                     break;
                 }
@@ -569,10 +570,10 @@ extern "C" {
     }
 
     static UTF16 NextNonWhitespaceCharacter_UTF32(ExtensibleIO_XMLDocument *Doc) {
-        UTF16 Character     = SyntaxIO_NextCharacter_UTF16(Doc);
+        UTF16 Character     = ExtensibleIO_NextCharacter_UTF16(Doc);
         while (UTF32_IsWhitespace(Character)) {
             Doc->DocOffset += 1;
-            Character       = SyntaxIO_NextCharacter_UTF32(Doc);
+            Character       = ExtensibleIO_NextCharacter_UTF32(Doc);
         }
         return Character;
     }
@@ -586,16 +587,16 @@ extern "C" {
     }
 
     ExtensibleIO_XMLDocument *XMLDocument_Init16_FromPath(UTF16 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
-        SyntaxIO_XMLDocument *Doc = calloc(1, sizeof(SyntaxIO_XMLDocument));
+        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(ExtensibleIO_XMLDocument));
         Doc->Stream               = AsyncIOStream_Init();
         AsyncIOStream_OpenPathUTF16(Doc->Stream, DocumentPath, FileMode_Read);
         if (MaxDocumentSize <= 0) {
             int64_t DocSize       = AsyncIOStream_GetSize(Doc->Stream);
             Doc->Document         = calloc(1, DocSize);
             if (MaxNodes > 5) {
-                Doc->Nodes        = calloc(MaxNodes, sizeof(SyntaxIO_XMLNode));
+                Doc->Nodes        = calloc(MaxNodes, sizeof(ExtensibleIO_XMLNode));
             } else {
-                Doc->Nodes        = calloc(DocSize / 5, sizeof(SyntaxIO_XMLNode));
+                Doc->Nodes        = calloc(DocSize / 5, sizeof(ExtensibleIO_XMLNode));
             }
         } else {
             Doc->Document         = calloc(1, MaxDocumentSize);
@@ -720,10 +721,10 @@ extern "C" {
             }
             Doc->Nodes[Doc->NumNodes + 1].NodeType               = XMLTokenType_Namespace;
             Doc->Nodes[Doc->NumNodes + 1].Slice                  = TextIO_Slice_Init(NamespaceNameStart, NamespaceNameStart + NamespaceNameSize);
-            SyntaxIO_ParseNamespaceID(Doc);
+            ExtensibleIO_ParseNamespaceID(Doc);
         } else if (Document[Doc->DocOffset + 5] == '=') { // Implicit namespace
             Doc->Namespaces[Doc->NumNamespaces].Name = TextIO_Slice_Init(Doc->DocOffset + 6, Doc->DocOffset + 6);
-            SyntaxIO_ParseNamespaceID(Doc);
+            ExtensibleIO_ParseNamespaceID(Doc);
         }
     }
     /* UTF-16 */
@@ -738,16 +739,16 @@ extern "C" {
     }
 
     static UTF32 NextNonWhitespaceCharacter_UTF8(ExtensibleIO_XMLDocument *Doc) {
-        UTF32 Character     = SyntaxIO_NextCharacter_UTF32(Doc);
+        UTF32 Character     = ExtensibleIO_NextCharacter_UTF32(Doc);
         while (UTF32_IsWhitespace(Character)) {
             Doc->DocOffset += 1;
-            Character       = SyntaxIO_NextCharacter_UTF32(Doc);
+            Character       = ExtensibleIO_NextCharacter_UTF32(Doc);
         }
         return Character;
     }
 
     ExtensibleIO_XMLDocument *XMLDocument_Init32(UTF32 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
-        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(SyntaxIO_XMLDocument));
+        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(ExtensibleIO_XMLDocument));
         Doc->Stream               = AsyncIOStream_Init();
         UTF16 *DocumentPath16     = UTF16_Encode(DocumentPath);
         AsyncIOStream_OpenPathUTF16(Doc->Stream, DocumentPath16, FileMode_Read);
@@ -755,15 +756,15 @@ extern "C" {
             int64_t DocSize       = AsyncIOStream_GetSize(Doc->Stream);
             Doc->Document         = calloc(1, DocSize);
             if (MaxNodes > 5) {
-                Doc->Nodes        = calloc(MaxNodes, sizeof(SyntaxIO_XMLNode));
+                Doc->Nodes        = calloc(MaxNodes, sizeof(ExtensibleIO_XMLNode));
             } else {
-                Doc->Nodes        = calloc(DocSize / 5, sizeof(SyntaxIO_XMLNode));
+                Doc->Nodes        = calloc(DocSize / 5, sizeof(ExtensibleIO_XMLNode));
             }
         } else {
             Doc->Document         = calloc(1, MaxDocumentSize);
         }
         Doc->NumNamespaces        = 0;
-        Doc->Namespaces           = calloc(1, sizeof(SyntaxIO_XMLNamespace));
+        Doc->Namespaces           = calloc(1, sizeof(ExtensibleIO_XMLNamespace));
         uint8_t CharSize          = FileIO_GetEncodingSize(Doc->Stream);
         if (CharSize == 1) {
             Doc->StringType       = StringType_UTF8;
@@ -905,10 +906,10 @@ extern "C" {
             }
             Doc->Nodes[Doc->NumNodes + 1].NodeType                = XMLTokenType_Namespace;
             Doc->Nodes[Doc->NumNodes + 1].Slice                   = TextIO_Slice_Init(NamespaceNameStart, NamespaceNameStart + NamespaceNameSize);
-            SyntaxIO_ParseNamespaceID(Doc);
+            ExtensibleIO_ParseNamespaceID(Doc);
         } else if (Document[Doc->DocOffset + 5] == '=') { // Implicit namespace
             Doc->Namespaces[Doc->NumNamespaces].Name = TextIO_Slice_Init(Doc->DocOffset + 6, Doc->DocOffset + 6);
-            SyntaxIO_ParseNamespaceID(Doc);
+            ExtensibleIO_ParseNamespaceID(Doc);
         }
     }
     /* UTF-32 */
@@ -1019,7 +1020,7 @@ extern "C" {
     void Tokenizer8(ExtensibleIO_XMLDocument *Doc) {
         UTF8 Character = Doc->Document[Doc->DocOffset];
         if (Character == '<') { // Open
-            Character = SyntaxIO_NextCharacter_UTF8(Doc);
+            Character = ExtensibleIO_NextCharacter_UTF8(Doc);
             if (Character == '!') {
                 // Could be CDATA or Comment
             } else if (Character == '?') {
