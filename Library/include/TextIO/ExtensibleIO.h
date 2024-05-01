@@ -34,7 +34,7 @@ extern "C" {
      @constant            XMLTokenType_Namespace                     Explicit: xmlns:Namespace="URL"; Implicit: xmlns="URL";
      @constant            XMLTokenType_Text                          <Namespace:element>Text</Namespace:element>
      */
-    typedef enum SyntaxIO_XMLTokenTypes {
+    typedef enum ExtensibleIO_XMLTokenTypes {
                           XMLTokenType_Unspecified                   = 0,
                           XMLTokenType_Instruction                   = 1,
                           XMLTokenType_Comment                       = 2,
@@ -65,13 +65,13 @@ extern "C" {
     
     typedef struct XMLDocument XMLDocument;
     
-    XMLDocument *XMLDocument_Init8(UTF8 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes);
+    XMLDocument *XMLDocument_Init8_FromPath(UTF8 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes);
     
-    XMLDocument *XMLDocument_Init16(UTF16 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes);
+    XMLDocument *XMLDocument_Init16_FromPath(UTF16 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes);
     
-    XMLDocument *XMLDocument_Init32(UTF32 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes);
+    XMLDocument *XMLDocument_Init32_FromPath(UTF32 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes);
     
-#define XMLDocument_Init(DocumentPath, MaxDocumentSize, MaxNodes) _Generic((DocumentPath), UTF8*:XMLDocument_Init8, UTF8[]:XMLDocument_Init8, UTF16*:XMLDocument_Init16, UTF16[]:XMLDocument_Init16, UTF32*:XMLDocument_Init32, UTF32[]:XMLDocument_Init32)(DocumentPath, MaxDocumentSize, MaxNodes)
+#define XMLDocument_Init(DocumentPath, MaxDocumentSize, MaxNodes) _Generic((DocumentPath), UTF8*:XMLDocument_Init8_FromPath, UTF8[]:XMLDocument_Init8_FromPath, UTF16*:XMLDocument_Init16_FromPath, UTF16[]:XMLDocument_Init16_FromPath, UTF32*:XMLDocument_Init32_FromPath, UTF32[]:XMLDocument_Init32_FromPath)(DocumentPath, MaxDocumentSize, MaxNodes)
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

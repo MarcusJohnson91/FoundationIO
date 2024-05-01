@@ -46,7 +46,7 @@ TextIO is not a sub library, it's all part of FoundationIO; it exists just to co
 * LocalizationIO: Localization, like how to format numbers for each culture.
 * LogIO: Generic logging functionality.
 * StringIO: Generic Unicode handling facilities, number to string and vice versa conversions.
-* SyntaxIO: XML parsing, work in progress.
+* ExtensibleIO: XML pull parser, work in progress.
 
 # TODO:
 * StringIO:
@@ -57,5 +57,5 @@ TextIO is not a sub library, it's all part of FoundationIO; it exists just to co
 * FormatIO:
 - l16 and l32 modifiers being standardized with ISO WG14, and being accepted into Clang.
 ----
-* SyntaxIO:
+* ExtensibleIO:
 - Finish the parsing, the main complication is having the tokenizer create string references instead of copying everything everywhere.
