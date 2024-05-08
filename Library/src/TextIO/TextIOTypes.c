@@ -31,7 +31,7 @@ extern "C" {
     }
     
 #if (sizeof(size_t) != 8)
-#error "TextIO_Normalization ONLY WORKS for 64 bit"
+#error "TextIO_StringMap ONLY WORKS for 64 bit"
 #endif
 
     typedef struct TextIO_CaseMap {
@@ -64,7 +64,7 @@ UTF32 TextIO_CaseMap_GetLowercase(TextIO_CaseMap CaseMap) {
 return Uppercase + Extended;
 }
     
-    typedef struct TextIO_Normalization {
+    typedef struct TextIO_StringMap {
          const union {
              const struct Internal {
                  const uint64_t Pauload0;
@@ -76,75 +76,74 @@ return Uppercase + Extended;
                 } External;
             };
         const uint64_t Replacee;
-    } TextIO_Normalization;
+    } TextIO_StringMap;
     
-    bool TextIO_Normalization_IsInternalized(TextIO_Normalization Norm) {
-        return ((Norm.Replacee & 0x10FFFF000000) >> 24) > 0 ? true : false;
+    bool TextIO_StringMap_IsInternalized(TextIO_StringMap Map) {
+        return ((Map.Replacee & 0x10FFFF000000) >> 24) > 0 ? true : false;
     }
     
-    size_t TextIO_Normalization_GetNumReplacements(TextIO_Normalization Norm) {
+    size_t TextIO_StringMap_GetNumReplacements(TextIO_StringMap Map) {
         size_t NumReplacements = 0;
-        if (TextIO_Normalization_IsInternalized(Norm) {
-            NumReplacements = ((Norm.Replacee & 0xE00000) >> 21) + 1;
+        if (TextIO_StringMap_IsInternalized(Map) {
+            NumReplacements = ((Map.Replacee & 0xE00000) >> 21) + 1;
         } else {
-            NumReplacements = Norm.External.ReplacementSizeMinus1 + 1;
+            NumReplacements = Map.External.ReplacementSizeMinus1 + 1;
         }
         return NumReplacements;
     }
     
-    UTF32 TextIO_Normalization_GetReplacee(TextIO_Normalization Norm) { 
-        return Norm.Replacee & UnicodeMaxCodePoint;
+    UTF32 TextIO_StringMap_GetReplacee(TextIO_StringMap Map) { 
+        return Map.Replacee & UnicodeMaxCodePoint;
     }
     
-    void TextIO_Normalization_SetReplacee(TextIO_Normalization Norm, UTF32 Replacee) {
-        Norm.Replacee |= Replacee & UnicodeMaxCodePoint;
+    void TextIO_StringMap_SetReplacee(TextIO_StringMap Map, UTF32 Replacee) {
+        Map.Replacee |= Replacee & UnicodeMaxCodePoint;
     }
     
-    UTF32 TextIO_Normalization_GetReplacement(TextIO_Normalization Norm, size_t ReplacementIndex) {
+    UTF32 TextIO_StringMap_GetReplacement(TextIO_StringMap Map, size_t ReplacementIndex) {
         UTF32 Replacement = 0;
-        if (ReplacementIndex + 1 > TextIO_Normalization_GetNumReplacements) {
+        if (ReplacementIndex + 1 > TextIO_StringMap_GetNumReplacements(Map)) {
         return 0;
         } else {
-            if (TextIO_Normalization_IsInternalized(Norm) {
+            if (TextIO_StringMap_IsInternalized(Map) {
             if (ReplacementIndex == 0) {
-            Replacement = (Norm.Replacee & 0x1FFFFF000000) >> 24;
+            Replacement = (Map.Replacee & 0x1FFFFF000000) >> 24;
             } else if (ReplacementIndex == 1) {
-            Replacement = (Norm.Replacee & 0xFFFFE00000000000) >> 45;
-            Replacement |= ((Norm.Internal.Payload1 & 0x3) << 19);
+            Replacement = (Map.Replacee & 0xFFFFE00000000000) >> 45;
+            Replacement |= ((Map.Internal.Payload1 & 0x3) << 19);
             } else if (ReplacementIndex == 2) {
-                Replacement = ((Norm.Internal.Payload1 & 0x7FFFFC) >> 2);
+                Replacement = ((Map.Internal.Payload1 & 0x7FFFFC) >> 2);
             } else if (ReplacementIndex == 3) {
-                Replacement = ((Norm.Internal.Payload1 & 0xFFFFF800000) >> 23;
+                Replacement = ((Map.Internal.Payload1 & 0xFFFFF800000) >> 23;
             } else if (ReplacementIndex == 4) {
             // 20 bits here, gotta OR it with the last bit of Payload0 at the top
-                Replacement = ((Norm.Internal.Payload1 & 0xFFFFF00000000000) >> 44);
-                Replacement |= ((Norm.Internal.Payload0 & 0x1) << 20);
+                Replacement = ((Map.Internal.Payload1 & 0xFFFFF00000000000) >> 44);
+                Replacement |= ((Map.Internal.Payload0 & 0x1) << 20);
             } else if (ReplacementIndex == 5) {
-                Replacement = ((Norm.Internal.Payload0 & 0x3FFFFE) >> 1);
+                Replacement = ((Map.Internal.Payload0 & 0x3FFFFE) >> 1);
             } else if (ReplacementIndex == 6) {
-                Replacement = ((Norm.Internal.Payload0 & 0x7FFFFC00000) >> 22;
+                Replacement = ((Map.Internal.Payload0 & 0x7FFFFC00000) >> 22;
             } else if (ReplacementIndex == 7) {
-                Replacement = ((Norm.Internal.Payload0 & 0xFFFFF80000000000) >> 43);
-            }
+                Replacement = ((Map.Internal.Payload0 & 0xFFFFF80000000000) >> 43);
             } else { // Externalized
-                Replacement = Norm.External.Replacement[ReplacementIndex];
+                Replacement = Map.External.Replacement[ReplacementIndex];
             }
         } 
         return Replacement;
     }
     
-    size_t TextIO_Normalization_UTF8_GetNumCodeUnitsInReplacements(TextIO_Normalization Norm) {
+    size_t TextIO_StringMap_UTF8_GetNumCodeUnitsInReplacements(TextIO_StringMap Map) {
         size_t NumCodeUnits = 0;
-            for (size_t Replacement = 0; Replacement < TextIO_Normalization_GetNumReplacements(Norm); Replacement++) {
-                NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(TextIO_Normalization_GetReplacement(Norm, Replacement));
+            for (size_t Replacement = 0; Replacement < TextIO_StringMap_GetNumReplacements(Map); Replacement++) {
+                NumCodeUnits += UTF32_GetCodePointSizeInUTF8CodeUnits(TextIO_StringMap_GetReplacement(Map, Replacement));
             }
         return NumCodeUnits;
     }
     
-    size_t TextIO_Normalization_UTF16_GetNumCodeUnitsInReplacements(TextIO_Normalization Norm) {
+    size_t TextIO_StringMap_UTF16_GetNumCodeUnitsInReplacements(TextIO_StringMap Map) {
         size_t NumCodeUnits = 0;
-            for (size_t Replacement = 0; Replacement < TextIO_Normalization_GetNumReplacements(Norm); Replacement++) {
-                NumCodeUnits += UTF32_GetCodePointSizeInUTF16CodeUnits(TextIO_Normalization_GetReplacement(Norm, Replacement));
+            for (size_t Replacement = 0; Replacement < TextIO_StringMap_GetNumReplacements(Map); Replacement++) {
+                NumCodeUnits += UTF32_GetCodePointSizeInUTF16CodeUnits(TextIO_StringMap_GetReplacement(Map, Replacement));
             }
         return NumCodeUnits;
     }
