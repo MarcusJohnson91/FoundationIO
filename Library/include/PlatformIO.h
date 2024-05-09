@@ -501,7 +501,9 @@ int64_t
 #endif /* Linux */
 
 #include <stdarg.h>     /* Included for va_list, va_copy */
+#if PlatformIO_LanguageVersionC < PlatformIO_LanguageVersionC23
 #include <stdbool.h>    /* Included for bool */
+#endif /* Include Bool where needed */
 #include <stdint.h>     /* Included for u/intX_t */
 #include <stdio.h>      /* Included for FILE, SEEK SET/END/CUR macros */
 #include <stdlib.h>     /* Included for calloc/free */
