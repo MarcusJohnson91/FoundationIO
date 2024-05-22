@@ -12,6 +12,54 @@ extern "C" {
 #define TokenString(StartQuotedTokenString,StopQuotedTokenString) PlatformIO_Concat(TokenPrefix, StartQuotedTokenString) PlatformIO_Concat(TokenPrefix, StopQuotedTokenString)
 #endif /* TokenString */
 
+    typedef struct XMLSyntaxPair8 {
+        const char8_t *Head;
+        const char8_t *Tail;
+        const uint8_t  HeadSize;
+        const uint8_t  TailSize;
+    } XMLSyntaxPair8;
+
+    const XMLSyntaxPair8 XMLTokens8 = {
+        [0] = {.Head = u8"<![CDATA[", .HeadSize = 9, .Tail = u8"]]>", .TailSize = 3}, // CDATA
+        [1] = {.Head = u8"<!--", .HeadSize = 4, .Tail = u8"-->", .TailSize = 3}, // Comment
+        [2] = {.Head = u8" <?", .HeadSize = 2, .Tail = u8"?>", .TailSize = 2}, // Instruction
+        [3] = {.Head = u8"<", .HeadSize = 1, .Tail = u8"/>", .TailSize = 2}, // Self-Closing Tag
+        [4] = {.Head = u8"</", .HeadSize = 2, .Tail = u8">",  .TailSize = 1}, // Closing Tag
+        [5] = {.Head = u8"<", .HeadSize = 1, .Tail = u8">", .TailSize = 1}, // Open Tag
+    } XMLTokens8;
+    
+    typedef struct XMLSyntaxPair16 {
+        const char16_t *Head;
+        const char16_t *Tail;
+        const uint8_t  HeadSize;
+        const uint8_t  TailSize;
+    } XMLSyntaxPair16;
+
+    const XMLSyntaxPair16 XMLTokens16 = {
+        [0] = {.Head = u"<![CDATA[", .HeadSize = 9, .Tail = u"]]>", .TailSize = 3}, // CDATA
+        [1] = {.Head = u"<!--", .HeadSize = 4, .Tail = u"-->", .TailSize = 3}, // Comment
+        [2] = {.Head = u" <?", .HeadSize = 2, .Tail = u"?>", .TailSize = 2}, // Instruction
+        [3] = {.Head = u"<", .HeadSize = 1, .Tail = u"/>", .TailSize = 2}, // Self-Closing Tag
+        [4] = {.Head = u"</", .HeadSize = 2, .Tail = u">",  .TailSize = 1}, // Closing Tag
+        [5] = {.Head = u"<", .HeadSize = 1, .Tail = u">", .TailSize = 1}, // Open Tag
+    } XMLTokens16;
+    
+    typedef struct XMLSyntaxPair32 {
+        const char32_t *Head;
+        const char32_t *Tail;
+        const uint8_t  HeadSize;
+        const uint8_t  TailSize;
+    } XMLSyntaxPair32;
+
+    const XMLSyntaxPair32 XMLTokens32 = {
+        [0] = {.Head = U"<![CDATA[", .HeadSize = 9, .Tail = U"]]>", .TailSize = 3}, // CDATA
+        [1] = {.Head = U"<!--", .HeadSize = 4, .Tail = U"-->", .TailSize = 3}, // Comment
+        [2] = {.Head = U"<?", .HeadSize = 2, .Tail = U"?>", .TailSize = 2}, // Instruction
+        [3] = {.Head = U"<", .HeadSize = 1, .Tail = U"/>", .TailSize = 2}, // Self-Closing Tag
+        [4] = {.Head = U"</", .HeadSize = 2, .Tail = U">",  .TailSize = 1}, // Closing Tag
+        [5] = {.Head = U"<", .HeadSize = 1, .Tail = U">", .TailSize = 1}, // Open Tag
+    } XMLTokens32;
+
     typedef struct XMLToken {
         void                   *StartTag;
         void                   *StopTag;
@@ -40,11 +88,21 @@ extern "C" {
 
         },
     };
+    
+    /*
+    ok, so there's a bunch of open and close tag pairs, and then we need to generate a UTF-8, 16, and 32 variants.
+    
+    so we can write macros to do that by just taking the prefix as an argument.
+    
+    something like TokenPair(OpenToken, CloseToken, Prefix) Prefix##OpenToken, Prefix##CloseToken
+    
+    yeah that seems like a good idea generally.
+    */ 
 
     const XMLTokens8[XMLTokenType_NumTokens] = {
         [Enum2Index(XMLTokenType_Instruction)] = {
-            .OpenTag =
-        },
+        TokenPair("<?", "?>", u8)
+        [Enum2Index(XMLTokenType_Comment)] = TokenPair("<--", "-->", u8)
     };
 
     const UTF8 *Tokens8[] = {
@@ -311,8 +369,8 @@ extern "C" {
     } XMLDeclaration;
     
     typedef struct XMLNode {
-        TextIO_Slice           Slice;
-        ExtensibleIO_XMLTokenTypes NodeType;
+        TextIO_Slice  Slice;
+        XMLTokenTypes NodeType;
     } XMLNode;
     
     typedef struct XMLNamespace {
@@ -348,7 +406,7 @@ extern "C" {
      */
 
     /* UTF-8 */
-    static UTF8 NextCharacter_UTF8(ExtensibleIO_XMLDocument *Doc) {
+    static UTF8 NextCharacter_UTF8(XMLDocument *Doc) {
         UTF8 Character  = 0;
         Doc->DocOffset += 1;
         UTF8 *Document8 = Doc->Document;
@@ -356,17 +414,17 @@ extern "C" {
         return Character;
     }
 
-    ExtensibleIO_XMLDocument *XMLDocument_Init8_FromPath(UTF8 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
-        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(ExtensibleIO_XMLDocument));
+    XMLDocument *XMLDocument_Init8_FromPath(UTF8 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
+        XMLDocument *Doc = calloc(1, sizeof(XMLDocument));
         Doc->Stream               = AsyncIOStream_Init();
         AsyncIOStream_OpenPathUTF8(Doc->Stream, DocumentPath, FileMode_Read);
         if (MaxDocumentSize <= 0) {
             int64_t DocSize       = AsyncIOStream_GetSize(Doc->Stream);
             Doc->Document         = calloc(1, DocSize);
             if (MaxNodes > 5) {
-                Doc->Nodes        = calloc(MaxNodes, sizeof(ExtensibleIO_XMLNode));
+                Doc->Nodes        = calloc(MaxNodes, sizeof(XMLNode));
             } else {
-                Doc->Nodes        = calloc(DocSize / 5, sizeof(ExtensibleIO_XMLNode));
+                Doc->Nodes        = calloc(DocSize / 5, sizeof(XMLNode));
             }
         } else {
             Doc->Document         = calloc(1, MaxDocumentSize);
@@ -382,7 +440,7 @@ extern "C" {
         return Doc;
     }
 
-    static bool CheckToken8(ExtensibleIO_XMLDocument *Doc, StringIO_WhitespaceTypes WhitespaceType, UTF8 *Token) {
+    static bool CheckToken8(XMLDocument *Doc, StringIO_WhitespaceTypes WhitespaceType, UTF8 *Token) {
         /*
          We need to update the DocOffset
 
@@ -402,7 +460,7 @@ extern "C" {
         return TokenStart;
     }
 
-    static void Tokenizer8(ExtensibleIO_XMLDocument *Doc) {
+    static void Tokenizer8(XMLDocument *Doc) {
         uint64_t Offset = Doc->DocOffset;
         UTF8 *Document  = Doc->Document;
         while (Offset < Doc->DocSize) {
@@ -418,18 +476,18 @@ extern "C" {
                     CodePoint     = UTF8_DecodeCodePoint(&Document[Offset + CodePointSize]);
                     CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Document[Offset + CodePointSize]);
                     if (CodePoint == '?') {
-                        //ExtensibleIO_ParseInstruction8(Doc);
+                ParseInstruction(Doc);
                     } else if (CodePoint == '!') {
                         CodePoint     = UTF8_DecodeCodePoint(&Document[Offset + CodePointSize]);
                         CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Document[Offset + CodePointSize]);
                         if (CodePoint == '-') {
-                            //ExtensibleIO_ParseComment8(Doc);
+                    ParseComment(Doc);
                         } else if (CodePoint == '[') {
-                            //ExtensibleIO_ParseCDATA8(Doc);
+                        ParseCDATA(Doc);
                         }
                     } else {
                         // Tag
-                        ExtensibleIO_ParseTag(Doc);
+                        ParseTag(Doc);
                     }
                     break;
                 }
@@ -440,7 +498,7 @@ extern "C" {
         }
     }
 
-    static void ParseInstruction8(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseInstruction8(XMLDocument *Doc) {
         UTF8 *Document = Doc->Document;
 
         size_t DeclOffset1 = UTF8_Find(&Document[Doc->DocOffset], Doc->DocSize - Doc->DocOffset, "<?", WhitespaceType_Insignificant); // Offset of "<?"
@@ -465,7 +523,7 @@ extern "C" {
         }
     }
 
-    static void ExtensibleIO_ParseCDATA8(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseCDATA8(XMLDocument *Doc) {
         // <![CDATA[Content]]>
         UTF8 *Document = Doc->Document;
 
@@ -482,7 +540,7 @@ extern "C" {
         }
     }
 
-    static void ParseReference8(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseReference8(XMLDocument *Doc) {
         UTF8 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset] == '#') { // Some kind of number, either decimal or hex
@@ -509,7 +567,7 @@ extern "C" {
         }
     }
 
-    static void ExtensibleIO_ParseComment8(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseComment8(XMLDocument *Doc) {
         // Starts with '<!--' ends with '-->'
         UTF8 *Document = Doc->Document;
 
@@ -525,7 +583,7 @@ extern "C" {
         }
     }
 
-    static void ParseNamespaceID8(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseNamespaceID8(XMLDocument *Doc) {
         UTF8 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 0] == '=' && Document[Doc->DocOffset + 1] == '\"') {
@@ -539,7 +597,7 @@ extern "C" {
         }
     }
 
-    static void ParseNamespaceDeclaration8(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseNamespaceDeclaration8(XMLDocument *Doc) {
         UTF8 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 0] == 'x' && Document[Doc->DocOffset + 1] == 'm' && Document[Doc->DocOffset + 2] == 'l' && Document[Doc->DocOffset + 3] == 'n' && Document[Doc->DocOffset + 4] == 's') {
@@ -551,17 +609,17 @@ extern "C" {
                 }
                 Doc->Nodes[Doc->NumNodes + 1].NodeType               = XMLTokenType_Namespace;
                 Doc->Nodes[Doc->NumNodes + 1].Slice                  = TextIO_Slice_Init(NamespaceNameStart, NamespaceNameStart + NamespaceNameSize);
-                ExtensibleIO_ParseNamespaceID(Doc);
+                ParseNamespaceID(Doc);
             } else if (Document[Doc->DocOffset + 5] == '=') { // Implicit namespace
                 Doc->Namespaces[Doc->NumNamespaces].Identifier       = TextIO_Slice_Init(Doc->DocOffset + 6, Doc->DocOffset + 6);
-                ExtensibleIO_ParseNamespaceID(Doc);
+                ParseNamespaceID(Doc);
             }
         }
     }
     /* UTF-8 */
 
     /* UTF-16 */
-    static UTF16 NextCharacter_UTF16(ExtensibleIO_XMLDocument *Doc) { // Make sure the document is in bounds
+    static UTF16 NextCharacter_UTF16(XMLDocument *Doc) { // Make sure the document is in bounds
         UTF16 Character   = 0;
         Doc->DocOffset   += 1;
         UTF16 *Document16 = Doc->Document;
@@ -569,16 +627,16 @@ extern "C" {
         return Character;
     }
 
-    static UTF16 NextNonWhitespaceCharacter_UTF32(ExtensibleIO_XMLDocument *Doc) {
-        UTF16 Character     = ExtensibleIO_NextCharacter_UTF16(Doc);
+    static UTF16 NextNonWhitespaceCharacter_UTF32(XMLDocument *Doc) {
+        UTF16 Character     = NextCharacter_UTF16(Doc);
         while (UTF32_IsWhitespace(Character)) {
             Doc->DocOffset += 1;
-            Character       = ExtensibleIO_NextCharacter_UTF32(Doc);
+            Character       = NextCharacter_UTF32(Doc);
         }
         return Character;
     }
 
-    static UTF16 NextCharacter_UTF16(ExtensibleIO_XMLDocument *Doc) {
+    static UTF16 NextCharacter_UTF16(XMLDocument *Doc) {
         UTF16 Character   = 0;
         Doc->DocOffset   += 1;
         UTF16 *Document16 = Doc->Document;
@@ -586,17 +644,17 @@ extern "C" {
         return Character;
     }
 
-    ExtensibleIO_XMLDocument *XMLDocument_Init16_FromPath(UTF16 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
-        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(ExtensibleIO_XMLDocument));
+    XMLDocument *XMLDocument_Init16_FromPath(UTF16 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
+      XMLDocument *Doc = calloc(1, sizeof(XMLDocument));
         Doc->Stream               = AsyncIOStream_Init();
         AsyncIOStream_OpenPathUTF16(Doc->Stream, DocumentPath, FileMode_Read);
         if (MaxDocumentSize <= 0) {
             int64_t DocSize       = AsyncIOStream_GetSize(Doc->Stream);
             Doc->Document         = calloc(1, DocSize);
             if (MaxNodes > 5) {
-                Doc->Nodes        = calloc(MaxNodes, sizeof(ExtensibleIO_XMLNode));
+                Doc->Nodes        = calloc(MaxNodes, sizeof(XMLNode));
             } else {
-                Doc->Nodes        = calloc(DocSize / 5, sizeof(ExtensibleIO_XMLNode));
+                Doc->Nodes        = calloc(DocSize / 5, sizeof(XMLNode));
             }
         } else {
             Doc->Document         = calloc(1, MaxDocumentSize);
@@ -612,7 +670,7 @@ extern "C" {
         return Doc;
     }
 
-    static void ParseInstruction16(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseInstruction16(XMLDocument *Doc) {
         UTF16 *Document = Doc->Document;
 
         size_t DeclOffset1 = UTF16_Find(&Document[Doc->DocOffset], Doc->DocSize - Doc->DocOffset, "<?", WhitespaceType_Insignificant); // Offset of "<?"
@@ -637,7 +695,7 @@ extern "C" {
         }
     }
 
-    static void ParseReference16(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseReference16(XMLDocument *Doc) {
         UTF16 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset] == '#') { // Some kind of number, either decimal or hex
@@ -664,7 +722,7 @@ extern "C" {
         }
     }
 
-    static void ParseCDATA16(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseCDATA16(XMLDocument *Doc) {
         // <![CDATA[Content]]>
         UTF16 *Document = Doc->Document;
 
@@ -681,7 +739,7 @@ extern "C" {
         }
     }
 
-    static void ParseComment16(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseComment16(XMLDocument *Doc) {
         UTF16 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 0] == '<' && Document[Doc->DocOffset + 1] == '!' && Document[Doc->DocOffset + 2] == '-' &&
@@ -696,7 +754,7 @@ extern "C" {
         }
     }
 
-    static void ParseNamespaceID16(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseNamespaceID16(XMLDocument *Doc) {
         UTF16 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 0] == '=' && Document[Doc->DocOffset + 1] == '\"') {
@@ -710,7 +768,7 @@ extern "C" {
         }
     }
 
-    static void ParseNamespaceDeclaration16(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseNamespaceDeclaration16(XMLDocument *Doc) {
         UTF16 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 5] == ':') { // Explicit namespace
@@ -721,16 +779,16 @@ extern "C" {
             }
             Doc->Nodes[Doc->NumNodes + 1].NodeType               = XMLTokenType_Namespace;
             Doc->Nodes[Doc->NumNodes + 1].Slice                  = TextIO_Slice_Init(NamespaceNameStart, NamespaceNameStart + NamespaceNameSize);
-            ExtensibleIO_ParseNamespaceID(Doc);
+            ParseNamespaceID(Doc);
         } else if (Document[Doc->DocOffset + 5] == '=') { // Implicit namespace
             Doc->Namespaces[Doc->NumNamespaces].Name = TextIO_Slice_Init(Doc->DocOffset + 6, Doc->DocOffset + 6);
-            ExtensibleIO_ParseNamespaceID(Doc);
+            ParseNamespaceID(Doc);
         }
     }
     /* UTF-16 */
 
     /* UTF-32 */
-    static UTF32 NextCharacter_UTF32(ExtensibleIO_XMLDocument *Doc) { // Make sure the document is in bounds
+    static UTF32 NextCharacter_UTF32(XMLDocument *Doc) { // Make sure the document is in bounds
         UTF32 Character   = 0;
         Doc->DocOffset   += 1;
         UTF32 *Document32 = Doc->Document;
@@ -738,17 +796,17 @@ extern "C" {
         return Character;
     }
 
-    static UTF32 NextNonWhitespaceCharacter_UTF8(ExtensibleIO_XMLDocument *Doc) {
-        UTF32 Character     = ExtensibleIO_NextCharacter_UTF32(Doc);
+    static UTF32 NextNonWhitespaceCharacter_UTF8(XMLDocument *Doc) {
+        UTF32 Character     = NextCharacter_UTF32(Doc);
         while (UTF32_IsWhitespace(Character)) {
             Doc->DocOffset += 1;
-            Character       = ExtensibleIO_NextCharacter_UTF32(Doc);
+            Character       = NextCharacter_UTF32(Doc);
         }
         return Character;
     }
 
-    ExtensibleIO_XMLDocument *XMLDocument_Init32(UTF32 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
-        ExtensibleIO_XMLDocument *Doc = calloc(1, sizeof(ExtensibleIO_XMLDocument));
+    XMLDocument *XMLDocument_Init32(UTF32 *DocumentPath, size_t MaxDocumentSize, size_t MaxNodes) {
+        XMLDocument *Doc = calloc(1, sizeof(XMLDocument));
         Doc->Stream               = AsyncIOStream_Init();
         UTF16 *DocumentPath16     = UTF16_Encode(DocumentPath);
         AsyncIOStream_OpenPathUTF16(Doc->Stream, DocumentPath16, FileMode_Read);
@@ -756,15 +814,15 @@ extern "C" {
             int64_t DocSize       = AsyncIOStream_GetSize(Doc->Stream);
             Doc->Document         = calloc(1, DocSize);
             if (MaxNodes > 5) {
-                Doc->Nodes        = calloc(MaxNodes, sizeof(ExtensibleIO_XMLNode));
+                Doc->Nodes        = calloc(MaxNodes, sizeof(XMLNode));
             } else {
-                Doc->Nodes        = calloc(DocSize / 5, sizeof(ExtensibleIO_XMLNode));
+                Doc->Nodes        = calloc(DocSize / 5, sizeof(XMLNode));
             }
         } else {
             Doc->Document         = calloc(1, MaxDocumentSize);
         }
         Doc->NumNamespaces        = 0;
-        Doc->Namespaces           = calloc(1, sizeof(ExtensibleIO_XMLNamespace));
+        Doc->Namespaces           = calloc(1, sizeof(XMLNamespace));
         uint8_t CharSize          = FileIO_GetEncodingSize(Doc->Stream);
         if (CharSize == 1) {
             Doc->StringType       = StringType_UTF8;
@@ -776,7 +834,7 @@ extern "C" {
         return Doc;
     }
 
-    static void ParseInstruction32(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseInstruction32(XMLDocument *Doc) {
         UTF32 *Document = Doc->Document;
 
         size_t DeclOffset1 = UTF32_Find(&Document[Doc->DocOffset], Doc->DocSize - Doc->DocOffset, "<?", WhitespaceType_Insignificant); // Offset of "<?"
@@ -801,7 +859,7 @@ extern "C" {
         }
     }
 
-    static bool CheckToken32(ExtensibleIO_XMLDocument *Doc, StringIO_WhitespaceTypes WhitespaceType, UTF32 *Token) {
+    static bool CheckToken32(XMLDocument *Doc, StringIO_WhitespaceTypes WhitespaceType, UTF32 *Token) {
         /*
          We need to update the DocOffset
 
@@ -821,7 +879,7 @@ extern "C" {
         return TokenStart;
     }
 
-    static void ParseReference32(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseReference32(XMLDocument *Doc) {
         UTF32 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset] == '#') { // Some kind of number, either decimal or hex
@@ -848,7 +906,7 @@ extern "C" {
         }
     }
 
-    static void ParseCDATA32(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseCDATA32(XMLDocument *Doc) {
         // <![CDATA[Content]]>
 
         UTF32 *Document = Doc->Document;
@@ -866,7 +924,7 @@ extern "C" {
         }
     }
 
-    static void ParseComment32(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseComment32(XMLDocument *Doc) {
         UTF32 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 0] == '<' && Document[Doc->DocOffset + 1] == '!' && Document[Doc->DocOffset + 2] == '-' &&
@@ -881,7 +939,7 @@ extern "C" {
         }
     }
 
-    static void ParseNamespaceID32(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseNamespaceID32(XMLDocument *Doc) {
         UTF32 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 0] == '=' && Document[Doc->DocOffset + 1] == '\"') {
@@ -895,7 +953,7 @@ extern "C" {
         }
     }
 
-    static void ParseNamespaceDeclaration32(ExtensibleIO_XMLDocument *Doc) {
+    static void ParseNamespaceDeclaration32(XMLDocument *Doc) {
         UTF32 *Document = Doc->Document;
 
         if (Document[Doc->DocOffset + 5] == ':') { // Explicit namespace
@@ -906,10 +964,10 @@ extern "C" {
             }
             Doc->Nodes[Doc->NumNodes + 1].NodeType                = XMLTokenType_Namespace;
             Doc->Nodes[Doc->NumNodes + 1].Slice                   = TextIO_Slice_Init(NamespaceNameStart, NamespaceNameStart + NamespaceNameSize);
-            ExtensibleIO_ParseNamespaceID(Doc);
+            ParseNamespaceID(Doc);
         } else if (Document[Doc->DocOffset + 5] == '=') { // Implicit namespace
             Doc->Namespaces[Doc->NumNamespaces].Name = TextIO_Slice_Init(Doc->DocOffset + 6, Doc->DocOffset + 6);
-            ExtensibleIO_ParseNamespaceID(Doc);
+            ParseNamespaceID(Doc);
         }
     }
     /* UTF-32 */
@@ -977,7 +1035,7 @@ extern "C" {
      Ok, so parsing means that we need to identify tokens, sooo what we need is two functions, one to identify tokens, and the next to parse the tokens
      */
     
-#define CheckToken(ExtensibleIO_XMLDocument, WhitespaceType, Token2Check) _Generic((Token2Check), char*:CheckToken8, unsigned char*:CheckToken8, short*:CheckToken16, unsigned short*:CheckToken16, int*:CheckToken32, unsigned int*:CheckToken32)(XMLDocument, WhitespaceType, Token2Check)
+#define CheckToken(XMLDocument, WhitespaceType, Token2Check) _Generic((Token2Check), signed char*:CheckToken8, unsigned char*:CheckToken8, signed short*:CheckToken16, unsigned short*:CheckToken16, signed int*:CheckToken32, unsigned int*:CheckToken32)(XMLDocument, WhitespaceType, Token2Check)
     
     /*
      PeekToken = Read the token without moving the Offset, which means we need a list of tokens...
@@ -997,13 +1055,13 @@ extern "C" {
      Read the document, searching through text comparing tokens
      */
 
-    void ExtensibleIO_DOM(ExtensibleIO_XMLDocument *Doc) {
+    void DOM(XMLDocument *Doc) {
         /*
          Ok, so here we create a DOM based on the document, aka a tree of tags for the whole document
          */
     }
 
-    void ExtensibleIO_Pull(ExtensibleIO_XMLDocument *Doc) {
+    void Pull(XMLDocument *Doc) {
         /*
          This is the pull parser interface, basically we just create a node list for each XML element
          */
@@ -1017,14 +1075,16 @@ extern "C" {
      DOM -> Pull -> Tokenize
      */
 
-    void Tokenizer8(ExtensibleIO_XMLDocument *Doc) {
+    void Tokenizer8(XMLDocument *Doc) {
         UTF8 Character = Doc->Document[Doc->DocOffset];
         if (Character == '<') { // Open
-            Character = ExtensibleIO_NextCharacter_UTF8(Doc);
+            Character = NextCharacter_UTF8(Doc);
             if (Character == '!') {
-                // Could be CDATA or Comment
+                // Could be CDATA
+                ParseCDATA(Doc);
             } else if (Character == '?') {
                 // Instuction?
+                ParseInstruction(Doc);
             } else if (Character == '/') {
                 // Start of a close tag
             } else {
@@ -1045,22 +1105,23 @@ extern "C" {
 
     }
 
-    void Tokenizer(ExtensibleIO_XMLDocument *Doc) {
+    void Tokenizer(XMLDocument *Doc) {
         switch (Doc->StringType) {
             case StringType_UTF8:
-                ExtensibleIO_Tokenizer8(Doc);
+                Tokenizer8(Doc);
                 break;
 
             case StringType_UTF16:
-                ExtensibleIO_Tokenizer16(Doc);
+                Tokenizer16(Doc);
                 break;
 
             case StringType_UTF32:
-                ExtensibleIO_Tokenizer32(Doc);
+                Tokenizer32(Doc);
                 break;
                 
             case StringType_Unspecified:
             default:
+            AssertIO("Unknown Encoding");
                 break;
         }
     }

@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
     /*!
-     @enum                ExtensibleIO_XMLTokenTypes
+     @enum                XMLTokenTypes
      @constant            XMLTokenType_Unspecified                   Invalid/Default value
      @constant            XMLTokenType_Instruction                   <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
      @constant            XMLTokenType_Comment                       <!-- Comment Content -->
@@ -34,7 +34,7 @@ extern "C" {
      @constant            XMLTokenType_Namespace                     Explicit: xmlns:Namespace="URL"; Implicit: xmlns="URL";
      @constant            XMLTokenType_Text                          <Namespace:element>Text</Namespace:element>
      */
-    typedef enum ExtensibleIO_XMLTokenTypes {
+    typedef enum XMLTokenTypes {
                           XMLTokenType_Unspecified                   = 0,
                           XMLTokenType_Instruction                   = 1,
                           XMLTokenType_Comment                       = 2,
@@ -49,19 +49,19 @@ extern "C" {
                           XMLTokenType_Namespace                     = 11,
                           XMLTokenType_Text                          = 12,
                           XMLTokenType_NumTokens                     = XMLTokenType_Text,
-    } ExtensibleIO_XMLTokenTypes;
+    } XMLTokenTypes;
     
     /*!
-     @enum                ExtensibleIO_XMLVersions
+     @enum                XMLVersions
      @constant            XMLVersion_Unspecified                 Invalid/Default value
      @constant            XMLVersion_1_0                         1.0
      @constant            XMLVersion_1_1                         1.1
      */
-    typedef enum ExtensibleIO_XMLVersions {
+    typedef enum XMLVersions {
                           XMLVersion_Unspecified                 = 0,
                           XMLVersion_1_0                         = 1,
                           XMLVersion_1_1                         = 2,
-    } ExtensibleIO_XMLVersions;
+    } XMLVersions;
     
     typedef struct XMLDocument XMLDocument;
     
