@@ -81,6 +81,7 @@ set(FoundationIO_SOURCE
     "${FoundationIO_Library_Dir}/src/SortIO.c"
     "${FoundationIO_Library_Dir}/src/TestIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/CommandLineIO.c"
+    "${FoundationIO_Library_Dir}/src/TextIO/ConfigurationIO.c"
     "${FoundationIO_Library_Dir}/src/ExtensibleIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/FormatIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/LocalizationIO.c"
