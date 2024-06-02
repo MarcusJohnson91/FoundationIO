@@ -1,4 +1,4 @@
-#include "../../include/TextIO/LogIO.h"    /* Included for the our declarations */
+#include "../../include/TextIO/LogIO.h"    /* Included for our declarations */
 
 #include "../../include/AssertIO.h"        /* Included for Assertions */
 #include "../../include/FileIO.h"          /* Included for FileIO_Close */
