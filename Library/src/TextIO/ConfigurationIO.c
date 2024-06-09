@@ -1,4 +1,5 @@
 #include "../../include/TextIO/ConfigurationIO.h"    /* Included for our declarations */
+#include "../../include/AssertIO.h" /* Included for Assertions */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -17,6 +18,14 @@ extern "C" {
     
     /* So, we can actually probably define a lot of our tests in TOML... that's useful. */
     
- #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+    
+    
+    size_t TOML_GetNumTables(UTF8 *TOML) {
+        AssertIO(TOML != NULL);
+        size_t NumTables = 0;
+        // Loop over the whole document, counting the number of [ followed by a non-whitespace, non-digit character
+    }
+    
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
-#endif
+#endif /* Extern C */
