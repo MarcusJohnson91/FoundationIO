@@ -82,14 +82,16 @@ set(FoundationIO_SOURCE
     "${FoundationIO_Library_Dir}/src/TestIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/CommandLineIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/ConfigurationIO.c"
-    "${FoundationIO_Library_Dir}/src/ExtensibleIO.c"
+    "${FoundationIO_Library_Dir}/src/TextIO/ExtensibleIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/FormatIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/LocalizationIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/LogIO.c"
+    "${FoundationIO_Library_Dir}/src/TextIO/SliceIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/StringIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/StringSetIO.c"
-    "${FoundationIO_Library_Dir}/src/TextIO/TextIOTypes.c"
-    "${FoundationIO_Library_Dir}/src/TextIO/Private/TextIOTables.c"
+     "${FoundationIO_Library_Dir}/src/TextIO/YarnIO.c"
+     "${FoundationIO_Library_Dir}/src/TextIO/TextIOTypes.c"
+     "${FoundationIO_Library_Dir}/src/TextIO/Private/TextIOTables.c"
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
