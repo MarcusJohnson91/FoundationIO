@@ -354,55 +354,6 @@ void HistogramU64_Deinit(HistogramU64 Histogram);
 _Generic(Histogram, HistogramS8:HistogramS8_Deinit, HistogramU8:HistogramU8_Deinit, HistogramS16:HistogramS16_Deinit, HistogramU16:HistogramU16_Deinit, HistogramS32:HistogramS32_Deinit, HistogramU32:HistogramU32_Deinit, HistogramS64:HistogramS64_Deinit, HistogramU64:HistogramU64_Deinit)(Histogram)
 #endif /* Histogram_Deinit */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /* Slice stuff */
-    typedef struct CollectionIO_Slice {
-        size_t StartElement;
-        size_t StopElement;
-    } CollectionIO_Slice;
-
-    /*!
-     @abstract                                  Creates an instance of a CollectionIO_Slice.
-     @param       StartElement                  Where should the string start?
-     @param       StopElement                   Where should the string end?
-     @return                                    Returns the initailized Slice.
-     */
-    CollectionIO_Slice Slice_Init(size_t StartElement, size_t StopElement);
-
-    /*!
-     @abstract                                  Where does this slice start?
-     @param       Slice                         The instance of the CollectionIO_Slice.
-     @return                                    The Start of the CollectionIO_Slice in Elements.
-     */
-    size_t Slice_GetStartElement(CollectionIO_Slice Slice);
-
-    /*!
-     @abstract                                      Where does this slice end?
-     @param       Slice                             The instance of the CollectionIO_Slice.
-     @return                                        The End of the CollectionIO_Slice in Elements.
-     */
-    size_t Slice_GetStopElement(CollectionIO_Slice Slice);
-    /* Slice stuff */
-
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */

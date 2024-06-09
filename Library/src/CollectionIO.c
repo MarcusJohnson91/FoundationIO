@@ -989,24 +989,6 @@ void HistogramU8_Sort(HistogramU8 Histogram, CollectionIO_SortTypes SortType) {
         free(Histogram.Frequencies); 
     }
 
-    /* Slice stuff */
-    CollectionIO_Slice Slice_Init(size_t StartElement, size_t StopElement) {
-        AssertIO(StartElement < StopElement);
-        CollectionIO_Slice Slice = {0};
-        Slice.StartElement  = StartElement;
-        Slice.StopElement   = StopElement;
-        return Slice;
-    }
-
-    size_t Slice_GetStartElement(CollectionIO_Slice Slice) {
-        return Slice.StartElement;
-    }
-
-    size_t Slice_GetStopElement(CollectionIO_Slice Slice) {
-        return Slice.StopElement;
-    }
-    /* Slice stuff */
-
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */
