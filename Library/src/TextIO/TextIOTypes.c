@@ -31,7 +31,7 @@ extern "C" {
     }
     
 #if (sizeof(size_t) != 8)
-#error "TextIO_StringMap ONLY WORKS for 64 bit"
+#error "TextIO_StringMap ONLY WORKS on 64 bit architectures"
 #endif
 
     typedef struct TextIO_CaseMap {
