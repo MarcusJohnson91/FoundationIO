@@ -86,8 +86,6 @@ CreateHeaderFile() {
         printf '    PlatformIO_Private extern const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2];\n\n'
         printf '    PlatformIO_Private extern const UTF32 *const CaseFoldTable[CaseFoldTableSize][2];\n\n'
         printf '    PlatformIO_Private extern const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2];\n\n'
-        printf '    TextIO_CaseMap_SetUppercase(CodePoint) .Map |= (CodePoint & UnicodeCodePointMask)/n/n'
-        printf '    TextIO_CaseMap_SetLowercase(CodePoint) .Map |= ((CodePoint & UnicodeCodePointMask) << 21)/n/n'
         printf '#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n'
         printf '}\n'
         printf '#endif /* Extern C */\n\n'

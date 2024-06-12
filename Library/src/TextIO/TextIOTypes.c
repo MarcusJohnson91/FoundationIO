@@ -5,64 +5,10 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-
-    typedef struct Unicode8 {
-        size_t  NumCodeUnits;
-        char8_t Array[];
-    } Unicode8;
-
-#define UTF8Constant(Literal) {.NumCodeUnits = PlatformIO_GetStringSizeInCodeUnits(Literal), .Array = Literal}
-
-    Unicode8 Blah2 = UTF8Constant("Blah?");
-
-    bool Unicode8_Compare(Unicode8 String1, Unicode8 String2) {
-        bool StringsMatch = true;
-        if (String1.NumCodeUnits == String2.NumCodeUnits) {
-            for (size_t CodeUnit = 0; CodeUnit < String1.NumCodeUnits; CodeUnit++) {
-                if (String1.Array[CodeUnit] != String2.Array[CodeUnit]) {
-                    StringsMatch = false;
-                    break;
-                }
-            }
-        } else {
-            StringsMatch = false;
-        }
-        return StringsMatch;
-    }
     
 #if (sizeof(size_t) != 8)
 #error "TextIO_StringMap ONLY WORKS on 64 bit architectures"
 #endif
-
-    typedef struct TextIO_CaseMap {
-        const UTF32 Map;
-        /*
-        Mode (Ranged vs Literal highest bit set for Ranged, Unset for Literal.
-        Ranged:
-    Bits 0-20 = Start of the range.
-    Bits 21-41 = End of the range.
-    Bits 42-63 = Start of Replacement, so we can calculate the real value of the casefolded codepoint.
-    
-    Literal:
-    Bits 0-20 = Replacee
-    Bits 21-41 = Replacement
-    
-    ----
-    
-    better solution, store the Uppercase codepoint and a difference to the Lowercase one in 32 bits.
-    */
-    } TextIO_CaseMap;
-    
-    UTF32 TextIO_CaseMap_GetUppercase(TextIO_CaseMap CaseMap) {
-    return CaseMap.Map & UnicodeCodePointMask;
-}
-
-UTF32 TextIO_CaseMap_GetLowercase(TextIO_CaseMap CaseMap) {
-    UTF32 Uppercase = TextIO_CaseMap_GetUppercase(CaseMap);
-    uint16_t Difference = (CaseMap.Map & 0xFFE00000) >> 21;
-    int32_t Extended = SignExtend32(Difference, 11);
-return Uppercase + Extended;
-}
     
     typedef struct TextIO_StringMap {
          const union {
