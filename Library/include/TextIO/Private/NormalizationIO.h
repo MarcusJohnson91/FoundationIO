@@ -16,10 +16,10 @@
 extern "C" {
 #endif
 
-    typedef struct TextIO_StringMap TextIO_StringMap;
+    typedef struct NormalizationMap NormalizationMap;
 
-#ifndef TextIO_StringMap_SetSize
-#define TextIO_StringMap_SetSize(Size) 
+#ifndef NormalizationMap_SetSize
+#define NormalizationMap_SetSize(Size) 
 #if (Size <= 8)
 .Replacee |= ((Size - 1) & 0x7) << 21;
 #elif (Size > 8)
@@ -27,42 +27,42 @@ extern "C" {
 #endif /* Size Check */
 #endif /* TextIO_StringMap_SetSize */
 
-#ifndef TextIO_StringMap_Init1
-#define TextIO_StringMap_Init1(Replacee, Replacement1) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(1) \
+#ifndef NormalizationMap_Init1
+#define NormalizationMap_Init1(Replacee, Replacement1) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(1) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 };
 #endif /* TextIO_StringMap_Init1 */
 
-#ifndef TextIO_StringMap_Init2
-#define TextIO_StringMap_Init2(Replacee, Replacement1, Replacement2) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(2) \
+#ifndef NormalizationMap_Init2
+#define NormalizationMap_Init2(Replacee, Replacement1, Replacement2) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(2) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 .Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
-.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
+.Internal.Payload2 |= ((Replacement2 & 0x180000) >> 19); \
 };
 #endif /* TextIO_StringMap_Init2 */
 
-#ifndef TextIO_StringMap_Init3
-#define TextIO_StringMap_Init3(Replacee, Replacement1, Replacement2, Replacement3) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(3) \
+#ifndef NormalizationMap_Init3
+#define NormalizationMap_Init3(Replacee, Replacement1, Replacement2, Replacement3) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(3) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 .Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
 .Payload2 |= ((Replacement2 & 0x180000) >> 19); \
 .Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
 };
-#endif /* TextIO_StringMap_Init3 */
+#endif /* NormalizationMap_Init3 */
 
-#ifndef TextIO_StringMap_Init4
-#define TextIO_StringMap_Init4(Replacee, Replacement1, Replacement2, Replacement3, Replacement4) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(4) \
+#ifndef NormalizationMap_Init4
+#define NormalizationMap_Init4(Replacee, Replacement1, Replacement2, Replacement3, Replacement4) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(4) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 .Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
@@ -70,12 +70,12 @@ TextIO_StringMap = { \
 .Payload2 |= ((Replacement3 & 0x1FFFFF) << 2); \
 .Payload2 |= ((Replacement4 & 0x1FFFFF) << 23); \
 };
-#endif /* TextIO_StringMap_Init4 */
+#endif /* NormalizationMap_Init4 */
 
-#ifndef TextIO_StringMap_Init5
-#define TextIO_StringMap_Init5(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(5) \
+#ifndef NormalizationMap_Init5
+#define NormalizationMap_Init5(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(5) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 .Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
@@ -85,12 +85,12 @@ TextIO_StringMap = { \
 .Payload2 |= ((Replacement5 & 0xFFFFF) << 44); \
 .Payload1 |= ((Replacement5 & 0x100000) >> 20); \
 };
-#endif /* TextIO_StringMap_Init5 */
+#endif /* NormalizationMap_Init5 */
 
-#ifndef TextIO_StringMap_Init6
-#define TextIO_StringMap_Init6(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(6) \
+#ifndef NormalizationMap_Init6
+#define NormalizationMap_Init6(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(6) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 .Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
@@ -101,12 +101,12 @@ TextIO_StringMap = { \
 .Payload1 |= ((Replacement5 & 0x100000) >> 20); \
 .Payload1 |= ((Replacement6 & 0x1FFFFF) << 1); \
 };
-#endif /* TextIO_StringMap_Init6 */
+#endif /* NormalizationMap_Init6 */
 
-#ifndef TextIO_StringMap_Init7
-#define TextIO_StringMap_Init7(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6, Replacement7) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(7) \
+#ifndef NormalizationMap_Init7
+#define NormalizationMap_Init7(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6, Replacement7) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(7) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 .Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
@@ -118,12 +118,12 @@ TextIO_StringMap = { \
 .Payload1 |= ((Replacement6 & 0x1FFFFF) << 1); \
 .Payload1 |= ((Replacement7 & 0x1FFFFF) << 22); \
 };
-#endif /* TextIO_StringMap_Init7 */
+#endif /* NormalizationMap_Init7 */
 
-#ifndef TextIO_StringMap_Init8
-#define TextIO_StringMap_Init8(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6, Replacement7, Replacement8) \
-TextIO_StringMap = { \
- TextIO_StringMap_SetSize(8) \
+#ifndef NormalizationMap_Init8
+#define NormalizationMap_Init8(Replacee, Replacement1, Replacement2, Replacement3, Replacement4, Replacement5, Replacement6, Replacement7, Replacement8) \
+NormalizationMap = { \
+ NormalizationMap_SetSize(8) \
 .Replacee |= (Replacee & 0x1FFFFF); \
 .Replacee |= ((Replacement1 & 0x1FFFFF) << 24); \
 .Replacee |= ((Replacement2 & 0x7FFFF) << 45); \
@@ -136,43 +136,43 @@ TextIO_StringMap = { \
 .Payload1 |= ((Replacement7 & 0x1FFFFF) << 22); \
 .Payload1 |= ((Replacement8 & 0x1FFFFF) << 43); \
 };
-#endif /* TextIO_StringMap_Init8 */
+#endif /* NormalizationMap_Init8 */
 
-#ifndef TextIO_StringMap_InitExternal
-#define TextIO_StringMap_InitExternal(Replacee, NumReplacements, String) \
-TextIO_StringMap = { \
+#ifndef NormalizationMap_InitExternal
+#define NormalizationMap_InitExternal(Replacee, NumReplacements, String) \
+NormalizationMap = { \
     .Replacee = (Replacee & UnicodeMaxCodePoint), \
     .ReplacementSizeMinus1 = NumReplacements, \
     .Replacement = U"/"String"/", \
 };
-#endif /* TextIO_StringMap_InitExternal */
+#endif /* NormalizationMap_InitExternal */
 
-#ifndef TextIO_StringMap_Init
-#define TextIO_StringMap_Init(Replacee, NumReplacements, Replacements) \
+#ifndef NormalizationMap_Init
+#define NormalizationMap_Init(Replacee, NumReplacements, Replacements) \
 #if (NumReplacements == 1) \
-TextIO_StringMap_Init1(Replacee, Replacements)
+NormalizationMap_Init1(Replacee, Replacements)
 #elif (NumReplacements == 2) \
-TextIO_StringMap_Init2(Replacee, Replacements)
+NormalizationMap_Init2(Replacee, Replacements)
 #elif (NumReplacements == 3) \
-TextIO_StringMap_Init3(Replacee, Replacements)
+NormalizationMap_Init3(Replacee, Replacements)
 #elif (NumReplacements == 4) \
-TextIO_StringMap_Init4(Replacee, Replacements)
+NormalizationMap_Init4(Replacee, Replacements)
 #elif (NumReplacements == 5) \
-TextIO_StringMap_Init5(Replacee, Replacements)
+NormalizationMap_Init5(Replacee, Replacements)
 #elif (NumReplacements == 6) \
-TextIO_StringMap_Init6(Replacee, Replacements)
+NormalizationMap_Init6(Replacee, Replacements)
 #elif (NumReplacements == 7) \
-TextIO_StringMap_Init7(Replacee, Replacements)
+NormalizationMap_Init7(Replacee, Replacements)
 #elif (NumReplacements == 8) \
-TextIO_StringMap_Init8(Replacee, Replacements)
+NormalizationMap_Init8(Replacee, Replacements)
 #else
-TectIO_StringMap_InitExternal(Replacee, NumReplacements, String)
+NormalizationMap_InitExternal(Replacee, NumReplacements, String)
 #endif /* NumReplacements */
-#endif /* TextIO_StringMap_Init */
+#endif /* NormalizationMap_Init */
 
-    size_t TextIO_StringMap_UTF8_GetNumCodeUnitsInReplacements(TextIO_StringMap Map);
+    size_t NormalizationMap_UTF8_GetNumCodeUnitsInReplacements(NormalizationMap Map);
     
-    size_t TextIO_StringMap_UTF16_GetNumCodeUnitsInReplacements(TextIO_StringMap Map);
+    size_t NormalizationMap_UTF16_GetNumCodeUnitsInReplacements(NormalizationMap Map);
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

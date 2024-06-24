@@ -90,7 +90,7 @@ set(FoundationIO_SOURCE
     "${FoundationIO_Library_Dir}/src/TextIO/StringIO.c"
     "${FoundationIO_Library_Dir}/src/TextIO/StringSetIO.c"
      "${FoundationIO_Library_Dir}/src/TextIO/YarnIO.c"
-     "${FoundationIO_Library_Dir}/src/TextIO/TextIOTypes.c"
+     "${FoundationIO_Library_Dir}/src/TextIO/Private/NormalizationIO.c"
      "${FoundationIO_Library_Dir}/src/TextIO/Private/TextIOTables.c"
 )
 
