@@ -3,7 +3,7 @@
  @author:                  Marcus Johnson
  @copyright:               2015+
  @SPDX-License-Identifier: Apache-2.0
- @version:                 0.9.7
+ @version:                 1.0.0
  @brief:                   This header contains all of FoundationIO's public APIs in one easy to include header.
  */
 
@@ -12,9 +12,9 @@
 #ifndef FoundationIO_H
 #define FoundationIO_H
 
-#define FoundationIO_Version_Major 0
-#define FoundationIO_Version_Minor 9
-#define FoundationIO_Version_Patch 7
+#define FoundationIO_Version_Major 1
+#define FoundationIO_Version_Minor 0
+#define FoundationIO_Version_Patch 0
 
 #include "AssertIO.h"
 #include "AsynchronousIO.h"
