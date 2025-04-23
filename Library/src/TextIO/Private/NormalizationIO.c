@@ -5,10 +5,6 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-    
-#if (sizeof(size_t) != 8)
-#error "TextIO_StringMap ONLY WORKS on 64 bit architectures"
-#endif
 
     typedef enum NormalizationIOConstants {
         InternalSizeFieldMask = 0xE00000,
@@ -16,6 +12,7 @@ extern "C" {
     } NormalizationIOConstants;
     
     typedef struct NormalizationMap {
+    static_assert(sizeof(size_t) == 8, "NormalizationMap REQUIRES 64 bit pointers"); 
          const uint64_t Replacee;
          const union {
              const struct Internal {

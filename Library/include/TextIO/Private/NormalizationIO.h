@@ -4,7 +4,7 @@
  @copyright:               2024+
  @version:                 1.0.0
  @SPDX-License-Identifier: Apache-2.0
- @brief:                   This header contains code for TextIO_StringMap which is used by the casefolding, case mapping, and normalization tables.
+ @brief:                   This header contains code for NormalizationMap which is used by the casefolding, case mapping, and normalization tables.
  */
 
 #pragma once
