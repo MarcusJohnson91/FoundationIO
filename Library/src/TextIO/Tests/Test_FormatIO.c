@@ -49,25 +49,25 @@ extern "C" {
          */
 
         bool TestPassed  = false;
-        ImmutableString_UTF32 String32_1   = UTF32String("%U32s");
-        ImmutableString_UTF32 String32_2   = UTF32String("wat");
-        ImmutableString_UTF32 TestU32      = UTF32_Format(String32_1, String32_2);
+        PlatformIO_Immutable(UTF32 *) String32_1   = UTF32String("%U32s");
+        PlatformIO_Immutable(UTF32 *) String32_2   = UTF32String("wat");
+        PlatformIO_Immutable(UTF32 *) TestU32      = UTF32_Format(String32_1, String32_2);
         if (UTF32_Compare(TestU32, String32_2)) {
             printf("%s\n", UTF8String("Test1 Passed"));
         } else {
             printf("%s\n", UTF8String("Test1 Failed"));
         }
       
-        ImmutableString_UTF16 String16_1   = UTF16String("%U16s");
-        ImmutableString_UTF16 String16_2   = UTF16String("wat");
-        ImmutableString_UTF16 TestU16      = UTF16_Format(String16_1, String16_2);
+        PlatformIO_Immutable(UTF16 *) String16_1   = UTF16String("%U16s");
+        PlatformIO_Immutable(UTF16 *) String16_2   = UTF16String("wat");
+        PlatformIO_Immutable(UTF16 *) TestU16      = UTF16_Format(String16_1, String16_2);
         if (UTF16_Compare(TestU16, String16_2)) {
             printf("%s\n", UTF8String("Test1 Passed"));
         } else {
             printf("%s\n", UTF8String("Test1 Failed"));
         }
 
-        ImmutableString_UTF32 Test1     = UTF32_SubstituteSubString(UTF32String("surr %1$s ound"), UTF32String("3"), 5, 4);
+        PlatformIO_Immutable(UTF32 *) Test1     = UTF32_SubstituteSubString(UTF32String("surr %1$s ound"), UTF32String("3"), 5, 4);
         printf("%ls\n", (wchar_t*) Test1);
         bool  Test1Match = UTF32_Compare(Test1, UTF32String("surr 3 ound"));
         if (Test1Match == No) {
@@ -76,7 +76,7 @@ extern "C" {
             printf("%s\n", UTF8String("Test1 Passed"));
         }
 
-        ImmutableString_UTF32 Test2 = UTF32_SubstituteSubString(UTF32String("surr %s ound"), UTF32String("12"), 5, 2);
+        PlatformIO_Immutable(UTF32 *) Test2 = UTF32_SubstituteSubString(UTF32String("surr %s ound"), UTF32String("12"), 5, 2);
         printf("%ls\n", (wchar_t*) Test2);
         bool  Test2Match = UTF32_Compare(Test2, UTF32String("surr 12 ound"));
         if (Test2Match == No) {
@@ -85,7 +85,7 @@ extern "C" {
             printf("%s\n", UTF8String("Test2 Passed"));
         }
 
-        ImmutableString_UTF32 Test3 = UTF32_SubstituteSubString(UTF32String("surr %zu ound"), UTF32String("1,234,567"), 5, 4);
+        PlatformIO_Immutable(UTF32 *) Test3 = UTF32_SubstituteSubString(UTF32String("surr %zu ound"), UTF32String("1,234,567"), 5, 4);
         printf("%ls\n", (wchar_t*) Test3);
         bool  Test3Match = UTF32_Compare(Test3, UTF32String("surr 1,234,567 ound"));
         if (Test3Match == No) {
@@ -103,19 +103,19 @@ extern "C" {
 
         // Duplicate Specifiers, something where repition would be helpful
 
-        ImmutableString_UTF8 HLBParent1           = UTF8String("Popa");
-        ImmutableString_UTF8 HLBParent2           = UTF8String("Momma");
-        ImmutableString_UTF8 HLBRhyme1Ending      = UTF8String("ing");
-        ImmutableString_UTF8 HLBRhyme2Ending      = UTF8String("ass");
+        PlatformIO_Immutable(UTF8 *)  HLBParent1           = UTF8String("Popa");
+        PlatformIO_Immutable(UTF8 *)  HLBParent2           = UTF8String("Momma");
+        PlatformIO_Immutable(UTF8 *)  HLBRhyme1Ending      = UTF8String("ing");
+        PlatformIO_Immutable(UTF8 *)  HLBRhyme2Ending      = UTF8String("ass");
 
-        ImmutableString_UTF8 HushLittleBabyResult1 = UTF8String("Hush little baby don't say a word, Popa's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Popa's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Popa's gonna buy you a looking glass");
-        ImmutableString_UTF8 HushLittleBabyResult2 = UTF8String("Hush little baby don't say a word, Momma's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Momma's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Momma's gonna buy you a looking glass");
+        PlatformIO_Immutable(UTF8 *)  HushLittleBabyResult1 = UTF8String("Hush little baby don't say a word, Popa's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Popa's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Popa's gonna buy you a looking glass");
+        PlatformIO_Immutable(UTF8 *) HushLittleBabyResult2 = UTF8String("Hush little baby don't say a word, Momma's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Momma's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Momma's gonna buy you a looking glass");
 
-       ImmutableString_UTF8 DuplicatePosition2Dad            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent1, HLBRhyme1Ending, HLBRhyme2Ending); // %1$ = 3, %2$ = 3, %3$ = 2, Dupes = 5
+       PlatformIO_Immutable(UTF8 *)  DuplicatePosition2Dad            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent1, HLBRhyme1Ending, HLBRhyme2Ending); // %1$ = 3, %2$ = 3, %3$ = 2, Dupes = 5
         bool  DuplicatePosition2Test1          = UTF8_Compare(DuplicatePosition2Dad, HushLittleBabyResult1);
         AssertIO(DuplicatePosition2Test1 == true);
 
-        ImmutableString_UTF8 DuplicatePosition2Mom            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent2, HLBRhyme1Ending, HLBRhyme2Ending);
+        PlatformIO_Immutable(UTF8 *)  DuplicatePosition2Mom            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent2, HLBRhyme1Ending, HLBRhyme2Ending);
         bool  DuplicatePosition2Test2          = UTF8_Compare(DuplicatePosition2Mom, HushLittleBabyResult2);
         AssertIO(DuplicatePosition2Test2 == true);
 

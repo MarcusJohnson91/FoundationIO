@@ -125,7 +125,7 @@ extern "C" {
         LocalizationIO_Init();
         UTF16 *LocaleString = PlatformIO_Cast(UTF16*, _wgetenv(L"LANG"));
         
-        UTF16 *LocaleString = getenv((ImmutableString_UTF8) "LANG");
+        UTF16 *LocaleString = getenv((PlatformIO_Immutable(UTF8 *)) "LANG");
         if (LocaleString != NULL) {
             size_t   StringSize         = UTF16_GetStringSizeInCodeUnits(LocaleString);
             size_t   Offset             = UTF16_FindSubString(LocaleString, UTF16String("."), 0, 1);
@@ -160,9 +160,9 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale = localeconv();
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        DecimalSeperator = UTF8_Clone((ImmutableString_UTF8) Locale->decimal_point);
+        DecimalSeperator = UTF8_Clone((PlatformIO_Immutable(UTF8 *)) Locale->decimal_point);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        UTF16 *DecimalSeperator16 = UTF16_Clone((ImmutableString_UTF16) Locale->_W_decimal_point);
+        UTF16 *DecimalSeperator16 = UTF16_Clone((PlatformIO_Immutable(UTF16 *)) Locale->_W_decimal_point);
         if (DecimalSeperator16 != NULL) {
             UTF32 *DecimalSeperator32 = UTF16_Decode(DecimalSeperator16);
             DecimalSeperator          = UTF8_Encode(DecimalSeperator32);
@@ -178,13 +178,13 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale = localeconv();
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        UTF8 *DecimalSeperator8 = UTF8_Clone((ImmutableString_UTF8) Locale->decimal_point);
+        UTF8 *DecimalSeperator8 = UTF8_Clone((PlatformIO_Immutable(UTF8 *)) Locale->decimal_point);
         if (DecimalSeperator8 != NULL) {
             DecimalSeperator = UTF8_Convert(DecimalSeperator8);
         }
         free(DecimalSeperator8);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        DecimalSeperator           = UTF16_Clone((ImmutableString_UTF16) Locale->_W_decimal_point);
+        DecimalSeperator           = UTF16_Clone((PlatformIO_Immutable(UTF16 *)) Locale->_W_decimal_point);
 #endif
         return DecimalSeperator;
     }
@@ -194,9 +194,9 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale = localeconv();
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        GroupingSeperator = UTF8_Clone((ImmutableString_UTF8) Locale->thousands_sep);
+        GroupingSeperator = UTF8_Clone((PlatformIO_Immutable(UTF8 *)) Locale->thousands_sep);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        UTF16 *GroupingSeperator16 = UTF16_Clone((ImmutableString_UTF16) Locale->_W_thousands_sep);
+        UTF16 *GroupingSeperator16 = UTF16_Clone((PlatformIO_Immutable(UTF16 *)) Locale->_W_thousands_sep);
         if (GroupingSeperator16 != NULL) {
             UTF32 *GroupingSeperator32 = UTF16_Decode(GroupingSeperator16);
             GroupingSeperator          = UTF8_Encode(GroupingSeperator32);
@@ -212,13 +212,13 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale = localeconv();
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        UTF8 *GroupingSeperator8 = UTF8_Clone((ImmutableString_UTF8) Locale->thousands_sep);
+        UTF8 *GroupingSeperator8 = UTF8_Clone((PlatformIO_Immutable(UTF8 *)) Locale->thousands_sep);
         if (GroupingSeperator8 != NULL) {
             GroupingSeperator = UTF8_Convert(GroupingSeperator8);
         }
         free(GroupingSeperator8);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        GroupingSeperator = UTF16_Clone((ImmutableString_UTF16) Locale->_W_thousands_sep);
+        GroupingSeperator = UTF16_Clone((PlatformIO_Immutable(UTF16 *)) Locale->_W_thousands_sep);
 #endif
         return GroupingSeperator;
     }
@@ -227,8 +227,8 @@ extern "C" {
         UTF8 **GroupingSize = NULL;
         LocalizationIO_Init();
         struct lconv *Locale                    = localeconv();
-        ImmutableString_UTF8 GroupingSizeString = UTF8_Clone((ImmutableString_UTF8) Locale->grouping);
-        ImmutableStringSet_UTF8 Delimiters      = UTF8StringSet(UTF8String("/"), UTF8String("\\"));
+        PlatformIO_Immutable(UTF8 *)  GroupingSizeString = UTF8_Clone((PlatformIO_Immutable(UTF8 *)) Locale->grouping);
+        PlatformIO_Immutable(UTF8 **) Delimiters      = UTF8StringSet(UTF8String("/"), UTF8String("\\"));
 #if (PlatformIO_Language == PlatformIO_LanguageIsC)
         GroupingSize      = UTF8_Split(GroupingSizeString, Delimiters);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -241,8 +241,8 @@ extern "C" {
         UTF16 **GroupingSize = NULL;
         LocalizationIO_Init();
         struct lconv *Locale                       = localeconv();
-        UTF8         *GroupingSizeString           = UTF8_Clone((ImmutableString_UTF8) Locale->grouping);
-        ImmutableStringSet_UTF8 Delimiters         = UTF8StringSet(UTF8String("/"), UTF8String("\\"));
+        UTF8         *GroupingSizeString           = UTF8_Clone((PlatformIO_Immutable(UTF8 *)) Locale->grouping);
+        PlatformIO_Immutable(UTF8 **) Delimiters         = UTF8StringSet(UTF8String("/"), UTF8String("\\"));
         
         UTF8 ** GroupingSize8  = UTF8_Split(GroupingSizeString, Delimiters);
         UTF32 **GroupingSize32 = UTF8_StringSet_Decode((const UTF8**) GroupingSize8);
@@ -257,9 +257,9 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale = localeconv();
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        CurrencySymbol = UTF8_Clone((ImmutableString_UTF8) Locale->currency_symbol);
+        CurrencySymbol = UTF8_Clone((PlatformIO_Immutable(UTF8 *)) Locale->currency_symbol);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        CurrencySymbol    = UTF16_Convert((ImmutableString_UTF16) Locale->_W_currency_symbol);
+        CurrencySymbol    = UTF16_Convert((PlatformIO_Immutable(UTF16 *)) Locale->_W_currency_symbol);
 #endif
         return CurrencySymbol;
     }
@@ -269,14 +269,14 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale = localeconv();
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
-        CurrencySymbol = UTF8_Convert((ImmutableString_UTF8) Locale->currency_symbol);
+        CurrencySymbol = UTF8_Convert((PlatformIO_Immutable(UTF8 *)) Locale->currency_symbol);
 #elif PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsWindows)
-        CurrencySymbol    = UTF16_Clone((ImmutableString_UTF16) Locale->_W_currency_symbol);
+        CurrencySymbol    = UTF16_Clone((PlatformIO_Immutable(UTF16 *)) Locale->_W_currency_symbol);
 #endif
         return CurrencySymbol;
     }
     
-    UTF8 *UTF8_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF8 String) {
+    UTF8 *UTF8_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
         UTF8 *Delocalized = NULL;
@@ -290,7 +290,7 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF16 *UTF16_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF16 String) {
+    UTF16 *UTF16_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
 
@@ -305,7 +305,7 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF32 *UTF32_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF32 String) {
+    UTF32 *UTF32_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
         UTF32 *Delocalized       = NULL;
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
@@ -387,7 +387,7 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF8 *UTF8_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF8 String) {
+    UTF8 *UTF8_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
         UTF8 *Delocalized = NULL;
@@ -401,7 +401,7 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF16 *UTF16_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF16 String) {
+    UTF16 *UTF16_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
         UTF16 *Delocalized = NULL;
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
@@ -415,7 +415,7 @@ extern "C" {
         return Delocalized;
     }
     
-    static UTF32 UTF32_DiscoverDecimalSeperator(ImmutableString_UTF32 String) {
+    static UTF32 UTF32_DiscoverDecimalSeperator(PlatformIO_Immutable(UTF32 *) String) {
         UTF32 DiscoveredSeperator = TextIO_NULLTerminator;
         AssertIO(String != NULL);
 
@@ -431,7 +431,7 @@ extern "C" {
         return DiscoveredSeperator;
     }
     
-    UTF32 *UTF32_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF32 String) {
+    UTF32 *UTF32_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
         UTF32 *Delocalized   = NULL;

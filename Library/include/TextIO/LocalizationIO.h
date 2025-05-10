@@ -248,7 +248,7 @@ extern "C" {
      @param                           String              The string to Delocalize.
      @return                                              Returns the delocalized string.
      */
-    UTF8                             *UTF8_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF8 String);
+    UTF8                             *UTF8_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                                            Creates a string containing just digits of Base from String.
@@ -256,7 +256,7 @@ extern "C" {
      @param                           String              The string to Delocalize.
      @return                                              Returns the delocalized string.
      */
-    UTF16                            *UTF16_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF16 String);
+    UTF16                            *UTF16_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                            Creates a string containing just digits of Base from String.
@@ -264,7 +264,7 @@ extern "C" {
      @param                           String              The string to Delocalize.
      @return                                              Returns the delocalized string.
      */
-    UTF32                            *UTF32_DelocalizeInteger(TextIO_Bases Base, ImmutableString_UTF32 String);
+    UTF32                            *UTF32_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                                            Creates a string containing just digits of Base from String.
@@ -272,7 +272,7 @@ extern "C" {
      @param                           String              The string to Delocalize.
      @return                                              Returns the delocalized string.
      */
-    UTF8                             *UTF8_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF8 String);
+    UTF8                             *UTF8_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                                            Creates a string containing just digits of Base from String.
@@ -280,7 +280,7 @@ extern "C" {
      @param                           String              The string to Delocalize.
      @return                                              Returns the delocalized string.
      */
-    UTF16                            *UTF16_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF16 String);
+    UTF16                            *UTF16_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                            Creates a string containing just digits of Base from String.
@@ -288,7 +288,7 @@ extern "C" {
      @param                           String              The string to Delocalize.
      @return                                              Returns the delocalized string.
      */
-    UTF32                            *UTF32_DelocalizeDecimal(TextIO_Bases Base, ImmutableString_UTF32 String);
+    UTF32                            *UTF32_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

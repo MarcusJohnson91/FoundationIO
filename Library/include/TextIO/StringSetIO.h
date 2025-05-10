@@ -70,70 +70,70 @@ extern "C" {
      @param            StringSet                         The StringSet to get the number of strings in.
      @return                                             Returns the number of strings in StringSet.
      */
-    size_t             UTF8_StringSet_GetNumStrings(ImmutableStringSet_UTF8 StringSet);
+    size_t             UTF8_StringSet_GetNumStrings(PlatformIO_Immutable(UTF8 **) StringSet);
 
     /*!
      @abstract                                           Gets the number of strings in a StringSet.
      @param            StringSet                         The StringSet to get the number of strings in.
      @return                                             Returns the number of strings in StringSet.
      */
-    size_t             UTF16_StringSet_GetNumStrings(ImmutableStringSet_UTF16 StringSet);
+    size_t             UTF16_StringSet_GetNumStrings(PlatformIO_Immutable(UTF16 **) StringSet);
 
     /*!
      @abstract                                           Gets the number of strings in a StringSet.
      @param            StringSet                         The StringSet to get the number of strings in.
      @return                                             Returns the number of strings in StringSet.
      */
-    size_t             UTF32_StringSet_GetNumStrings(ImmutableStringSet_UTF32 StringSet);
+    size_t             UTF32_StringSet_GetNumStrings(PlatformIO_Immutable(UTF32 **) StringSet);
 
     /*!
      @abstract                                           Gets the size of each string in the StringSet in code units.
      @param            StringSet                         The StringSet to get the size of each string.
      @return                                             Returns an array containing NumStrings elements, where each element contains the size.
      */
-    size_t            *UTF8_StringSet_GetStringSizesInCodeUnits(ImmutableStringSet_UTF8 StringSet);
+    size_t            *UTF8_StringSet_GetStringSizesInCodeUnits(PlatformIO_Immutable(UTF8 **) StringSet);
 
     /*!
      @abstract                                           Gets the size of each string in the StringSet in code units.
      @param            StringSet                         The StringSet to get the size of each string.
      @return                                             Returns an array containing NumStrings elements, where each element contains the size.
      */
-    size_t            *UTF16_StringSet_GetStringSizesInCodeUnits(ImmutableStringSet_UTF16 StringSet);
+    size_t            *UTF16_StringSet_GetStringSizesInCodeUnits(PlatformIO_Immutable(UTF16 **) StringSet);
 
     /*!
      @abstract                                           Gets the size of each string in the StringSet in code points.
      @param            StringSet                         The StringSet to get the size of each string.
      @return                                             Returns an array containing NumStrings elements, where each element contains the size.
      */
-    size_t            *UTF8_StringSet_GetStringSizesInCodePoints(ImmutableStringSet_UTF8 StringSet);
+    size_t            *UTF8_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF8 **) StringSet);
 
     /*!
      @abstract                                           Gets the size of each string in the StringSet in code points.
      @param            StringSet                         The StringSet to get the size of each string.
      @return                                             Returns an array containing NumStrings elements, where each element contains the size.
      */
-    size_t            *UTF16_StringSet_GetStringSizesInCodePoints(ImmutableStringSet_UTF16 StringSet);
+    size_t            *UTF16_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF16 **) StringSet);
 
     /*!
      @abstract                                           Gets the size of each string in the StringSet in code points.
      @param            StringSet                         The StringSet to get the size of each string.
      @return                                             Returns an array containing NumStrings elements, where each element contains the size.
      */
-    size_t            *UTF32_StringSet_GetStringSizesInCodePoints(ImmutableStringSet_UTF32 StringSet);
+    size_t            *UTF32_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF32 **)  StringSet);
 
     /*!
      @abstract                                           Decodes a StringSet to a UTF32_StringSet.
      @param            StringSet                         The StringSet to decode.
      @return                                             Returns the decoded StringSet.
      */
-    UTF32            **UTF8_StringSet_Decode(ImmutableStringSet_UTF8 StringSet);
+    UTF32            **UTF8_StringSet_Decode(PlatformIO_Immutable(UTF8 **) StringSet);
 
     /*!
      @abstract                                           Decodes a StringSet to a UTF32_StringSet.
      @param            StringSet                         The StringSet to decode.
      @return                                             Returns the decoded StringSet.
      */
-    UTF32            **UTF16_StringSet_Decode(ImmutableStringSet_UTF16 StringSet);
+    UTF32            **UTF16_StringSet_Decode(PlatformIO_Immutable(UTF16 **) StringSet);
 
     /*!
      @abstract                                           Encodes a StringSet to a UTF8_StringSet.
@@ -154,21 +154,21 @@ extern "C" {
      @param            StringSet                         The StringSet to convert to a string.
      @return                                             Returns the encoded String.
      */
-    UTF8              *UTF8_StringSet_Flatten(ImmutableStringSet_UTF8 StringSet);
+    UTF8              *UTF8_StringSet_Flatten(PlatformIO_Immutable(UTF8 **) StringSet);
 
     /*!
      @abstract                                           Creates a String from a StringSet.
      @param            StringSet                         The StringSet to convert to a string.
      @return                                             Returns the encoded String.
      */
-    UTF16             *UTF16_StringSet_Flatten(ImmutableStringSet_UTF16 StringSet);
+    UTF16             *UTF16_StringSet_Flatten(PlatformIO_Immutable(UTF16 **) StringSet);
 
     /*!
      @abstract                                           Creates a String from a StringSet.
      @param            StringSet                         The StringSet to convert to a string.
      @return                                             Returns the encoded String.
      */
-    UTF32             *UTF32_StringSet_Flatten(ImmutableStringSet_UTF32 StringSet);
+    UTF32             *UTF32_StringSet_Flatten(PlatformIO_Immutable(UTF32 **)  StringSet);
 
     /*!
      @abstract                                           Deletes a UTF-8 encoded StringSet (like is returned by SplitString).

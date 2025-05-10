@@ -23,7 +23,7 @@ extern "C" {
         Log_LogFile = File;
     }
     
-    static void Log_OpenLogFilePath(ImmutableString_UTF8 Path) {
+    static void Log_OpenLogFilePath(PlatformIO_Immutable(UTF8 *) Path) {
         AssertIO(Path != NULL);
 
         UTF8 *FoldedPath = UTF8_CaseFold(Path);
@@ -44,21 +44,21 @@ extern "C" {
         }
     }
     
-    void Log(LogIO_Severities Severity, ImmutableString_UTF8 FunctionName, ImmutableString_UTF8 Description, ...) {
+    void Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) {
         AssertIO(FunctionName != NULL);
         AssertIO(Description != NULL);
         if (Log_LogFile == NULL) {
             Log_LogFile  = stderr;
         }
 
-        ImmutableString_UTF8 Severities[3] = {
+        PlatformIO_Immutable(UTF8 *)  Severities[3] = {
             [0] = UTF8String("ERROR"),
             [1] = UTF8String("Mistake"),
             [2] = UTF8String("Warning"),
         };
 
         UTF8 *SecurityName8 = NULL;
-        ImmutableString_UTF8 WarnString = Severities[Severity - 1];
+        PlatformIO_Immutable(UTF8 *) WarnString = Severities[Severity - 1];
         if (Log_ProgramName8 != NULL) {
             int Size           = snprintf(NULL, 0, "%s's %s in %s: ", Log_ProgramName8, WarnString, FunctionName);
             SecurityName8      = UTF8_Init((size_t) Size);

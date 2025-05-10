@@ -27,7 +27,7 @@ extern "C" {
      @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
      @param             Path8                           Path is a UTF8 encoded string.
      */
-    UTF8               *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8);
+    UTF8               *FileIO_UTF8_GetFileName(PlatformIO_Immutable(UTF8 *) Path8);
 
     /*!
      @abstract                                          Returns just the filename portion of a path string
@@ -35,7 +35,7 @@ extern "C" {
      @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
      @param             Path16                          Path is a UTF16 encoded string.
      */
-    UTF16              *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16);
+    UTF16              *FileIO_UTF16_GetFileName(PlatformIO_Immutable(UTF16 *) Path16);
     
     /*!
      @abstract                                          Returns just the filename portion of a path string
@@ -43,28 +43,28 @@ extern "C" {
      @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
      @param             Path32                          Path is a UTF32 encoded string.
      */
-    UTF32              *FileIO_UTF32_GetFileName(ImmutableString_UTF32 Path32);
+    UTF32              *FileIO_UTF32_GetFileName(PlatformIO_Immutable(UTF32 *) Path32);
 
     /*!
      @abstract                                         Returns the extension from a filename
      @remark                                           Stops at the earliest period, e.g. '.tar.gz' is extracted properly
      @param             Path8                          Path is a UTF8 encoded string
      */
-    UTF8               *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8);
+    UTF8               *FileIO_UTF8_GetFileExtension(PlatformIO_Immutable(UTF8 *) Path8);
 
     /*!
      @abstract                                         Returns the extension from a filename
      @remark                                           Stops at the earliest period, e.g. '.tar.gz' is extracted properly
      @param             Path16                         Path is a UTF16 encoded string
      */
-    UTF16              *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16);
+    UTF16              *FileIO_UTF16_GetFileExtension(PlatformIO_Immutable(UTF16 *) Path16);
     
     /*!
      @abstract                                         Returns the extension from a filename
      @remark                                           Stops at the earliest period, e.g. '.tar.gz' is extracted properly
      @param             Path32                         Path is a UTF32 encoded string
      */
-    UTF32              *FileIO_UTF32_GetFileExtension(ImmutableString_UTF32 Path32);
+    UTF32              *FileIO_UTF32_GetFileExtension(PlatformIO_Immutable(UTF32 *) Path32);
     /* Path Operations */
 
     /* File Operations */

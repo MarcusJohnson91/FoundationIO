@@ -29,7 +29,7 @@ extern "C" {
         AsynchronousIO_FileModes   Mode; // like was the file opened for reading/writing, etc
     } FileIO_FILE;
     
-    UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
+    UTF8 *FileIO_UTF8_GetFileName(PlatformIO_Immutable(UTF8 *) Path8) {
         AssertIO(Path8 != NULL);
 
         UTF8  *Base                    = NULL;
@@ -57,7 +57,7 @@ extern "C" {
         return Base;
     }
     
-    UTF16 *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16) {
+    UTF16 *FileIO_UTF16_GetFileName(PlatformIO_Immutable(UTF16 *) Path16) {
         AssertIO(Path16 != NULL);
 
         UTF16 *Base                    = NULL;
@@ -85,7 +85,7 @@ extern "C" {
         return Base;
     }
     
-    UTF32 *FileIO_UTF32_GetFileName(ImmutableString_UTF32 Path32) {
+    UTF32 *FileIO_UTF32_GetFileName(PlatformIO_Immutable(UTF32 *) Path32) {
         AssertIO(Path32 != NULL);
         UTF32 *Base                  = NULL;
         size_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
@@ -112,7 +112,7 @@ extern "C" {
         return Base;
     }
     
-    UTF8 *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8) {
+    UTF8 *FileIO_UTF8_GetFileExtension(PlatformIO_Immutable(UTF8 *) Path8) {
         AssertIO(Path8 != NULL);
 
         UTF8    *Base                  = NULL;
@@ -152,7 +152,7 @@ extern "C" {
         return Base;
     }
     
-    UTF16 *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16) {
+    UTF16 *FileIO_UTF16_GetFileExtension(PlatformIO_Immutable(UTF16 *) Path16) {
         AssertIO(Path16 != NULL);
 
         UTF16 *Base                    = NULL;
@@ -192,7 +192,7 @@ extern "C" {
         return Base;
     }
     
-    UTF32 *FileIO_UTF32_GetFileExtension(ImmutableString_UTF32 Path32) {
+    UTF32 *FileIO_UTF32_GetFileExtension(PlatformIO_Immutable(UTF32 *) Path32) {
         AssertIO(Path32 != NULL);
 
         UTF32 *Base                  = NULL;
@@ -431,7 +431,7 @@ extern "C" {
     /*!
      @abstract Dirname replacement
      */
-    UTF8 *FileIO_UTF8_GetDirectoryName(ImmutableString_UTF8 Path8) {
+    UTF8 *FileIO_UTF8_GetDirectoryName(PlatformIO_Immutable(UTF8 *) Path8) {
         AssertIO(Path8 != NULL);
 
         UTF8 *DirectoryName = NULL;
@@ -442,7 +442,7 @@ extern "C" {
     /*!
      @abstract Dirname replacement
      */
-    UTF16 *FileIO_UTF16_GetDirectoryName(ImmutableString_UTF16 Path16) {
+    UTF16 *FileIO_UTF16_GetDirectoryName(PlatformIO_Immutable(UTF16 *) Path16) {
         AssertIO(Path16 != NULL);
 
         UTF16 *DirectoryName = NULL;

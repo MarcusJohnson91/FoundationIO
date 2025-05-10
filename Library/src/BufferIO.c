@@ -749,7 +749,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF8(BitBuffer *BitB, ImmutableString_UTF8 String2Write, BufferIO_StringTerminators WriteType) {
+    void BitBuffer_WriteUTF8(BitBuffer *BitB, PlatformIO_Immutable(UTF8 *)  String2Write, BufferIO_StringTerminators WriteType) {
         AssertIO(BitB != NULL);
         AssertIO(String2Write != NULL);
         AssertIO(WriteType == StringTerminator_NULL || WriteType == StringTerminator_Sized);
@@ -764,7 +764,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF16(BitBuffer *BitB, ImmutableString_UTF16 String2Write, BufferIO_StringTerminators WriteType) {
+    void BitBuffer_WriteUTF16(BitBuffer *BitB, PlatformIO_Immutable(UTF16 *) String2Write, BufferIO_StringTerminators WriteType) {
         AssertIO(BitB != NULL);
         AssertIO(String2Write != NULL);
         AssertIO(WriteType == StringTerminator_NULL || WriteType == StringTerminator_Sized);

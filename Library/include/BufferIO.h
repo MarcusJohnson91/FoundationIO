@@ -29,68 +29,68 @@ extern "C" {
      @constant     UnaryType_Whole                 Supports whole numbers (including zero).
      @constant     UnaryType_Truncated             Supports all the integers including zero and negatives (up to 2^63 anyway).
      */
-    typedef enum BufferIO_UnaryTypes : uint8_t {
+    typedef enum UnaryTypes : uint8_t {
                    UnaryType_Unspecified           = 0,
                    UnaryType_Natural               = 1,
                    UnaryType_Whole                 = 3,
                    UnaryType_Truncated             = 2,
-    } BufferIO_UnaryTypes;
+    } UnaryTypes;
 
     /*!
-     @enum         BufferIO_UnaryTerminators
+     @enum         UnaryTerminators
      @constant     UnaryTerminator_Zero            The stop bit is 0.
      @constant     UnaryTerminator_One             The stop bit is 1.
      */
-    typedef enum BufferIO_UnaryTerminators : uint8_t {
+    typedef enum UnaryTerminators : uint8_t {
                    UnaryTerminator_Zero            = 0,
                    UnaryTerminator_One             = 1,
-    } BufferIO_UnaryTerminators;
+    } UnaryTerminators;
 
     /*!
-     @enum        BufferIO_ByteOrders
+     @enum        ByteOrders
      @constant    ByteOrder_Unspecified            Invalid/Native for Strings.
      @rename      ByteOrder_LSByteIsNearest        Is now ByteOrder_Right2Left aka LSByte aka LSByteFirst aka little endian.
      @rename      ByteOrder_LSByteIsFarthest       Is now ByteOrder_Left2Right  aka MSByte aka MSByteFirst aka big endian.
      @constant    ByteOrder_Right2Left             The least significant byte is the closest to the current offset.
      @constant    ByteOrder_Left2Right             The least significant byte is the farthest from the current offset.
      */
-    typedef enum BufferIO_ByteOrders : uint8_t {
+    typedef enum ByteOrders : uint8_t {
                   ByteOrder_Unspecified          = 0,
                   ByteOrder_Right2Left           = 1,
                   ByteOrder_Left2Right           = 2,
-    } BufferIO_ByteOrders;
+    } ByteOrders;
 
     /*!
-     @enum         BufferIO_BitOrders
+     @enum         BitOrders
      @constant     BitOrder_Unspecified            Invalid bit order.
      @rename       BitOrder_LSBitIsNearest         Is now BitOrder_Right2Left aka LSByte aka LSByteFirst aka little endian.
      @rename       BitOrder_LSBitIsFarthest        Is now BitOrder_Left2Right  aka MSByte aka MSByteFirst aka big endian.
      @constant     BitOrder_LSBitIsNearest         The least significant byte is the closest to the current offset; previously LSBit.
      @constant     BitOrder_Left2Right             The least significant byte is the farthest from the current offset; previously MSBit.
      */
-    typedef enum BufferIO_BitOrders : uint8_t {
+    typedef enum BitOrders : uint8_t {
                    BitOrder_Unspecified            = 0,
                    BitOrder_Right2Left             = 1,
                    BitOrder_Left2Right             = 2,
-    } BufferIO_BitOrders;
+    } BitOrders;
 
     /*!
-     @enum         BufferIO_StringTerminators
+     @enum         StringTerminators
      @constant     StringTerminator_NULL           Write the NULL Terminator.
      @constant     StringTerminator_Sized          Do not write the null terminaotr, there's a size field.
      */
-    typedef enum BufferIO_StringTerminators : uint8_t {
+    typedef enum StringTerminators : uint8_t {
                    StringTerminator_Unspecified    = 0,
                    StringTerminator_NULL           = 1,
                    StringTerminator_Sized          = 2,
-    } BufferIO_StringTerminators;
+    } StringTerminators;
 
     /*!
-     @enum         BufferIO_CRCPolynomials
+     @enum         CRCPolynomials
      @constant     CRCPolynomial_Unspecified       Invalid Polynomial.
      @constant     CRCPolynomial_IEEE802_3         CRC32 Polynomial used in PNG, MPEG-4, Zip, etc.
      */
-    typedef enum BufferIO_CRCPolynomials : uint64_t {
+    typedef enum CRCPolynomials : uint64_t {
                    CRCPolynomial_Unspecified       = 0,
                    CRCPolynomial_IEEE802_3         = 0xEDB88320,
     } BufferIO_CRCPolynomials;
@@ -380,7 +380,7 @@ extern "C" {
      @param        String2Write                    The string to write to the BitBuffer.
      @param        WriteType                       Should the NULL terminator be written?
      */
-    void           BitBuffer_WriteUTF8(BitBuffer *BitB, ImmutableString_UTF8 String2Write, BufferIO_StringTerminators WriteType);
+    void           BitBuffer_WriteUTF8(BitBuffer *BitB, PlatformIO_Immutable(UTF8 *)  String2Write, BufferIO_StringTerminators WriteType);
 
     /*!
      @abstract                                     Writes a UTF-16 encoded string to the BitBuffer.
@@ -389,7 +389,7 @@ extern "C" {
      @param        String2Write                    The string to write to the BitBuffer.
      @param        WriteType                       Should the NULL terminator be written?
      */
-    void           BitBuffer_WriteUTF16(BitBuffer *BitB, ImmutableString_UTF16 String2Write, BufferIO_StringTerminators WriteType);
+    void           BitBuffer_WriteUTF16(BitBuffer *BitB, PlatformIO_Immutable(UTF16 *) String2Write, BufferIO_StringTerminators WriteType);
 
     /*!
      @abstract                                     Writes a GUUID to the BitBuffer.

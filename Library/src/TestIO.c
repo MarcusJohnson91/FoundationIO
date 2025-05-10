@@ -138,8 +138,8 @@ extern "C" {
         }
     }
     */
-    static ImmutableStringSet_UTF8 UTF8_TestIO_GetFunctionNamesAsStringSet(TestIO_Suite *Suite) {
-        ImmutableStringSet_UTF8 StringSet = NULL;
+    static  PlatformIO_Immutable(UTF8 **) UTF8_TestIO_GetFunctionNamesAsStringSet(TestIO_Suite *Suite) {
+        PlatformIO_Immutable(UTF8 **) StringSet = NULL;
         if (Suite != NULL) {
             size_t NumEnabledTests               = 0ULL;
             for (size_t Test = 0; Test < Suite->NumTests; Test++) {

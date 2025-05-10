@@ -47,7 +47,7 @@ typedef struct UTF16CodePoint {
     char16_t CodeUnits[UTF16MaxCodeUnitsInCodePoint];
 } UTF16CodePoint;
 
-    static UTF8CodePoint UTF8_ExtractCodePoint(ImmutableString_UTF8 String) {
+    static UTF8CodePoint UTF8_ExtractCodePoint(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         UTF8CodePoint CodePoint                                       = {};
         switch (UTF8_GetCodePointSizeInCodeUnits(String[0])) {
@@ -79,7 +79,7 @@ CodePoint.CodeUnits[3] = String[3];
         return CodePoint;
     }
 
-    static UTF16CodePoint UTF16_ExtractCodePointAsCodeUnits(ImmutableString_UTF16 String) {
+    static UTF16CodePoint UTF16_ExtractCodePointAsCodeUnits(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         UTF16CodePoint CodePoint                                   = {};
         if (String[0] < UTF16HighSurrogateStart || String[0] > UTF16LowSurrogateEnd) {
@@ -93,7 +93,7 @@ CodePoint.CodeUnits[3] = String[3];
         return CodePoint;
     }
 
-    static UTF32 UTF32_ExtractCodePointAsCodeUnits(ImmutableString_UTF32 String) {
+    static UTF32 UTF32_ExtractCodePointAsCodeUnits(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
 
         return String[0];
@@ -333,7 +333,7 @@ CodePoint.CodeUnits[3] = String[3];
         return UTF16CodeUnits;
     }
     
-    UTF32 UTF8_ExtractCodePoint(ImmutableString_UTF8 StartCodeUnit) { // The CodeUnits have already been checked
+    UTF32 UTF8_ExtractCodePoint(PlatformIO_Immutable(UTF8 *) StartCodeUnit) { // The CodeUnits have already been checked
         AssertIO(StartCodeUnit != NULL);
         UTF32 CodePoint                       = 0;
         UTF8 *Extracted                   = UTF8_ExtractCodePointAsCodeUnits(StartCodeUnit);
@@ -385,7 +385,7 @@ CodePoint.CodeUnits[3] = String[3];
         return CodePoint;
     }
     
-    UTF32 UTF16_ExtractCodePoint(ImmutableString_UTF16 CodeUnits) {
+    UTF32 UTF16_ExtractCodePoint(PlatformIO_Immutable(UTF16 *) CodeUnits) {
         AssertIO(CodeUnits != NULL);
         UTF32 CodePoint                       = 0;
         UTF16 *Extracted                  = UTF16_ExtractCodePointAsCodeUnits(CodeUnits);
@@ -404,7 +404,7 @@ CodePoint.CodeUnits[3] = String[3];
         return CodePoint;
     }
 
-    UTF8 *UTF8_ExtractGrapheme(ImmutableString_UTF8 String, size_t GraphemeIndex) { // We could just return the size of the Grapheme in UTF8 CodeUnits
+    UTF8 *UTF8_ExtractGrapheme(PlatformIO_Immutable(UTF8 *) String, size_t GraphemeIndex) { // We could just return the size of the Grapheme in UTF8 CodeUnits
         AssertIO(String != NULL);
         UTF8 *Grapheme        = NULL;
         /*
@@ -423,7 +423,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Grapheme;
     }
 
-    UTF16 *UTF16_ExtractGrapheme(ImmutableString_UTF16 String, size_t GraphemeIndex) {
+    UTF16 *UTF16_ExtractGrapheme(PlatformIO_Immutable(UTF16 *) String, size_t GraphemeIndex) {
         AssertIO(String != NULL);
         UTF16 *Grapheme        = NULL;
         UTF32 *String32   = UTF16_Decode(String);
@@ -434,7 +434,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Grapheme;
     }
 
-    UTF32 *UTF32_ExtractGrapheme(ImmutableString_UTF32 String, size_t GraphemeIndex) {
+    UTF32 *UTF32_ExtractGrapheme(PlatformIO_Immutable(UTF32 *) String, size_t GraphemeIndex) {
         AssertIO(String != NULL);
         UTF32 *Grapheme         = NULL;
         UTF32  CodePoint1   = 0;
@@ -518,7 +518,7 @@ CodePoint.CodeUnits[3] = String[3];
         return GraphemeSize;
     }
     
-    size_t UTF8_GetStringSizeInCodeUnits(ImmutableString_UTF8 String) {
+    size_t UTF8_GetStringSizeInCodeUnits(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         size_t StringSizeInCodeUnits = String[-sizeof(size_t)];
         /*
@@ -529,7 +529,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringSizeInCodeUnits;
     }
     
-    size_t UTF16_GetStringSizeInCodeUnits(ImmutableString_UTF16 String) {
+    size_t UTF16_GetStringSizeInCodeUnits(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         size_t StringSizeInCodeUnits = String[-(sizeof(size_t) / sizeof(UTF16))];
         while (String[StringSizeInCodeUnits] != TextIO_NULLTerminator) {
@@ -538,7 +538,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringSizeInCodeUnits;
     }
     
-    static size_t UTF32_GetStringSizeInUTF8CodeUnits(ImmutableString_UTF32 String) {
+    static size_t UTF32_GetStringSizeInUTF8CodeUnits(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         size_t UTF8CodeUnits      = 0;
         size_t CodePoint          = 0;
@@ -549,7 +549,7 @@ CodePoint.CodeUnits[3] = String[3];
         return UTF8CodeUnits;
     }
     
-    static size_t UTF32_GetStringSizeInUTF16CodeUnits(ImmutableString_UTF32 String) {
+    static size_t UTF32_GetStringSizeInUTF16CodeUnits(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         size_t UTF16CodeUnits         = 0;
         size_t CodePoint          = 0;
@@ -560,7 +560,7 @@ CodePoint.CodeUnits[3] = String[3];
         return UTF16CodeUnits;
     }
     
-    size_t UTF8_GetStringSizeInCodePoints(ImmutableString_UTF8 String) {
+    size_t UTF8_GetStringSizeInCodePoints(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         size_t StringSizeInCodePoints = 0;
         size_t CodeUnit               = 0;
@@ -571,7 +571,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringSizeInCodePoints;
     }
     
-    size_t UTF16_GetStringSizeInCodePoints(ImmutableString_UTF16 String) {
+    size_t UTF16_GetStringSizeInCodePoints(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         size_t NumCodePoints         = 0;
         size_t CodeUnit              = 0;
@@ -582,7 +582,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumCodePoints;
     }
     
-    size_t UTF32_GetStringSizeInCodePoints(ImmutableString_UTF32 String) {
+    size_t UTF32_GetStringSizeInCodePoints(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         size_t NumCodePoints = String[-(sizeof(size_t) / sizeof(UTF32))];
         while (String[NumCodePoints] != TextIO_NULLTerminator) {
@@ -612,7 +612,7 @@ CodePoint.CodeUnits[3] = String[3];
         return SizeDifference;
     }
     
-    size_t UTF8_GetStringSizeInGraphemes(ImmutableString_UTF8 String) {
+    size_t UTF8_GetStringSizeInGraphemes(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         size_t NumGraphemes    = 0;
         UTF32 *Decoded     = UTF8_Decode(String);
@@ -621,7 +621,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumGraphemes;
     }
     
-    size_t UTF16_GetStringSizeInGraphemes(ImmutableString_UTF16 String) {
+    size_t UTF16_GetStringSizeInGraphemes(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         size_t NumGraphemes    = 0;
         UTF32 *Decoded     = UTF16_Decode(String);
@@ -630,7 +630,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumGraphemes;
     }
     
-    size_t UTF32_GetStringSizeInGraphemes(ImmutableString_UTF32 String) {
+    size_t UTF32_GetStringSizeInGraphemes(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         size_t NumGraphemes            = 0;
         size_t CodePoint               = 1;
@@ -653,7 +653,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumGraphemes;
     }
 
-    size_t UTF8_GetWordSizeInCodePoints(ImmutableString_UTF8 String) {
+    size_t UTF8_GetWordSizeInCodePoints(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         size_t WordSize      = 0;
         size_t CodeUnit  = 0;
@@ -666,7 +666,7 @@ CodePoint.CodeUnits[3] = String[3];
         return WordSize;
     }
     
-    size_t UTF16_GetWordSizeInCodePoints(ImmutableString_UTF16 String) {
+    size_t UTF16_GetWordSizeInCodePoints(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         size_t WordSize      = 0;
         size_t CodeUnit  = 0;
@@ -679,7 +679,7 @@ CodePoint.CodeUnits[3] = String[3];
         return WordSize;
     }
 
-    size_t UTF8_GetWordBreakSizeInCodePoints(ImmutableString_UTF8 String) {
+    size_t UTF8_GetWordBreakSizeInCodePoints(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         size_t WordBreakSize   = 0;
         /* Count the number of word breaks, for example /cr/lf before the start of a new word */
@@ -693,7 +693,7 @@ CodePoint.CodeUnits[3] = String[3];
         return WordBreakSize;
     }
 
-    size_t UTF16_GetWordBreakSizeInCodePoints(ImmutableString_UTF16 String) {
+    size_t UTF16_GetWordBreakSizeInCodePoints(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         size_t WordBreakSize   = 0;
         size_t CodeUnit    = 0;
@@ -732,7 +732,7 @@ CodePoint.CodeUnits[3] = String[3];
     }
     /* Low Level functions, be careful */
     
-    bool UTF8_HasBOM(ImmutableString_UTF8 String) {
+    bool UTF8_HasBOM(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         bool StringHasABOM        = No;
         size_t StringSize     = UTF8_GetStringSizeInCodeUnits(String);
@@ -744,7 +744,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringHasABOM;
     }
     
-    bool UTF16_HasBOM(ImmutableString_UTF16 String) {
+    bool UTF16_HasBOM(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         bool StringHasABOM    = No;
         if (String[0] == UTF16BOM_LE || String[0] == UTF16BOM_BE) {
@@ -753,7 +753,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringHasABOM;
     }
     
-    bool UTF32_HasBOM(ImmutableString_UTF32 String) {
+    bool UTF32_HasBOM(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         bool StringHasABOM    = No;
         if (String[0] == UTF32BOM_LE || String[0] == UTF32BOM_BE) {
@@ -1030,7 +1030,7 @@ CodePoint.CodeUnits[3] = String[3];
 
     }
     
-    bool UTF8_IsUNCPath(ImmutableString_UTF8 String) {
+    bool UTF8_IsUNCPath(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         bool StringIsUNCPath = No;
         size_t StringSize       = UTF8_GetStringSizeInCodePoints(String);
@@ -1061,7 +1061,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringIsUNCPath;
     }
     
-    bool UTF16_IsUNCPath(ImmutableString_UTF16 String) {
+    bool UTF16_IsUNCPath(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         bool StringIsUNCPath = No;
         size_t StringSize       = UTF16_GetStringSizeInCodePoints(String);
@@ -1092,7 +1092,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringIsUNCPath;
     }
     
-    bool UTF32_IsUNCPath(ImmutableString_UTF32 String) {
+    bool UTF32_IsUNCPath(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         bool StringIsUNCPath        = No;
         size_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
@@ -1124,7 +1124,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringIsUNCPath;
     }
     
-    bool UTF8_IsAbsolutePath(ImmutableString_UTF8 String) {
+    bool UTF8_IsAbsolutePath(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         bool PathIsAbsolute = No;
         bool StringHasBOM      = UTF8_HasBOM(String);
@@ -1146,7 +1146,7 @@ CodePoint.CodeUnits[3] = String[3];
         return PathIsAbsolute;
     }
     
-    bool UTF16_IsAbsolutePath(ImmutableString_UTF16 String) {
+    bool UTF16_IsAbsolutePath(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         bool PathIsAbsolute        = No;
         bool StringHasBOM      = UTF16_HasBOM(String);
@@ -1168,7 +1168,7 @@ CodePoint.CodeUnits[3] = String[3];
         return PathIsAbsolute;
     }
     
-    bool UTF32_IsAbsolutePath(ImmutableString_UTF32 String) {
+    bool UTF32_IsAbsolutePath(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         bool PathIsAbsolute        = No;
         bool StringHasBOM      = UTF32_HasBOM(String);
@@ -1200,7 +1200,7 @@ CodePoint.CodeUnits[3] = String[3];
         return IsWhitespace;
     }
     
-    bool UTF8_HasNewLine(ImmutableString_UTF8 String) {
+    bool UTF8_HasNewLine(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         bool StringHasNewLine = No;
         UTF32 *String32   = UTF8_Decode(String);
@@ -1209,7 +1209,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringHasNewLine;
     }
     
-    bool UTF16_HasNewLine(ImmutableString_UTF16 String) {
+    bool UTF16_HasNewLine(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         bool StringHasNewLine = No;
         UTF32 *String32   = UTF16_Decode(String);
@@ -1218,7 +1218,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringHasNewLine;
     }
     
-    bool UTF32_HasNewLine(ImmutableString_UTF32 String) {
+    bool UTF32_HasNewLine(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         bool HasNewLine                  = No;
         size_t CodePoint             = 0ULL;
@@ -1256,7 +1256,7 @@ CodePoint.CodeUnits[3] = String[3];
         return CodePointIsUppercase;
     }
     
-    bool UTF8_IsValid(ImmutableString_UTF8 String) {
+    bool UTF8_IsValid(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         size_t   CodeUnit    = 0ULL;
         bool     IsValidUTF8 = Yes;
@@ -1286,7 +1286,7 @@ CodePoint.CodeUnits[3] = String[3];
         return IsValidUTF8;
     }
     
-    bool UTF16_IsValid(ImmutableString_UTF16 String) {
+    bool UTF16_IsValid(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         size_t   CodeUnit             = 1ULL;
         bool     IsValidUTF16         = Yes;
@@ -1300,7 +1300,7 @@ CodePoint.CodeUnits[3] = String[3];
         return IsValidUTF16;
     }
     
-    bool UTF32_IsValid(ImmutableString_UTF32 String) {
+    bool UTF32_IsValid(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         size_t   CodePoint       = 0ULL;
         bool     IsValidUTF32    = Yes;
@@ -1351,7 +1351,7 @@ CodePoint.CodeUnits[3] = String[3];
         return ByteOrder;
     }
     
-    UTF8 *UTF8_AddBOM(ImmutableString_UTF8 String, StringIO_BOMs BOM2Add) {
+    UTF8 *UTF8_AddBOM(PlatformIO_Immutable(UTF8 *) String, StringIO_BOMs BOM2Add) {
         AssertIO(String != NULL);
         AssertIO(BOM2Add != StringIO_BOM_Unspecified);
         UTF32 *String32  = UTF8_Decode(String);
@@ -1361,7 +1361,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringWithBOM;
     }
     
-    UTF16 *UTF16_AddBOM(ImmutableString_UTF16 String, StringIO_BOMs BOM2Add) {
+    UTF16 *UTF16_AddBOM(PlatformIO_Immutable(UTF16 *) String, StringIO_BOMs BOM2Add) {
         AssertIO(String != NULL);
         AssertIO(BOM2Add != StringIO_BOM_Unspecified);
         UTF32 *String32  = UTF16_Decode(String);
@@ -1371,7 +1371,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringWithBOM;
     }
     
-    UTF32 *UTF32_AddBOM(ImmutableString_UTF32 String, StringIO_BOMs BOM2Add) {
+    UTF32 *UTF32_AddBOM(PlatformIO_Immutable(UTF32 *) String, StringIO_BOMs BOM2Add) {
         AssertIO(String != NULL);
         AssertIO(BOM2Add != StringIO_BOM_Unspecified);
         UTF32   *StringWithBOM        = NULL;
@@ -1399,7 +1399,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringWithBOM;
     }
     
-    UTF8 *UTF8_RemoveBOM(ImmutableString_UTF8 String) {
+    UTF8 *UTF8_RemoveBOM(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         UTF8    *BOMLessString                      = NULL;
         size_t   StringSize                         = 0ULL;
@@ -1415,7 +1415,7 @@ CodePoint.CodeUnits[3] = String[3];
         return BOMLessString;
     }
     
-    UTF16 *UTF16_RemoveBOM(ImmutableString_UTF16 String) {
+    UTF16 *UTF16_RemoveBOM(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         UTF16   *BOMLessString                      = NULL;
         size_t   StringSize                         = 0ULL;
@@ -1431,7 +1431,7 @@ CodePoint.CodeUnits[3] = String[3];
         return BOMLessString;
     }
     
-    UTF32 *UTF32_RemoveBOM(ImmutableString_UTF32 String) {
+    UTF32 *UTF32_RemoveBOM(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         UTF32   *BOMLessString                   = NULL;
         size_t   StringSize                      = 0ULL;
@@ -1447,7 +1447,7 @@ CodePoint.CodeUnits[3] = String[3];
         return BOMLessString;
     }
     
-    UTF32 *UTF8_Decode(ImmutableString_UTF8 String) {
+    UTF32 *UTF8_Decode(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         size_t   CodeUnit                        = 0ULL;
         size_t   StringSize                      = UTF8_GetStringSizeInCodePoints(String);
@@ -1460,7 +1460,7 @@ CodePoint.CodeUnits[3] = String[3];
         return DecodedString;
     }
     
-    UTF32 *UTF16_Decode(ImmutableString_UTF16 String) {
+    UTF32 *UTF16_Decode(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         size_t   CodeUnit                        = 0ULL;
         size_t   StringSize                      = UTF16_GetStringSizeInCodePoints(String);
@@ -1473,7 +1473,7 @@ CodePoint.CodeUnits[3] = String[3];
         return DecodedString;
     }
     
-    UTF8 *UTF8_Encode(ImmutableString_UTF32 String) {
+    UTF8 *UTF8_Encode(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         size_t   UTF8CodeUnits                     = UTF32_GetStringSizeInUTF8CodeUnits(String);
         UTF8    *EncodedString                     = UTF8_Init(UTF8CodeUnits);
@@ -1491,7 +1491,7 @@ CodePoint.CodeUnits[3] = String[3];
         return EncodedString;
     }
     
-    UTF16 *UTF16_Encode(ImmutableString_UTF32 String) {
+    UTF16 *UTF16_Encode(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         UTF16   *EncodedString                       = NULL;
         size_t   CodePoint                           = 0ULL;
@@ -1510,7 +1510,7 @@ CodePoint.CodeUnits[3] = String[3];
         return EncodedString;
     }
     
-    UTF8 *UTF16_Convert(ImmutableString_UTF16 String) {
+    UTF8 *UTF16_Convert(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         UTF8 *String8       = NULL;
         UTF32 *String32 = UTF16_Decode(String);
@@ -1519,7 +1519,7 @@ CodePoint.CodeUnits[3] = String[3];
         return String8;
     }
     
-    UTF16 *UTF8_Convert(ImmutableString_UTF8 String) {
+    UTF16 *UTF8_Convert(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         UTF16 *String16     = NULL;
         UTF32 *String32 = UTF8_Decode(String);
@@ -1528,7 +1528,7 @@ CodePoint.CodeUnits[3] = String[3];
         return String16;
     }
     
-    UTF8 *UTF8_Clone(ImmutableString_UTF8 String) {
+    UTF8 *UTF8_Clone(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         UTF8 *Copy = NULL;
         size_t StringSizeInCodeUnits   = UTF8_GetStringSizeInCodeUnits(String);
@@ -1540,7 +1540,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Copy;
     }
     
-    UTF16 *UTF16_Clone(ImmutableString_UTF16 String) {
+    UTF16 *UTF16_Clone(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         UTF16 *Copy = NULL;
         size_t StringSizeInCodeUnits   = UTF16_GetStringSizeInCodeUnits(String);
@@ -1552,7 +1552,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Copy;
     }
     
-    UTF32 *UTF32_Clone(ImmutableString_UTF32 String) {
+    UTF32 *UTF32_Clone(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         UTF32 *Copy = NULL;
         size_t StringSizeInCodePoints   = UTF32_GetStringSizeInCodePoints(String);
@@ -1597,7 +1597,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Verification;
     }
     
-    UTF8 *UTF8_Truncate(ImmutableString_UTF8 String, size_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
+    UTF8 *UTF8_Truncate(PlatformIO_Immutable(UTF8 *) String, size_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         AssertIO(String != NULL);
         AssertIO(NumGraphemes >= 1);
         UTF8 *Truncated = NULL;
@@ -1609,7 +1609,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Truncated;
     }
     
-    UTF16 *UTF16_Truncate(ImmutableString_UTF16 String, size_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
+    UTF16 *UTF16_Truncate(PlatformIO_Immutable(UTF16 *) String, size_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         AssertIO(String != NULL);
         AssertIO(NumGraphemes >= 1);
         UTF16 *Truncated = NULL;
@@ -1621,7 +1621,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Truncated;
     }
     
-    UTF32 *UTF32_Truncate(ImmutableString_UTF32 String, size_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
+    UTF32 *UTF32_Truncate(PlatformIO_Immutable(UTF32 *) String, size_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         AssertIO(String != NULL);
         AssertIO(NumGraphemes >= 1);
         UTF32 *Truncated = NULL;
@@ -1639,7 +1639,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Truncated;
     }
     
-    void UTF8_WriteGrapheme(FILE *Source, ImmutableString_UTF8 Grapheme) {
+    void UTF8_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF8 *) Grapheme) {
         AssertIO(Source != NULL);
         AssertIO(Grapheme != NULL);
         size_t   StringSize       = UTF8_GetStringSizeInCodeUnits(Grapheme);
@@ -1647,7 +1647,7 @@ CodePoint.CodeUnits[3] = String[3];
         AssertIO(CodeUnitsWritten == StringSize);
     }
     
-    void UTF16_WriteGrapheme(FILE *Source, ImmutableString_UTF16 Grapheme) {
+    void UTF16_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF16 *) Grapheme) {
         AssertIO(Source != NULL);
         AssertIO(Grapheme != NULL);
         size_t   StringSize       = UTF16_GetStringSizeInCodeUnits(Grapheme);
@@ -1881,7 +1881,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Sentence;
     }
     
-    void UTF8_File_WriteString(FILE *OutputFile, ImmutableString_UTF8 String) {
+    void UTF8_File_WriteString(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(OutputFile != NULL);
         AssertIO(String != NULL);
 
@@ -1905,7 +1905,7 @@ CodePoint.CodeUnits[3] = String[3];
         AssertIO(CodeUnitsWritten == StringSize);
     }
     
-    void UTF16_File_WriteString(FILE *OutputFile, ImmutableString_UTF16 String) {
+    void UTF16_File_WriteString(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(OutputFile != NULL);
         AssertIO(String != NULL);
 
@@ -1931,7 +1931,7 @@ CodePoint.CodeUnits[3] = String[3];
         AssertIO(CodeUnitsWritten == StringSize);
     }
     
-    void UTF32_File_WriteString(FILE *OutputFile, ImmutableString_UTF32 String) {
+    void UTF32_File_WriteString(FILE *OutputFile, PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(OutputFile != NULL);
         AssertIO(String != NULL);
 
@@ -1954,7 +1954,7 @@ CodePoint.CodeUnits[3] = String[3];
         AssertIO(CodeUnitsWritten == StringSize);
     }
     
-    UTF8 *UTF8_Reverse(ImmutableString_UTF8 String) {
+    UTF8 *UTF8_Reverse(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         UTF8 *Reversed        = NULL;
         UTF32 *String32   = UTF8_Decode(String);
@@ -1965,7 +1965,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Reversed;
     }
     
-    UTF16 *UTF16_Reverse(ImmutableString_UTF16 String) {
+    UTF16 *UTF16_Reverse(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         UTF16 *Reversed = NULL;
         UTF32 *String32   = UTF16_Decode(String);
@@ -1976,7 +1976,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Reversed;
     }
     
-    UTF32 *UTF32_Reverse(ImmutableString_UTF32 String) {
+    UTF32 *UTF32_Reverse(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         UTF32 *Reverse = NULL;
         size_t StringSize   = UTF32_GetStringSizeInCodePoints(String);
@@ -2057,7 +2057,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Offset;
     }
     
-    size_t UTF8_FindSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString, size_t Offset, size_t Length) {
+    size_t UTF8_FindSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) SubString, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         AssertIO(SubString != NULL);
         ssize_t FoundOffset    = 0LL;
@@ -2069,7 +2069,7 @@ CodePoint.CodeUnits[3] = String[3];
         return FoundOffset;
     }
     
-    size_t UTF16_FindSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString, size_t Offset, size_t Length) {
+    size_t UTF16_FindSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) SubString, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         AssertIO(SubString != NULL);
         ssize_t FoundOffset    = 0LL;
@@ -2081,7 +2081,7 @@ CodePoint.CodeUnits[3] = String[3];
         return FoundOffset;
     }
     
-    size_t UTF32_FindSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString, size_t Offset, size_t Length) {
+    size_t UTF32_FindSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) SubString, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         AssertIO(SubString != NULL);
         size_t  StringSize            = UTF32_GetStringSizeInCodePoints(String);
@@ -2098,7 +2098,7 @@ CodePoint.CodeUnits[3] = String[3];
         return MatchingOffset;
     }
     
-    UTF8 *UTF8_ExtractSubString(ImmutableString_UTF8 String, size_t Offset, size_t NumCodeUnits) {
+    UTF8 *UTF8_ExtractSubString(PlatformIO_Immutable(UTF8 *) String, size_t Offset, size_t NumCodeUnits) {
         AssertIO(String != NULL);
         UTF8 *ExtractedSubString = NULL;
         UTF32 *String32    = UTF8_Decode(String);
@@ -2109,7 +2109,7 @@ CodePoint.CodeUnits[3] = String[3];
         return ExtractedSubString;
     }
     
-    UTF16 *UTF16_ExtractSubString(ImmutableString_UTF16 String, size_t Offset, size_t NumCodeUnits) {
+    UTF16 *UTF16_ExtractSubString(PlatformIO_Immutable(UTF16 *) String, size_t Offset, size_t NumCodeUnits) {
         AssertIO(String != NULL);
         UTF16 *ExtractedSubString = NULL;
         UTF32 *String32    = UTF16_Decode(String);
@@ -2120,7 +2120,7 @@ CodePoint.CodeUnits[3] = String[3];
         return ExtractedSubString;
     }
     
-    UTF32 *UTF32_ExtractSubString(ImmutableString_UTF32 String, size_t Offset, size_t NumCodePoints) {
+    UTF32 *UTF32_ExtractSubString(PlatformIO_Immutable(UTF32 *) String, size_t Offset, size_t NumCodePoints) {
         AssertIO(String != NULL);
         size_t    StringSize                            = UTF32_GetStringSizeInCodePoints(String);
         AssertIO(StringSize >= Offset + NumCodePoints);
@@ -2134,7 +2134,7 @@ CodePoint.CodeUnits[3] = String[3];
         return ExtractedString;
     }
     
-    UTF8 *UTF8_Create(ImmutableString_UTF8 Padding, size_t Times2Pad) {
+    UTF8 *UTF8_Create(PlatformIO_Immutable(UTF8 *) Padding, size_t Times2Pad) {
         AssertIO(Padding != NULL);
         AssertIO(Times2Pad >= 1);
         UTF8 *Padded           = NULL;
@@ -2145,7 +2145,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Padded;
     }
     
-    UTF16 *UTF16_Create(ImmutableString_UTF16 Padding, size_t Times2Pad) {
+    UTF16 *UTF16_Create(PlatformIO_Immutable(UTF16 *) Padding, size_t Times2Pad) {
         AssertIO(Padding != NULL);
         AssertIO(Times2Pad >= 1);
         UTF16 *Padded          = NULL;
@@ -2156,7 +2156,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Padded;
     }
     
-    UTF32 *UTF32_Create(ImmutableString_UTF32 Padding, size_t Times2Pad) {
+    UTF32 *UTF32_Create(PlatformIO_Immutable(UTF32 *) Padding, size_t Times2Pad) {
         AssertIO(Padding != NULL);
         AssertIO(Times2Pad >= 1);
         UTF32 *Padded                     = NULL;
@@ -2173,7 +2173,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Padded;
     }
     
-    UTF8 *UTF8_SubstituteSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substitution, size_t Offset, size_t Length) {
+    UTF8 *UTF8_SubstituteSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) Substitution, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         AssertIO(Substitution != NULL);
         UTF8 *Replaced8           = NULL;
@@ -2187,7 +2187,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Replaced8;
     }
     
-    UTF16 *UTF16_SubstituteSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substitution, size_t Offset, size_t Length) {
+    UTF16 *UTF16_SubstituteSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) Substitution, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         AssertIO(Substitution != NULL);
         UTF16 *Replaced16         = NULL;
@@ -2201,7 +2201,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Replaced16;
     }
     
-    UTF32 *UTF32_SubstituteSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substitution, size_t Offset, size_t Length) {
+    UTF32 *UTF32_SubstituteSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) Substitution, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         AssertIO(Substitution != NULL);
         UTF32 *NewString                          = NULL;
@@ -2268,7 +2268,7 @@ CodePoint.CodeUnits[3] = String[3];
          */
     }
     
-    UTF8 *UTF8_StitchSubString(ImmutableString_UTF8 String, size_t Offset, size_t Length) {
+    UTF8 *UTF8_StitchSubString(PlatformIO_Immutable(UTF8 *) String, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         UTF8 *Stitched = NULL;
 
@@ -2279,7 +2279,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Stitched;
     }
     
-    UTF16 *UTF16_StitchSubString(ImmutableString_UTF16 String, size_t Offset, size_t Length) {
+    UTF16 *UTF16_StitchSubString(PlatformIO_Immutable(UTF16 *) String, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         UTF16 *Stitched       = NULL;
         UTF32 *Decoded    = UTF16_Decode(String);
@@ -2290,7 +2290,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Stitched;
     }
     
-    UTF32 *UTF32_StitchSubString(ImmutableString_UTF32 String, size_t Offset, size_t Length) {
+    UTF32 *UTF32_StitchSubString(PlatformIO_Immutable(UTF32 *) String, size_t Offset, size_t Length) {
         AssertIO(String != NULL);
         UTF32 *Stitched               = NULL;
         size_t StringSize         = UTF32_GetStringSizeInCodePoints(String);
@@ -2313,7 +2313,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NULL;
     }
     
-    UTF8 *UTF8_RemoveSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString2Remove, size_t Instance2Remove) {
+    UTF8 *UTF8_RemoveSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) SubString2Remove, size_t Instance2Remove) {
         AssertIO(String != NULL);
         AssertIO(SubString2Remove != NULL);
         UTF8 *TrimmedString         = NULL;
@@ -2327,7 +2327,7 @@ CodePoint.CodeUnits[3] = String[3];
         return TrimmedString;
     }
     
-    UTF16 *UTF16_RemoveSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString2Remove, size_t Instance2Remove) {
+    UTF16 *UTF16_RemoveSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) SubString2Remove, size_t Instance2Remove) {
         AssertIO(String != NULL);
         AssertIO(SubString2Remove != NULL);
         UTF16 *TrimmedString        = NULL;
@@ -2341,7 +2341,7 @@ CodePoint.CodeUnits[3] = String[3];
         return TrimmedString;
     }
     
-    UTF32 *UTF32_RemoveSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString2Remove, size_t Instance2Remove) {
+    UTF32 *UTF32_RemoveSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) SubString2Remove, size_t Instance2Remove) {
         AssertIO(String != NULL);
         AssertIO(SubString2Remove != NULL);
         UTF32 *EditedString = NULL;
@@ -2395,7 +2395,7 @@ CodePoint.CodeUnits[3] = String[3];
         return EditedString;
     }
     
-    UTF8 *UTF8_Insert(ImmutableString_UTF8 String, ImmutableString_UTF8 String2Insert, size_t Offset) {
+    UTF8 *UTF8_Insert(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) String2Insert, size_t Offset) {
         AssertIO(String != NULL);
         AssertIO(String2Insert != NULL);
         UTF8 *Inserted = NULL;
@@ -2409,7 +2409,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Inserted;
     }
     
-    UTF16 *UTF16_Insert(ImmutableString_UTF16 String, ImmutableString_UTF16 String2Insert, size_t Offset) {
+    UTF16 *UTF16_Insert(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) String2Insert, size_t Offset) {
         AssertIO(String != NULL);
         AssertIO(String2Insert != NULL);
         UTF16 *Inserted = NULL;
@@ -2422,7 +2422,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Inserted;
     }
     
-    UTF32 *UTF32_Insert(ImmutableString_UTF32 String, ImmutableString_UTF32 String2Insert, size_t Offset) {
+    UTF32 *UTF32_Insert(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) String2Insert, size_t Offset) {
         AssertIO(String != NULL);
         AssertIO(String2Insert != NULL);
         UTF32 *Inserted = NULL;
@@ -2537,7 +2537,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Replacement;
     }
 
-    UTF8 *UTF8_CaseFold(ImmutableString_UTF8 String) {
+    UTF8 *UTF8_CaseFold(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         UTF8 *CaseFolded      = NULL;
         UTF32 *String32   = UTF8_Decode(String);
@@ -2548,7 +2548,7 @@ CodePoint.CodeUnits[3] = String[3];
         return CaseFolded;
     }
     
-    UTF16 *UTF16_CaseFold(ImmutableString_UTF16 String) {
+    UTF16 *UTF16_CaseFold(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         UTF16 *CaseFolded     = NULL;
         UTF32 *String32   = UTF16_Decode(String);
@@ -2559,7 +2559,7 @@ CodePoint.CodeUnits[3] = String[3];
         return CaseFolded;
     }
     
-    static size_t UTF32_GetCaseFoldedSize(ImmutableString_UTF32 String) {
+    static size_t UTF32_GetCaseFoldedSize(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         size_t NumCodePoints = 0ULL;
         size_t CodePoint = 0ULL;
@@ -2577,7 +2577,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumCodePoints;
     }
     
-    static void UTF32_SubstitutePreallocated(UTF32 *String2Edit, ImmutableString_UTF32 Replacement) {
+    static void UTF32_SubstitutePreallocated(UTF32 *String2Edit, PlatformIO_Immutable(UTF32 *) Replacement) {
         AssertIO(String2Edit != NULL);
         AssertIO(Replacement != NULL);
         size_t CodePoint = 0ULL;
@@ -2587,7 +2587,7 @@ CodePoint.CodeUnits[3] = String[3];
         }
     }
     
-    UTF32 *UTF32_CaseFold(ImmutableString_UTF32 String) {
+    UTF32 *UTF32_CaseFold(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         UTF32   *CaseFoldedString                = NULL;
 
@@ -2652,7 +2652,7 @@ CodePoint.CodeUnits[3] = String[3];
         return -1;
     }
 
-    static size_t UTF32_GetComulativeReplacementSizeForNormalization(ImmutableString_UTF32 String, StringIO_NormalizationForms NormalizationForm) {
+    static size_t UTF32_GetComulativeReplacementSizeForNormalization(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms NormalizationForm) {
         AssertIO(String != NULL);
         AssertIO(NormalizationForm != NormalizationForm_Unspecified);
         size_t CumulativeReplacementSize       = 0;
@@ -2700,7 +2700,7 @@ CodePoint.CodeUnits[3] = String[3];
         return ComposedString;
     }
     
-    static UTF32 *UTF32_Decompose(ImmutableString_UTF32 String, StringIO_NormalizationForms DecompositionType) { // TODO: Must use a stable sorting algorithm
+    static UTF32 *UTF32_Decompose(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms DecompositionType) { // TODO: Must use a stable sorting algorithm
         AssertIO(String != NULL);
         AssertIO(DecompositionType == NormalizationForm_CanonicalDecompose || DecompositionType == NormalizationForm_KompatibleDecompose);
         size_t   CodePoint      = 0ULL;
@@ -2727,7 +2727,7 @@ CodePoint.CodeUnits[3] = String[3];
         return DecomposedString;
     }
     
-    UTF8 *UTF8_Normalize(ImmutableString_UTF8 String, StringIO_NormalizationForms NormalizedForm) {
+    UTF8 *UTF8_Normalize(PlatformIO_Immutable(UTF8 *) String, StringIO_NormalizationForms NormalizedForm) {
         AssertIO(String != NULL);
         AssertIO(NormalizedForm != NormalizationForm_Unspecified);
         UTF8 *NormalizedString8       = NULL;
@@ -2739,7 +2739,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NormalizedString8;
     }
     
-    UTF16 *UTF16_Normalize(ImmutableString_UTF16 String, StringIO_NormalizationForms NormalizedForm) {
+    UTF16 *UTF16_Normalize(PlatformIO_Immutable(UTF16 *) String, StringIO_NormalizationForms NormalizedForm) {
         AssertIO(String != NULL);
         AssertIO(NormalizedForm != NormalizationForm_Unspecified);
         UTF16 *NormalizedString16     = NULL;
@@ -2751,7 +2751,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NormalizedString16;
     }
     
-    UTF32 *UTF32_Normalize(ImmutableString_UTF32 String, StringIO_NormalizationForms NormalizedForm) {
+    UTF32 *UTF32_Normalize(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms NormalizedForm) {
         AssertIO(String != NULL);
         AssertIO(NormalizedForm != NormalizationForm_Unspecified);
         UTF32 *NormalizedString = NULL;
@@ -2772,7 +2772,7 @@ CodePoint.CodeUnits[3] = String[3];
     }
     /* TextIOTables Operations */
     
-    int64_t UTF8_String2Integer(TextIO_Bases Base, ImmutableString_UTF8 String) { // Replaces atoi, atol, strtol, strtoul,
+    int64_t UTF8_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) { // Replaces atoi, atol, strtol, strtoul,
         AssertIO(PlatformIO_Is(Base, Base_Integer));
         AssertIO(String != NULL);
         int64_t Value = 0LL;
@@ -2782,7 +2782,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Value;
     }
     
-    int64_t UTF16_String2Integer(TextIO_Bases Base, ImmutableString_UTF16 String) {
+    int64_t UTF16_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(PlatformIO_Is(Base, Base_Integer));
         AssertIO(String != NULL);
         int64_t Value = 0LL;
@@ -2793,7 +2793,7 @@ CodePoint.CodeUnits[3] = String[3];
     }
     
     // Integer2String should accept any integer base from the lookup table and shift the value until it can't anymore
-    int64_t UTF32_String2Integer(TextIO_Bases Base, ImmutableString_UTF32 String) {
+    int64_t UTF32_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(PlatformIO_Is(Base, Base_Integer));
         AssertIO(String != NULL);
         size_t   CodePoint = 0;
@@ -2853,7 +2853,7 @@ CodePoint.CodeUnits[3] = String[3];
     UTF8 *UTF8_Integer2String(TextIO_Bases Base, int64_t Integer2Convert) {
         AssertIO(PlatformIO_Is(Base, Base_Integer));
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
-        UTF8  *IntegerString8  = UTF8_Encode((ImmutableString_UTF32) IntegerString32);
+        UTF8  *IntegerString8  = UTF8_Encode((PlatformIO_Immutable(UTF32 *)) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString8;
     }
@@ -2861,7 +2861,7 @@ CodePoint.CodeUnits[3] = String[3];
     UTF16 *UTF16_Integer2String(TextIO_Bases Base, int64_t Integer2Convert) {
         AssertIO(PlatformIO_Is(Base, Base_Integer));
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
-        UTF16 *IntegerString16 = UTF16_Encode((ImmutableString_UTF32) IntegerString32);
+        UTF16 *IntegerString16 = UTF16_Encode((PlatformIO_Immutable(UTF32 *)) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString16;
     }
@@ -2919,7 +2919,7 @@ CodePoint.CodeUnits[3] = String[3];
         return String;
     }
 
-    double UTF8_String2Decimal(TextIO_Bases Base, ImmutableString_UTF8 String) {
+    double UTF8_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(PlatformIO_Is(Base, Base_Decimal));
         double Decimal = 0.0;
         UTF32 *String32 = UTF8_Decode(String);
@@ -2928,7 +2928,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Decimal;
     }
 
-    double UTF16_String2Decimal(TextIO_Bases Base, ImmutableString_UTF16 String) {
+    double UTF16_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(PlatformIO_Is(Base, Base_Decimal));
         double Decimal = 0.0;
         UTF32 *String32 = UTF16_Decode(String);
@@ -2937,7 +2937,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Decimal;
     }
 
-    double UTF32_String2Decimal(TextIO_Bases Base, ImmutableString_UTF32 String) { // Replaces strtod, strtof, strold, atof, and atof_l
+    double UTF32_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) { // Replaces strtod, strtof, strold, atof, and atof_l
         AssertIO(PlatformIO_Is(Base, Base_Decimal));
         double   Value         = 0.0;
         bool     IsNegative    = No;
@@ -3169,7 +3169,7 @@ CodePoint.CodeUnits[3] = String[3];
     }
     /* Number Conversions */
 
-    bool UTF8_Compare(ImmutableString_UTF8 String1, ImmutableString_UTF8 String2) {
+    bool UTF8_Compare(PlatformIO_Immutable(UTF8 *) String1, PlatformIO_Immutable(UTF8 *) String2) {
         AssertIO(String1 != NULL);
         AssertIO(String2 != NULL);
         bool StringsMatch         = No;
@@ -3185,7 +3185,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringsMatch;
     }
 
-    bool UTF16_Compare(ImmutableString_UTF16 String1, ImmutableString_UTF16 String2) {
+    bool UTF16_Compare(PlatformIO_Immutable(UTF16 *) String1, PlatformIO_Immutable(UTF16 *) String2) {
         AssertIO(String1 != NULL);
         AssertIO(String2 != NULL);
         bool StringsMatch         = No;
@@ -3201,7 +3201,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringsMatch;
     }
 
-    bool UTF32_Compare(ImmutableString_UTF32 String1, ImmutableString_UTF32 String2) {
+    bool UTF32_Compare(PlatformIO_Immutable(UTF32 *) String1, PlatformIO_Immutable(UTF32 *) String2) {
         AssertIO(String1 != NULL);
         AssertIO(String2 != NULL);
         bool StringsMatch                    = No;
@@ -3222,7 +3222,7 @@ CodePoint.CodeUnits[3] = String[3];
         return StringsMatch;
     }
 
-    bool UTF8_CompareSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substring, size_t StringOffset, size_t SubstringOffset) {
+    bool UTF8_CompareSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) Substring, size_t StringOffset, size_t SubstringOffset) {
         AssertIO(String != NULL);
         AssertIO(Substring != NULL);
         bool SubstringMatchesAtOffset = No;
@@ -3234,7 +3234,7 @@ CodePoint.CodeUnits[3] = String[3];
         return SubstringMatchesAtOffset;
     }
 
-    bool UTF16_CompareSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substring, size_t StringOffset, size_t SubstringOffset) {
+    bool UTF16_CompareSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) Substring, size_t StringOffset, size_t SubstringOffset) {
         AssertIO(String != NULL);
         AssertIO(Substring != NULL);
         bool SubstringMatchesAtOffset = No;
@@ -3246,7 +3246,7 @@ CodePoint.CodeUnits[3] = String[3];
         return SubstringMatchesAtOffset;
     }
 
-    bool UTF32_CompareSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substring, size_t StringOffset, size_t SubstringOffset) {
+    bool UTF32_CompareSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) Substring, size_t StringOffset, size_t SubstringOffset) {
         AssertIO(String != NULL);
         AssertIO(Substring != NULL);
         bool SubstringMatchesAtOffset            = No;
@@ -3264,7 +3264,7 @@ CodePoint.CodeUnits[3] = String[3];
         return SubstringMatchesAtOffset;
     }
 
-    UTF8 *UTF8_Trim(ImmutableString_UTF8 String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF8 Strings2Remove) {
+    UTF8 *UTF8_Trim(PlatformIO_Immutable(UTF8 *) String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF8 Strings2Remove) {
         AssertIO(String != NULL);
         AssertIO(Type != TruncationType_Unspecified);
         AssertIO(Strings2Remove != NULL);
@@ -3278,7 +3278,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Trimmed;
     }
 
-    UTF16 *UTF16_Trim(ImmutableString_UTF16 String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF16 Strings2Remove) {
+    UTF16 *UTF16_Trim(PlatformIO_Immutable(UTF16 *) String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF16 Strings2Remove) {
         AssertIO(String != NULL);
         AssertIO(Type != TruncationType_Unspecified);
         AssertIO(Strings2Remove != NULL);
@@ -3292,7 +3292,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Trimmed;
     }
 
-    UTF32 *UTF32_Trim(ImmutableString_UTF32 String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF32 Strings2Remove) {
+    UTF32 *UTF32_Trim(PlatformIO_Immutable(UTF32 *) String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF32 Strings2Remove) {
         AssertIO(String != NULL);
         AssertIO(Type != TruncationType_Unspecified);
         AssertIO(Strings2Remove != NULL);
@@ -3374,11 +3374,11 @@ CodePoint.CodeUnits[3] = String[3];
         return Trimmed;
     }
 
-    UTF8 **UTF8_Split(ImmutableString_UTF8 String, ImmutableStringSet_UTF8 Delimiters) {
+    UTF8 **UTF8_Split(PlatformIO_Immutable(UTF8 *) String, ImmutableStringSet_UTF8 Delimiters) {
         AssertIO(String != NULL);
         AssertIO(Delimiters != NULL);
         UTF8 **SplitString                                 = NULL;
-        ImmutableString_UTF32  String32        = UTF8_Decode(String);
+        PlatformIO_Immutable(UTF32 *)  String32        = UTF8_Decode(String);
         UTF32 **Delimiters32  = UTF8_StringSet_Decode(Delimiters);
         UTF32 **SplitString32 = UTF32_Split(String32, (const UTF32 *const *) Delimiters32);
         UTF32_Deinit((UTF32*) String32);
@@ -3387,7 +3387,7 @@ CodePoint.CodeUnits[3] = String[3];
         return SplitString;
     }
 
-    UTF16 **UTF16_Split(ImmutableString_UTF16 String, ImmutableStringSet_UTF16 Delimiters) {
+    UTF16 **UTF16_Split(PlatformIO_Immutable(UTF16 *) String, ImmutableStringSet_UTF16 Delimiters) {
         AssertIO(String != NULL);
         AssertIO(Delimiters != NULL);
         UTF16 **SplitString       = NULL;
@@ -3400,7 +3400,7 @@ CodePoint.CodeUnits[3] = String[3];
         return SplitString;
     }
 
-    UTF32 **UTF32_Split(ImmutableString_UTF32 String, ImmutableStringSet_UTF32 Delimiters) {
+    UTF32 **UTF32_Split(PlatformIO_Immutable(UTF32 *) String, ImmutableStringSet_UTF32 Delimiters) {
         AssertIO(String != NULL);
         AssertIO(Delimiters != NULL);
         UTF32    **SplitStrings    = NULL; // What we return, it's a 0 indexed array of strings
@@ -3465,7 +3465,7 @@ CodePoint.CodeUnits[3] = String[3];
         return SplitStrings;
     }
 
-    size_t UTF8_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF8 String) {
+    size_t UTF8_GetNumDigits(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
         size_t NumDigits      = 0ULL;
@@ -3555,7 +3555,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumDigits;
     }
 
-    size_t UTF16_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF16 String) {
+    size_t UTF16_GetNumDigits(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
         size_t NumDigits      = 0ULL;
@@ -3645,7 +3645,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumDigits;
     }
 
-    size_t UTF32_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF32 String) {
+    size_t UTF32_GetNumDigits(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(Base != Base_Unspecified);
         AssertIO(String != NULL);
         size_t NumDigits      = 0ULL;
@@ -3735,7 +3735,7 @@ CodePoint.CodeUnits[3] = String[3];
         return NumDigits;
     }
 
-    size_t UTF32_GetSubStringLength(ImmutableString_UTF32 Format, ImmutableString_UTF32 Formatted, size_t Offset) {
+    size_t UTF32_GetSubStringLength(PlatformIO_Immutable(UTF32 *) Format, PlatformIO_Immutable(UTF32 *) Formatted, size_t Offset) {
         AssertIO(Format != NULL);
         AssertIO(Formatted != NULL);
         size_t Length        = 0ULL;
@@ -3749,7 +3749,7 @@ CodePoint.CodeUnits[3] = String[3];
     }
 
     /* Unicode Conversion */
-    CharSet8 *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CodePages CodePage) {
+    CharSet8 *UTF8_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF8 *) String, StringIO_CodePages CodePage) {
         AssertIO(String != NULL);
         AssertIO(CodePage != CodePage_Unspecified);
         CharSet8 *Encoded = NULL;
@@ -3777,7 +3777,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Encoded;
     }
 
-    CharSet16 *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CodePages CodePage) {
+    CharSet16 *UTF16_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF16 *) String, StringIO_CodePages CodePage) {
         AssertIO(String != NULL);
         AssertIO(CodePage != CodePage_Unspecified);
         CharSet16 *Encoded = NULL;
@@ -3806,7 +3806,7 @@ CodePoint.CodeUnits[3] = String[3];
         return Encoded;
     }
 
-    CharSet32 *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CodePages CodePage) {
+    CharSet32 *UTF32_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF32 *) String, StringIO_CodePages CodePage) {
         AssertIO(String != NULL);
         AssertIO(CodePage != CodePage_Unspecified);
         CharSet32 *Encoded = NULL;

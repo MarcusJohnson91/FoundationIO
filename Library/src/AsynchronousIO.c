@@ -106,7 +106,7 @@ extern "C" {
         Stream->StreamPosition = Position;
     }
 
-    bool AsynchronousIOStream_OpenPathUTF8(AsynchronousIOStream *Stream, ImmutableString_UTF8 Path8, AsynchronousIO_FileModes Mode) {
+    bool AsynchronousIOStream_OpenPathUTF8(AsynchronousIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsynchronousIO_FileModes Mode) {
         AssertIO(Stream != NULL);
         AssertIO(Path8 != NULL);
         AssertIO(Mode != FileMode_Unspecified);
@@ -131,7 +131,7 @@ extern "C" {
         return OpenedSucessfully;
     }
 
-    bool AsynchronousIOStream_OpenPathUTF16(AsynchronousIOStream *Stream, ImmutableString_UTF16 Path16, AsynchronousIO_FileModes Mode) {
+    bool AsynchronousIOStream_OpenPathUTF16(AsynchronousIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsynchronousIO_FileModes Mode) {
         AssertIO(Stream != NULL);
         AssertIO(Path16 != NULL);
         AssertIO(Mode != FileMode_Unspecified);

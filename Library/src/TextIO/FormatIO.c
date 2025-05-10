@@ -395,7 +395,7 @@ extern "C" {
         }
     }
     
-    static void FormatIO_FindSpecifierBoundaries(ImmutableString_UTF32 Format, FormatSpecifiers *Specifiers) {
+    static void FormatIO_FindSpecifierBoundaries(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers) {
         AssertIO(Format != NULL);
         AssertIO(Specifiers != NULL);
 
@@ -447,7 +447,7 @@ extern "C" {
         }
     }
     
-    static void UTF32_ParseFormatSpecifiers(ImmutableString_UTF32 Format, FormatSpecifiers *Specifiers, TextIO_StringTypes StringType) {
+    static void UTF32_ParseFormatSpecifiers(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, TextIO_StringTypes StringType) {
         AssertIO(Format != NULL);
         AssertIO(Specifiers != NULL);
         AssertIO(StringType != StringType_Unspecified);
@@ -1259,7 +1259,7 @@ extern "C" {
         }
     }
     
-    static uint64_t UTF32_LocateNextPercent(ImmutableString_UTF32 String) {
+    static uint64_t UTF32_LocateNextPercent(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         uint64_t NextPercent     = -1;
 
@@ -1272,7 +1272,7 @@ extern "C" {
         return NextPercent;
     }
     
-    static UTF32 *FormatString_UTF32(ImmutableString_UTF32 Format, FormatSpecifiers *Specifiers, size_t FormattedSize) {
+    static UTF32 *FormatString_UTF32(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, size_t FormattedSize) {
         AssertIO(Format != NULL);
         AssertIO(Specifiers != NULL);
         AssertIO(FormattedSize > 0);
@@ -1420,7 +1420,7 @@ extern "C" {
         return Formatted;
     }
     
-    static UTF32 **DeformatString_UTF32(ImmutableString_UTF32 Format, FormatSpecifiers *Specifiers, ImmutableString_UTF32 Formatted) {
+    static UTF32 **DeformatString_UTF32(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, PlatformIO_Immutable(UTF32 *) Formatted) {
         AssertIO(Format != NULL);
         AssertIO(Specifiers != NULL);
         AssertIO(Formatted > 0);
@@ -1463,7 +1463,7 @@ extern "C" {
 
             if (PlatformIO_Is(BaseType, BaseType_Integer) || PlatformIO_Is(BaseType, BaseType_Decimal) || PlatformIO_Is(BaseType, BaseType_Pointer)) {
                 TextIO_Bases       Base            = ConvertModifierType2Base(&Specifiers->Specifiers[Specifier]);
-                ImmutableString_UTF32 Formatted2 = &Formatted[FormatStart];
+                PlatformIO_Immutable(UTF32 *) Formatted2 = &Formatted[FormatStart];
                 uint64_t           SubStringLength = UTF32_GetNumDigits(Base, Formatted2);
                 Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, FormatStart, SubStringLength);
             } else if PlatformIO_Is(BaseType, BaseType_CodeUnit) {
@@ -1478,7 +1478,7 @@ extern "C" {
         return Deformatted;
     }
     
-    uint64_t UTF8_GetNumFormatSpecifiers(ImmutableString_UTF8 String) {
+    uint64_t UTF8_GetNumFormatSpecifiers(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
@@ -1493,7 +1493,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    uint64_t UTF16_GetNumFormatSpecifiers(ImmutableString_UTF16 String) {
+    uint64_t UTF16_GetNumFormatSpecifiers(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
@@ -1507,7 +1507,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    uint64_t UTF32_GetNumFormatSpecifiers(ImmutableString_UTF32 String) {
+    uint64_t UTF32_GetNumFormatSpecifiers(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodePoint             = 0ULL;
@@ -1521,7 +1521,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    static uint64_t UTF32_GetFormattedStringSize(ImmutableString_UTF32 Format, FormatSpecifiers *Specifiers) {
+    static uint64_t UTF32_GetFormattedStringSize(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers) {
         AssertIO(Format != NULL);
         AssertIO(Specifiers != NULL);
         uint64_t FormattedStringSize     = 0ULL;
@@ -1559,7 +1559,7 @@ extern "C" {
         return FormattedStringSize;
     }
     
-    UTF8 *UTF8_Format(ImmutableString_UTF8 Format, ...) {
+    UTF8 *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...) {
         AssertIO(Format != NULL);
         UTF8 *Format8                        = NULL;
         uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
@@ -1584,7 +1584,7 @@ extern "C" {
         return Format8;
     }
     
-    UTF16 *UTF16_Format(ImmutableString_UTF16 Format, ...) {
+    UTF16 *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...) {
         AssertIO(Format != NULL);
         UTF16 *Format16                      = NULL;
         uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
@@ -1608,7 +1608,7 @@ extern "C" {
         return Format16;
     }
     
-    UTF32 *UTF32_Format(ImmutableString_UTF32 Format, ...) {
+    UTF32 *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...) {
         AssertIO(Format != NULL);
         UTF32 *FormattedString               = NULL;
         uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
@@ -1628,17 +1628,17 @@ extern "C" {
         return FormattedString;
     }
     
-    UTF8 **UTF8_Deformat(ImmutableString_UTF8 Format, ImmutableString_UTF8 Formatted) {
+    UTF8 **UTF8_Deformat(PlatformIO_Immutable(UTF8 *) Format, PlatformIO_Immutable(UTF8 *) Formatted) {
         AssertIO(Format != NULL);
         AssertIO(Formatted != NULL);
         UTF8 **StringSet                            = NULL;
 
         uint64_t NumSpecifiers                  = UTF8_GetNumFormatSpecifiers(Format);
         if (NumSpecifiers > 0) {
-            ImmutableString_UTF32 Format32      = UTF8_Decode(Format);
+            PlatformIO_Immutable(UTF32 *) Format32      = UTF8_Decode(Format);
             FormatSpecifiers *Specifiers        = FormatSpecifiers_Init(NumSpecifiers);
             UTF32_ParseFormatSpecifiers(Format32, Specifiers, StringType_UTF8);
-            ImmutableString_UTF32 Formatted32   = UTF8_Decode(Formatted);
+            PlatformIO_Immutable(UTF32 *) Formatted32   = UTF8_Decode(Formatted);
             UTF32 **Strings32                   = DeformatString_UTF32(Format32, Specifiers, Formatted32);
             FormatSpecifiers_Deinit(Specifiers);
             UTF32_Deinit((UTF32*) Format32);
@@ -1649,7 +1649,7 @@ extern "C" {
         return StringSet;
     }
     
-    UTF16 **UTF16_Deformat(ImmutableString_UTF16 Format, ImmutableString_UTF16 Formatted) {
+    UTF16 **UTF16_Deformat(PlatformIO_Immutable(UTF16 *) Format, PlatformIO_Immutable(UTF16 *) Formatted) {
         AssertIO(Format != NULL);
         AssertIO(Formatted != NULL);
         UTF16 **StringSet                    = NULL;
@@ -1670,7 +1670,7 @@ extern "C" {
         return StringSet;
     }
     
-    UTF32 **UTF32_Deformat(ImmutableString_UTF32 Format, ImmutableString_UTF32 Formatted) {
+    UTF32 **UTF32_Deformat(PlatformIO_Immutable(UTF32 *) Format, PlatformIO_Immutable(UTF32 *) Formatted) {
         AssertIO(Format != NULL);
         AssertIO(Formatted != NULL);
         UTF32 **StringSet                    = NULL;

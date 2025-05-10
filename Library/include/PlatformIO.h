@@ -276,14 +276,14 @@
 
 #ifndef             PlatformIO_FunctionName
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define             PlatformIO_FunctionName                                             PlatformIO_Cast(ImmutableString_UTF8, __func__)
+#define             PlatformIO_FunctionName                                             PlatformIO_Cast(PlatformIO_Immutable(UTF8 *), __func__)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define             PlatformIO_FunctionName                                             PlatformIO_Cast(ImmutableString_UTF8, __PRETTY_FUNCTION__)
+#define             PlatformIO_FunctionName                                             PlatformIO_Cast(PlatformIO_Immutable(UTF8 *), __PRETTY_FUNCTION__)
 #endif /* Language */
 #endif /* PlatformIO_FunctionName */
 
 #ifndef             PlatformIO_FileName
-#define             PlatformIO_FileName                                                 PlatformIO_Cast(ImmutableString_UTF8, __FILE__)
+#define             PlatformIO_FileName                                                 PlatformIO_Cast(PlatformIO_Immutable(UTF8 *), __FILE__)
 #endif /* PlatformIO_FunctionName */
 
 #ifndef PlatformIO_TargetOS

@@ -168,12 +168,12 @@ extern "C" {
      */
 
     /*
-     static const ImmutableStringSet_UTF8 StringSet[] = {
+     static const PlatformIO_Immutable(UTF8 **) StringSet[] = {
      &XMLInstruction_Open8,
      &XMLInstruction_Close8,
      };
 
-     static const ImmutableStringSet_UTF8 *XMLTokens8[] = {
+     static const PlatformIO_Immutable(UTF8 **) *XMLTokens8[] = {
      [PlatformIO_Enum2Index(XMLTokenType_Instruction)] = UTF8StringSet(UTF8String("<?"), UTF8String("?>")),
      [PlatformIO_Enum2Index(XMLTokenType_Comment)] = {
      UTF8String("<!--"),

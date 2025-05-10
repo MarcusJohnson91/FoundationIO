@@ -316,7 +316,7 @@ typedef                   const UTF32                         *StringSet_UTF32;
 #ifndef                   TextIO_Unicodize8
 #define                   TextIO_Unicodize8               (1)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define                   UTF8String(Literal)                   PlatformIO_Cast(ImmutableString_UTF8, u8##Literal)
+#define                   UTF8String(Literal)                   PlatformIO_Cast(PlatformIO_Immutable(UTF8 *), u8##Literal)
 #define                   UTF8StringSet(...)                    {PlatformIO_Expand(__VA_ARGS__), UTF8String("\0")}
 #define                   UTF8Character(Literal)                PlatformIO_Cast(ImmutableChar_UTF8, u8##Literal)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
@@ -329,7 +329,7 @@ typedef                   const UTF32                         *StringSet_UTF32;
 #ifndef                   TextIO_Unicodize16
 #define                   TextIO_Unicodize16              (2)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define                   UTF16String(Literal)                  PlatformIO_Cast(ImmutableString_UTF16, u##Literal)
+#define                   UTF16String(Literal)                  PlatformIO_Cast(PlatformIO_Immutable(UTF16 *), u##Literal)
 #define                   UTF16StringSet(...)                   {PlatformIO_Expand(__VA_ARGS__), UTF16String("\0")}
 #define                   UTF16Character(Literal)               PlatformIO_Cast(ImmutableChar_UTF16, u##Literal)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
@@ -342,7 +342,7 @@ typedef                   const UTF32                         *StringSet_UTF32;
 #ifndef                   TextIO_Unicodize32
 #define                   TextIO_Unicodize32              (4)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define                   UTF32String(Literal)                  PlatformIO_Cast(ImmutableString_UTF32, U##Literal)
+#define                   UTF32String(Literal)                  PlatformIO_Cast(PlatformIO_Immutable(UTF32 *), U##Literal)
 #define                   UTF32StringSet(...)                   {PlatformIO_Expand(__VA_ARGS__), UTF32String("\0")}
 #define                   UTF32Character(Literal)               PlatformIO_Cast(ImmutableChar_UTF32, U##Literal)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)

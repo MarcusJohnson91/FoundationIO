@@ -59,9 +59,9 @@ extern "C" {
         size_t                        OptionID;
         size_t                        NumIncompatibleOptions;
         size_t                        NumChildren;
-        CommandLineIO_SwitchArguments ArgumentType;
-        CommandLineIO_SwitchTypes     SwitchType;
-        CommandLineIO_SwitchStatuses  Status;
+        SwitchArguments ArgumentType;
+        SwitchTypes     SwitchType;
+        SwitchStatuses  Status;
     } CommandLineSwitch;
     
     typedef struct CommandLineIO {
@@ -96,7 +96,7 @@ extern "C" {
         return CLI;
     }
     
-    size_t CommandLineIO_GetTerminalWidth(void) {
+    size_t GetTerminalWidth(void) {
         size_t Width = 0ULL;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         struct winsize       WindowSize;
@@ -110,7 +110,7 @@ extern "C" {
         return Width;
     }
     
-    size_t CommandLineIO_GetTerminalHeight(void) {
+    size_t GetTerminalHeight(void) {
         size_t Height = 0ULL;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         struct winsize       WindowSize;
@@ -124,7 +124,7 @@ extern "C" {
         return Height;
     }
     
-    bool CommandLineIO_TerminalWasResized(void) {
+    bool TerminalWasResized(void) {
         bool SizeChanged = No;
 #if   PlatformIO_Is(PlatformIO_TargetOS, PlatformIO_TargetOSIsPOSIX)
         /*
@@ -146,7 +146,7 @@ extern "C" {
         return SizeChanged;
     }
     
-    void CommandLineIO_SetName(CommandLineIO *CLI, ImmutableString_UTF32 Name) {
+    void CommandLineIO_SetName(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Name) {
         AssertIO(CLI != NULL);
         AssertIO(Name != NULL);
 
@@ -156,7 +156,7 @@ extern "C" {
         CLI->ProgramName     = CaseFolded;
     }
     
-    void CommandLineIO_SetVersion(CommandLineIO *CLI, ImmutableString_UTF32 Version) {
+    void CommandLineIO_SetVersion(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Version) {
         AssertIO(CLI != NULL);
         AssertIO(Version != NULL);
 
@@ -166,7 +166,7 @@ extern "C" {
         CLI->ProgramVersion  = CaseFolded;
     }
     
-    void CommandLineIO_SetDescription(CommandLineIO *CLI, ImmutableString_UTF32 Description) {
+    void CommandLineIO_SetDescription(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Description) {
         AssertIO(CLI != NULL);
         AssertIO(Description != NULL);
 
@@ -176,7 +176,7 @@ extern "C" {
         CLI->ProgramDescription  = CaseFolded;
     }
     
-    void CommandLineIO_SetAuthor(CommandLineIO *CLI, ImmutableString_UTF32 Author) {
+    void CommandLineIO_SetAuthor(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Author) {
         AssertIO(CLI != NULL);
         AssertIO(Author != NULL);
 
@@ -186,7 +186,7 @@ extern "C" {
         CLI->ProgramAuthor  = CaseFolded;
     }
     
-    void CommandLineIO_SetCopyright(CommandLineIO *CLI, ImmutableString_UTF32 Copyright) {
+    void CommandLineIO_SetCopyright(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Copyright) {
         AssertIO(CLI != NULL);
         AssertIO(Copyright != NULL);
 
@@ -196,7 +196,7 @@ extern "C" {
         CLI->ProgramCopyright = CaseFolded;
     }
     
-    void CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, ImmutableString_UTF32 Name, ImmutableString_UTF32 LicenseURL) {
+    void CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, PlatformIO_Immutable(UTF32 *) Name, PlatformIO_Immutable(UTF32 *) LicenseURL) {
         AssertIO(CLI != NULL);
         AssertIO(LicenseType != LicenseType_Unspecified);
         AssertIO(Name != NULL);
@@ -228,7 +228,7 @@ extern "C" {
         CLI->HelpOption = HelpOption;
     }
     
-    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, ImmutableStringSet_UTF32 Strings, PlatformIO_Immutable(uint64_t *) Numerator, PlatformIO_Immutable(uint64_t *) Denominator) {
+    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, PlatformIO_Immutable(UTF32 **)  Strings, PlatformIO_Immutable(uint64_t *) Numerator, PlatformIO_Immutable(uint64_t *) Denominator) {
         AssertIO(CLI != NULL);
         AssertIO(Strings != NULL);
 
@@ -276,7 +276,7 @@ extern "C" {
         UTF32 **GeneratedHelp = UTF32_StringSet_Init(StringSetSize);
 
         for (size_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
-            CommandLineIO_SwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
+            SwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
             GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%U32s: %U32s%U32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, TextIO_NewLine32);
 
             if (CurrentSwitchType == SwitchType_Parent && CLI->Switches[Switch].NumChildren > 0) {
@@ -301,7 +301,7 @@ extern "C" {
         }
     }
     
-    static void CommandLineIO_ShowBanner(CommandLineIO *CLI) {
+    static void ShowBanner(CommandLineIO *CLI) {
         AssertIO(CLI != NULL);
         AssertIO(CLI->LicenseType != LicenseType_Unspecified);
         UTF32 *License = NULL;
@@ -332,7 +332,7 @@ extern "C" {
         UTF32_Deinit(Banner32);
     }
     
-    static UTF32 *ArgumentString2OptionFlag(ImmutableString_UTF32 ArgumentString) {
+    static UTF32 *ArgumentString2OptionFlag(PlatformIO_Immutable(UTF32 *) ArgumentString) {
         AssertIO(ArgumentString != NULL);
         UTF32 *ArgumentSwitch = NULL;
 
@@ -376,7 +376,7 @@ extern "C" {
         return StringSet;
     }
     
-    void CommandLineIO_Switch_SetName(CommandLineIO *CLI, size_t SwitchID, ImmutableString_UTF32 Name) {
+    void Switch_SetName(CommandLineIO *CLI, size_t SwitchID, PlatformIO_Immutable(UTF32 *) Name) {
         AssertIO(CLI != NULL);
         AssertIO(Name != NULL);
         AssertIO(SwitchID < CLI->NumSwitches);
@@ -387,7 +387,7 @@ extern "C" {
         CLI->Switches[SwitchID].Name  = CaseFolded;
     }
     
-    void CommandLineIO_Switch_SetDescription(CommandLineIO *CLI, size_t SwitchID, ImmutableString_UTF32 Description) {
+    void Switch_SetDescription(CommandLineIO *CLI, size_t SwitchID, PlatformIO_Immutable(UTF32 *) Description) {
         AssertIO(CLI != NULL);
         AssertIO(Description != NULL);
         AssertIO(SwitchID < CLI->NumSwitches);
@@ -398,7 +398,7 @@ extern "C" {
         CLI->Switches[SwitchID].Description  = CaseFolded;
     }
     
-    void CommandLineIO_Switch_SetChild(CommandLineIO *CLI, size_t ParentID, size_t ChildID) {
+    void Switch_SetChild(CommandLineIO *CLI, size_t ParentID, size_t ChildID) {
         AssertIO(CLI != NULL);
         AssertIO(ParentID < CLI->NumSwitches);
         AssertIO(ChildID < CLI->NumSwitches);
@@ -409,7 +409,7 @@ extern "C" {
         CLI->Switches[ParentID].Children           = realloc(CLI->Switches[ParentID].Children, CLI->Switches[ParentID].NumChildren * sizeof(size_t));
     }
     
-    void CommandLineIO_Switch_SetType(CommandLineIO *CLI, size_t SwitchID, CommandLineIO_SwitchTypes SwitchType) {
+    void Switch_SetType(CommandLineIO *CLI, size_t SwitchID, CommandLineIO_SwitchTypes SwitchType) {
         AssertIO(CLI != NULL);
         AssertIO(SwitchID < CLI->NumSwitches);
         AssertIO(SwitchType != SwitchType_Unspecified);
@@ -417,7 +417,7 @@ extern "C" {
         CLI->Switches[SwitchID].SwitchType = SwitchType;
     }
     
-    void CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, size_t SwitchID, CommandLineIO_SwitchArguments ArgumentType) {
+    void Switch_SetArgumentType(CommandLineIO *CLI, size_t SwitchID, CommandLineIO_SwitchArguments ArgumentType) {
         AssertIO(CLI != NULL);
         AssertIO(SwitchID < CLI->NumSwitches);
         AssertIO(ArgumentType != SwitchArgument_Unspecified);
@@ -443,7 +443,7 @@ extern "C" {
      Argv: Path
      */
     
-    static size_t CommandLineIO_UTF32_GetNumTokens(uint64_t NumArguments, ImmutableStringSet_UTF32 Arguments) {
+    static size_t UTF32_GetNumTokens(uint64_t NumArguments, PlatformIO_Immutable(UTF32 **)  Arguments) {
         AssertIO(Arguments != NULL);
         size_t NumTokens = 0;
 
@@ -470,7 +470,7 @@ extern "C" {
         return NumTokens;
     }
     
-    static void CommandLineIO_UTF32_TokenizeArguments(CommandLineIO *CLI, size_t NumArguments, ImmutableStringSet_UTF32 Arguments) {
+    static void UTF32_TokenizeArguments(CommandLineIO *CLI, size_t NumArguments, PlatformIO_Immutable(UTF32 **)  Arguments) {
         AssertIO(CLI != NULL);
         AssertIO(Arguments != NULL);
 
@@ -482,7 +482,7 @@ extern "C" {
         }
     }
     
-    static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, size_t NumArguments, ImmutableStringSet_UTF32 Arguments) {
+    static void UTF32_ParseOptions(CommandLineIO *CLI, size_t NumArguments, PlatformIO_Immutable(UTF32 **)  Arguments) {
         AssertIO(CLI != NULL);
         AssertIO(CLI->MinOptions > 0);
         AssertIO(CLI->MinOptions < CLI->NumOptions);
@@ -521,7 +521,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, size_t NumArguments, ImmutableStringSet_UTF8 Arguments) {
+    void UTF8_ParseOptions(CommandLineIO *CLI, size_t NumArguments, PlatformIO_Immutable(UTF8 **) Arguments) {
         AssertIO(CLI != NULL);
         AssertIO(Arguments != NULL);
 
@@ -534,11 +534,11 @@ extern "C" {
             UTF32_Deinit(CaseFolded);
             Arguments32[Arg]    = Normalized;
         }
-        CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, (const UTF32 *const *) Arguments32);
+        UTF32_ParseOptions(CLI, NumArguments, (const UTF32 *const *) Arguments32);
         UTF32_StringSet_Deinit(Arguments32);
     }
     
-    void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, size_t NumArguments, ImmutableStringSet_UTF16 Arguments) {
+    void UTF16_ParseOptions(CommandLineIO *CLI, size_t NumArguments, PlatformIO_Immutable(UTF16 **) Arguments) {
         AssertIO(CLI != NULL);
         AssertIO(Arguments != NULL);
 
@@ -551,16 +551,16 @@ extern "C" {
             UTF32_Deinit(CaseFolded);
             Arguments32[Arg]    = Normalized;
         }
-        CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, (const UTF32 *const *) Arguments32);
+        UTF32_ParseOptions(CLI, NumArguments, (const UTF32 *const *) Arguments32);
         UTF32_StringSet_Deinit(Arguments32);
     }
     
-    static void CommandLineIO_Error(CommandLineIO *CLI) {
+    static void Error(CommandLineIO *CLI) {
         AssertIO(CLI != NULL);
         /*
          How do we handle erroring?
 
-         We can generate some errors ourselves, like f a required switch isn't present, or something doesn't match our syntax, but for more complex things the user will just have to log.
+         We can generate some errors ourselves, like if a required switch isn't present, or something doesn't match our syntax, but for more complex things the user will just have to log.
 
          and on second thought I think that's ok
 
@@ -586,7 +586,7 @@ extern "C" {
      
      */
     
-    size_t CommandLineIO_Option_GetOptionID(CommandLineIO *CLI, size_t SwitchID, size_t NumChildren, size_t *ChildIDs) {
+    size_t Option_GetOptionID(CommandLineIO *CLI, size_t SwitchID, size_t NumChildren, size_t *ChildIDs) {
         AssertIO(CLI != NULL);
         AssertIO(ChildIDs != NULL);
         AssertIO(SwitchID < CLI->NumSwitches);
@@ -609,7 +609,7 @@ extern "C" {
         return OptionID;
     }
     
-    int8_t CommandLineIO_ConvertBoolString(CommandLineIO *CLI, size_t OptionID) {
+    int8_t ConvertBoolString(CommandLineIO *CLI, size_t OptionID) {
         AssertIO(CLI != NULL);
         AssertIO(OptionID < CLI->NumOptions);
 
@@ -619,21 +619,21 @@ extern "C" {
         return Value;
     }
     
-    UTF8 *CommandLineIO_UTF8_GetOptionResult(CommandLineIO *CLI, size_t OptionID) {
+    UTF8 *UTF8_GetOptionResult(CommandLineIO *CLI, size_t OptionID) {
         AssertIO(CLI != NULL);
         AssertIO(OptionID < CLI->NumOptions);
 
         return UTF8_Encode(CLI->Options[OptionID].Argument);
     }
     
-    UTF16 *CommandLineIO_UTF16_GetOptionResult(CommandLineIO *CLI, size_t OptionID) {
+    UTF16 *UTF16_GetOptionResult(CommandLineIO *CLI, size_t OptionID) {
         AssertIO(CLI != NULL);
         AssertIO(OptionID < CLI->NumOptions);
 
         return UTF16_Encode(CLI->Options[OptionID].Argument);
     }
     
-    UTF8 *CommandLineIO_UTF8_Colorize(ImmutableString_UTF8 String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF8 *UTF8_Colorize(PlatformIO_Immutable(UTF8 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         AssertIO(String != NULL);
         AssertIO(ColorType != ColorType_Unspecified);
 
@@ -646,7 +646,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF16 *CommandLineIO_UTF16_Colorize(ImmutableString_UTF16 String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF16 *UTF16_Colorize(PlatformIO_Immutable(UTF16 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         AssertIO(String != NULL);
         AssertIO(ColorType != ColorType_Unspecified);
 
@@ -659,7 +659,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF32 *CommandLineIO_UTF32_Colorize(ImmutableString_UTF32 String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF32 *UTF32_Colorize(PlatformIO_Immutable(UTF32 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         AssertIO(String != NULL);
         AssertIO(ColorType != ColorType_Unspecified);
 
@@ -687,19 +687,19 @@ extern "C" {
         return Colorized;
     }
     
-    UTF8 *CommandLineIO_UTF8_Decolorize(ImmutableString_UTF8 String) {
+    UTF8 *UTF8_Decolorize(PlatformIO_Immutable(UTF8 *) String) {
         AssertIO(String != NULL);
 
         UTF8  *Decolorized   = NULL;
         UTF32 *String32      = UTF8_Decode(String);
-        UTF32 *Decolorized32 = CommandLineIO_UTF32_Decolorize(String32);
+        UTF32 *Decolorized32 = UTF32_Decolorize(String32);
         UTF32_Deinit(String32);
         Decolorized          = UTF8_Encode(Decolorized32);
         UTF32_Deinit(Decolorized32);
         return Decolorized;
     }
     
-    UTF16 *CommandLineIO_UTF16_Decolorize(ImmutableString_UTF16 String) {
+    UTF16 *UTF16_Decolorize(PlatformIO_Immutable(UTF16 *) String) {
         AssertIO(String != NULL);
 
         UTF16 *Decolorized   = NULL;
@@ -711,7 +711,7 @@ extern "C" {
         return Decolorized;
     }
     
-    UTF32 *CommandLineIO_UTF32_Decolorize(ImmutableString_UTF32 String) {
+    UTF32 *UTF32_Decolorize(PlatformIO_Immutable(UTF32 *) String) {
         AssertIO(String != NULL);
 
         UTF32    *Decolorized          = NULL;
