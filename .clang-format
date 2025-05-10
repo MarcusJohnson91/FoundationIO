@@ -2,7 +2,7 @@
 Language: C
 Standard: Latest
 
-## C++ Rules
+## C Rules
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: true
