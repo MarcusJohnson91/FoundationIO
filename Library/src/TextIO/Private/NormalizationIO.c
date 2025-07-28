@@ -16,7 +16,7 @@ extern "C" {
          const uint64_t Replacee;
          const union {
              const struct Internal {
-                 const uint64_t Pauload0;
+                 const uint64_t Payload0;
                  const uint64_t Payload1;
             } Internal;
             const struct External {
