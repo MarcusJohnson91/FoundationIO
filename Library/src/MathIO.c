@@ -199,23 +199,30 @@ extern "C" {
     int64_t Subtract(const int64_t Integer1, const int64_t Integer2) {
         return Maximum(Integer1, Integer2) - Minimum(Integer1, Integer2);
     }
+    
+    int8_t SignExtend8(const int8_t Integer, const uint8_t IntegerSizeInBits) {
+        AssertIO(IntegerSizeInBits >= 1, "IntegerSizeInBits must be at least one");
+        uint8_t Shift = 8 - IntegerSizeInBits;
+        return (Integer << Shift) >> Shift;
+    }
+    
+    int16_t SignExtend16(const int16_t Integer, const uint8_t IntegerSizeInBits) {
+        AssertIO(IntegerSizeInBits >= 1, "IntegerSizeInBits must be at least one");
+        uint8_t Shift = 16 - IntegerSizeInBits;
+        return (Integer << Shift) >> Shift;
+    }
+    
+    int32_t SignExtend32(const int32_t Integer, const uint8_t IntegerSizeInBits) {
+        AssertIO(IntegerSizeInBits >= 1, "IntegerSizeInBits must be at least one");
+        uint8_t Shift = 32 - IntegerSizeInBits;
+        return (Integer << Shift) >> Shift;
+    }
 
-    /*
-     Value to extend = 10 aka 0b1010 aka 0x0A 5 bits
-     1 << (NumBits - 1) = Sign Bit
-     */
-    int64_t SignExtend(const int64_t Integer, const uint8_t IntegerSizeInBits) {
-        AssertIO(IntegerSizeInBits >= 1 && "IntegerSizeInBits must be at least one");
-        int64_t Extended = 0;
-        // (1 << IntegerSizeInBits) - 1 = all 1's for IntegerSizeInBits
-        if (Integer < 1) {
-            Extended     = (0xFFFFFFFFFFFFFFFF << IntegerSizeInBits) | Integer;
-        } else {
-            Extended     = Integer;
-        }
-        return Extended;
-        // 0xFFFFFFFFFFFFFFFF XOR Integer = 0xFFFFFFFFFFFFFFF5
-        // ((0xFFFFFFFFFFFFFFFF << IntegerSizeInBits) | Integer) = 0xFFFFFFFFFFFFFFEA
+    
+    int64_t SignExtend64(const int64_t Integer, const uint8_t IntegerSizeInBits) {
+        AssertIO(IntegerSizeInBits >= 1, "IntegerSizeInBits must be at least one");
+        uint8_t Shift = 64 - IntegerSizeInBits;
+        return (Integer << Shift) >> Shift;
     }
     
     bool DecimalIsNormalF(const float Decimal) {

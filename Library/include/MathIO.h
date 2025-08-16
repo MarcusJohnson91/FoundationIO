@@ -232,7 +232,17 @@ extern "C" {
      @param      IntegerSizeInBits                The number of bits that are actually being used.
      @return                                      Returns the extended integger
      */
-    int64_t      SignExtend(const int64_t Integer, const uint8_t IntegerSizeInBits);
+     int8_t SignExtend8(const int8_t Integer, const uint8_t IntegerSizeInBits);
+     
+     int16_t SignExtend16(const int16_t Integer, const uint8_t IntegerSizeInBits);
+     
+     int32_t SignExtend32(const int32_t Integer, const uint8_t IntegerSizeInBits) {
+    int64_t      SignExtend64(const int64_t Integer, const uint8_t IntegerSizeInBits);
+    
+#ifndef SignExtend
+#define SignExtend(Value2Extend, NumBits) _Generic(Value2Extend, int8_t:SignExtend8, uint8_t:SignExtend8, int16_t:SignExtend16, uint16_t:SignExtend16, int32_t:SignExtend32, uint32_t:SignExtend32, int64_t:SignExtend64, uint64_t:SignExtend64)(Value2Extend, NumBits)
+#endif /* SignExtend */    
+    
     
     /*!
      @abstract                                    Is the decimal normal?
